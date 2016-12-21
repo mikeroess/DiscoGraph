@@ -3,10 +3,52 @@
   <head>
     <meta charset="utf-8">
     <title>DiscoGraph</title>
-  </head>
-  <body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="./bundle.js"></script>
+    <link rel="stylesheet" href="./master.css"></link>
 
-    <svg class="mainChart">
+    <script type="text/javascript">
+      $(document).ready(() => {
+        $("#mainForm").submit( (e) => {
+          e.preventDefault();
+          let startYear = $('#startYear').val();
+          let endYear = $('#endYear').val();
+          let genre = $('#genre').val();
+          for (var i = startYear; i <= endYear; i++) {
+            GenreQuery(genre, i).then(
+              (response) => {
+                debugger
+                localStorage.setItem(response['results']['0']['year'], response['pagination']['items'])
+              },
+              (error) => console.log(error)
+            );
+            // debugger
+        }});
+      });
+    </script>
+  </head>
+
+
+  <body>
+    <header><h1 class="logo">DiscoGraphs</h1></header>
+    <main>
+      <form id="mainForm">
+        <label for="year">Start Year
+          <input type="text" name="startYear" value="" id="startYear">
+        </label>
+
+        <label for="year">End Year
+          <input type="text" name="endYear" value="" id="endYear">
+        </label>
+          <br/>
+          <br/>
+        <label for="genre">Genre
+          <input type="text" name="genre" value="" id="genre">
+        </label>
+        <button>submit!</button>
+      </form>
+    </main>
+    <!-- <svg class="mainChart"> -->
 
   </body>
 </html>

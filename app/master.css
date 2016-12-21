@@ -1,0 +1,19 @@
+body header h1 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+header {
+  margin-left: 500px;
+  /*margin: 0 auto;*/
+}
+
+.logo {
+  margin: 0 auto;
+  /*display: inline-block;*/
+}
+
+body {
+  width: 100%;
+}
