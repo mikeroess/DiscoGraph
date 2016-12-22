@@ -17,3 +17,9 @@ header {
 body {
   width: 100%;
 }
+
+.bar {
+  display: inline-block;
+  background: green;
+  width: 20px;
+}

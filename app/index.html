@@ -6,24 +6,117 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script type="text/javascript" src="./bundle.js"></script>
     <link rel="stylesheet" href="./master.css"></link>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
 
     <script type="text/javascript">
       $(document).ready(() => {
+
+        const GenerateLeftAxis = (localStorage) => {
+          const years = Object.keys(localStorage).sort();
+          const allNumOfReleases = years.map((year) => localStorage[year]);
+          const maxNumOfReleases = d3.max(allNumOfReleases);
+          const minNumOfReleases = d3.min(allNumOfReleases);
+          const releasesScale = d3.scaleLinear()
+                            .domain([minNumOfReleases, maxNumOfReleases])
+                            .range([450, 0]);
+          const leftAxis = d3.axisLeft(releasesScale);
+          return leftAxis;
+        };
+
+        const GenerateBottomAxis = (localStorage) => {
+          const Allyears = Object.keys(localStorage).sort();
+          const maxYear = Allyears[Allyears.length -1];
+          const minYear = Allyears[0];
+          const yearsScale = d3.scaleTime()
+                    .domain([minYear, maxYear])
+                    .range([0, 800]);
+                    // .ticks(maxYear - minYear);
+          const bottomAxis = d3.axisBottom(yearsScale)
+                .tickFormat(d3.timeFormat("%Y").parse);
+          return bottomAxis;
+        };
+
+
+        const formatData = (localStorage ) => {
+          const keys = Object.keys(localStorage).sort();
+          const data = keys.map( (key) => {
+            return [key, localStorage[key]] }
+          )
+          return data;
+        }
+
+
+        const setLocalStorage = () => {
+            let startYear = $('#startYear').val();
+            let endYear = $('#endYear').val();
+            let genre = $('#genre').val();
+            for (var i = startYear; i <= endYear; i++) {
+              GenreQuery(genre, i).then(
+                (response) => {
+                  localStorage.setItem(response['results']['0']['year'], response['pagination']['items'])
+                },
+                (error) => console.log(error)
+              );}
+        }
+
+        // const area = d3.svg.area()
+        //   .interpolate("monotone")
+        //   .x( (d) => x(d.year))
+        //   .y0(400)
+        //   .y1((d) => y(d.releases));
+
+
+
         $("#mainForm").submit( (e) => {
           e.preventDefault();
-          let startYear = $('#startYear').val();
-          let endYear = $('#endYear').val();
-          let genre = $('#genre').val();
-          for (var i = startYear; i <= endYear; i++) {
-            GenreQuery(genre, i).then(
-              (response) => {
-                debugger
-                localStorage.setItem(response['results']['0']['year'], response['pagination']['items'])
-              },
-              (error) => console.log(error)
-            );
-            // debugger
-        }});
+          // setLocalStorage();
+
+          const margin = {top: 20, right: 20, bottom: 30, left: 50};
+            const width = 960 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+          const leftAxis = GenerateLeftAxis(localStorage);
+          const bottomAxis = GenerateBottomAxis(localStorage);
+
+          let svgContainer = d3.select('#d3Graph').append("svg")
+                .attr("width", 750)
+                .attr("height", 400);
+
+          let bars = svgContainer.selectAll("rect")
+                .data(formatData(localStorage))
+                .enter()
+                .append("rect");
+
+          bars.attr("x", function(d, i) {
+            return ( i * 50) + 25;
+          })
+              .attr("y", 0)
+              .attr("class", "bar")
+              .style("height", function(d) {
+                console.log(d[1])
+                return d[1] / 400 + "px";
+              });
+
+
+              svgContainer.append("g")
+                .attr("transform", "translate(50)")
+                .call(leftAxis)
+              .append("g")
+                .attr("transform", "translate(0, 280)")
+                .call(bottomAxis);
+
+
+
+
+          // svgContainer.data(formatData(localStorage))
+          // .enter()
+          // .append("div")
+          // .attr("class", "bar")
+          // .style("height", function(d) {
+          //   console.log(d[1])
+          //   return d[1] / 400 + "px";
+          // })
+          // .text("something?");
+      });
       });
     </script>
   </head>
@@ -40,15 +133,19 @@
         <label for="year">End Year
           <input type="text" name="endYear" value="" id="endYear">
         </label>
-          <br/>
-          <br/>
+
+
+
+
+
         <label for="genre">Genre
           <input type="text" name="genre" value="" id="genre">
         </label>
         <button>submit!</button>
       </form>
+              <div id="d3Graph"></div>
     </main>
-    <!-- <svg class="mainChart"> -->
+
 
   </body>
 </html>
