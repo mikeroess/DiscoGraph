@@ -11,39 +11,50 @@
     <script type="text/javascript">
       $(document).ready(() => {
 
-        const GenerateLeftAxis = (localStorage) => {
+          const w = 750;
+          const h = 400;
           const years = Object.keys(localStorage).sort();
+          const maxYear = years[years.length -1];
+          const minYear = years[0];
           const allNumOfReleases = years.map((year) => localStorage[year]);
           const maxNumOfReleases = d3.max(allNumOfReleases);
-          const minNumOfReleases = d3.min(allNumOfReleases);
-          const releasesScale = d3.scaleLinear()
-                            .domain([minNumOfReleases, maxNumOfReleases])
-                            .range([450, 0]);
-          const leftAxis = d3.axisLeft(releasesScale);
-          return leftAxis;
-        };
 
-        const GenerateBottomAxis = (localStorage) => {
-          const Allyears = Object.keys(localStorage).sort();
-          const maxYear = Allyears[Allyears.length -1];
-          const minYear = Allyears[0];
-          const yearsScale = d3.scaleTime()
-                    .domain([minYear, maxYear])
-                    .range([0, 800]);
-                    // .ticks(maxYear - minYear);
-          const bottomAxis = d3.axisBottom(yearsScale)
-                .tickFormat(d3.timeFormat("%Y").parse);
+          const xScale = d3.scaleLinear()
+                        .rangeRound([0, w - 100]);
+
+          const yScale = d3.scaleLinear()
+                        .rangeRound([h, 0]);
+
+          const line = d3.line()
+                .x((d) => parseInt(d[0]))
+                .y((d) => d[1]);
+
+            const formatData = (localStorage ) => {
+              const keys = Object.keys(localStorage).sort();
+              const data = keys.map( (key) => {
+                return [key, localStorage[key]] }
+              )
+              return data;
+            }
+
+          let dataset = formatData(localStorage);
+
+          xScale.domain(d3.extent(dataset, (d) => d[0]));
+          yScale.domain(d3.extent(dataset, (d) => d[1]));
+
+          const GenerateLeftAxis = (scale) => {
+            const leftAxis = d3.axisLeft(scale);
+            return leftAxis;
+          };
+
+        const GenerateBottomAxis = (scale) => {
+          const bottomAxis = d3.axisBottom(scale)
+                .tickFormat(d3.format("d"))
+                .ticks(dataset.length);
           return bottomAxis;
         };
 
 
-        const formatData = (localStorage ) => {
-          const keys = Object.keys(localStorage).sort();
-          const data = keys.map( (key) => {
-            return [key, localStorage[key]] }
-          )
-          return data;
-        }
 
 
         const setLocalStorage = () => {
@@ -59,50 +70,48 @@
               );}
         }
 
-        // const area = d3.svg.area()
-        //   .interpolate("monotone")
-        //   .x( (d) => x(d.year))
-        //   .y0(400)
-        //   .y1((d) => y(d.releases));
-
-
-
         $("#mainForm").submit( (e) => {
           e.preventDefault();
           // setLocalStorage();
-
-          const margin = {top: 20, right: 20, bottom: 30, left: 50};
-            const width = 960 - margin.left - margin.right;
-            const height = 500 - margin.top - margin.bottom;
-          const leftAxis = GenerateLeftAxis(localStorage);
-          const bottomAxis = GenerateBottomAxis(localStorage);
+          // const margin = {top: 20, right: 20, bottom: 30, left: 50};
+          //   const width = 960 - margin.left - margin.right;
+          //   const height = 500 - margin.top - margin.bottom;
+          const leftAxis = GenerateLeftAxis(yScale);
+          const bottomAxis = GenerateBottomAxis(xScale);
+          const dataset = formatData(localStorage);
 
           let svgContainer = d3.select('#d3Graph').append("svg")
-                .attr("width", 750)
-                .attr("height", 400);
-
-          let bars = svgContainer.selectAll("rect")
-                .data(formatData(localStorage))
-                .enter()
-                .append("rect");
-
-          bars.attr("x", function(d, i) {
-            return ( i * 50) + 25;
-          })
-              .attr("y", 0)
-              .attr("class", "bar")
-              .style("height", function(d) {
-                console.log(d[1])
-                return d[1] / 400 + "px";
-              });
-
+                .attr("width", w)
+                .attr("height", h);
+          //
+          // let bars = svgContainer.selectAll("rect")
+          //       .data(dataset)
+          //       .enter()
+          //       .append("rect");
+          //
+          // bars.attr("x", function(d, i) {
+          //   return  i * (w / dataset.length) + 70;
+          // })
+          //     .attr("y", (d) => d[1] / h )
+          //     .attr("class", "bar")
+          //     .style("height", function(d) {
+          //       return yScale(d[1])+ "px";
+          //     });
 
               svgContainer.append("g")
+                .attr("class", "axis")
                 .attr("transform", "translate(50)")
-                .call(leftAxis)
-              .append("g")
-                .attr("transform", "translate(0, 280)")
+                .call(leftAxis);
+
+              svgContainer.append("g")
+              .attr("class", "axis")
+                .attr("transform", `translate(20, ${h - 25})`)
                 .call(bottomAxis);
+
+              svgContainer.append("g")
+                .data(dataset)
+                .attr("class", "line")
+                .attr("d", line);
 
 
 
