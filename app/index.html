@@ -26,8 +26,9 @@
                         .rangeRound([h, 0]);
 
           const line = d3.line()
-                .x((d) => parseInt(d[0]))
-                .y((d) => d[1]);
+                .x(function(d) { return xScale(parseInt(d[0])) })
+                .y(function(d) { return yScale(parseInt(d[1])) })
+
 
             const formatData = (localStorage ) => {
               const keys = Object.keys(localStorage).sort();
@@ -108,10 +109,15 @@
                 .attr("transform", `translate(20, ${h - 25})`)
                 .call(bottomAxis);
 
-              svgContainer.append("g")
-                .data(dataset)
-                .attr("class", "line")
-                .attr("d", line);
+              svgContainer.append("path")
+                .attr("d", line(dataset))
+                .attr("stroke", "blue")
+                .attr("stroke-width", 2)
+                .attr("fill", "none");
+                //
+                // .data(dataset)
+                // .attr("class", "line")
+                // .attr("d", line);
 
 
 
