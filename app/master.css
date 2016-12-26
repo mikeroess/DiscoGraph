@@ -41,3 +41,7 @@ body {
   stroke: steelblue;
   stroke-width: 1.5px;
 }
+
+#d3Graph {
+  margin-top: 50px;
+}

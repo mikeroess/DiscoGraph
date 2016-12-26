@@ -34,14 +34,14 @@
           // setLocalStorage();
 
           const xScale = d3.scaleTime()
-                        .rangeRound([0, w - margin.left]);
+                        .rangeRound([0, w - margin.left - margin.right]);
 
           const yScale = d3.scaleLinear()
-                        .rangeRound([h - margin.bottom, 0]);
+                        .rangeRound([h - margin.bottom - margin.top, 0]);
 
           const line = d3.line()
-                .x(function(d) { return xScale(parseInt(d[0])) })
-                .y(function(d) { return yScale(parseInt(d[1])) })
+                .x(function(d) { return xScale(d[0]) })
+                .y(function(d) { return yScale(d[1]) })
 
           const parseDate = d3.timeParse("%Y");
 
@@ -80,21 +80,21 @@
           const bottomAxis = GenerateBottomAxis(xScale);
           // const dataset = formatData(localStorage);
 
-          let svgContainer = d3.select('#d3Graph').append("svg")
+          let svg = d3.select('#d3Graph').append("svg")
                 .attr("width", w + margin.left + margin.right)
                 .attr("height", h + margin.top + margin.bottom);
 
-              svgContainer.append("g")
+              svg.append("g")
                 .attr("class", "axis")
-                .attr("transform", `translate(${margin.left})`)
+                .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
                 .call(leftAxis);
 
-              svgContainer.append("g")
+              svg.append("g")
               .attr("class", "axis")
                 .attr("transform", `translate(${margin.left}, ${h - margin.bottom})`)
                 .call(bottomAxis);
 
-              svgContainer.append("path")
+              svg.append("path")
                 .attr("d", line(dataset))
                 .attr("stroke", "blue")
                 .attr("stroke-width", 2)
