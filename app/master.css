@@ -7,12 +7,10 @@ body header h1 {
 
 header {
   margin-left: 500px;
-  /*margin: 0 auto;*/
 }
 
 .logo {
   margin: 0 auto;
-  /*display: inline-block;*/
 }
 
 body {
@@ -59,7 +57,9 @@ body {
 
 .switch {
   float: left;
-  margin: 10px 20px;
+  margin-right: 20px;
+  margin-left: 20px;
+  margin-bottom: 10px;
 }
 
 .check-to-toggle {
@@ -90,7 +90,7 @@ body {
   background-color: #f1f1f1;
   right: 1px;
   border-radius: 60px;
-  transition: background 0.4s;
+  transition: background 1s;
   text-align: center;
   line-height: 40px;
 }
