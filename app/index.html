@@ -11,6 +11,25 @@
     <script type="text/javascript">
       $(document).ready(() => {
 
+        const genreButtonClick = function (genre, clicked, startYear, endYear) {
+          if  (clicked === false) {
+            // WRITE CODE TO REMOVE LINE FROM GRAPH
+          } else if (startYear === "" || endYear === "") {
+            alert("You must provide start and end years")
+          } else {
+            const releases = {}
+            for (let i = startYear; i <= endYear; i++) {
+              GenreQuery(genre, i).then(
+                (response) => {
+                  releases[response['results']['0']['year']] = response['pagination']['items'];
+                  console.log(releases)
+                  localStorage.setItem(genre, JSON.stringify(releases))
+                },
+                (error) => console.log(error)
+              );
+            }
+            }
+          }
 
         const rockButton = document.getElementById("rock-toggle");
         const popButton = document.getElementById("pop-toggle");
@@ -20,13 +39,13 @@
         const classicalButton = document.getElementById("classical-toggle");
         const jazzButton = document.getElementById("jazz-toggle");
 
-        rockButton.addEventListener("click", () => alert("hey"), false)
-        popButton.addEventListener("click", () => alert("hey"), false)
-        hipHopButton.addEventListener("click", () => alert("hey"), false)
-        funkSoulButton.addEventListener("click", () => alert("hey"), false)
-        electronicButton.addEventListener("click", () => alert("hey"), false)
-        jazzButton.addEventListener("click", () => alert("hey"), false)
-
+        rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        funkSoulButton.addEventListener("click", () => genreButtonClick("funk/soul", funkSoulButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        electronicButton.addEventListener("click", () => genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
 
 
 
