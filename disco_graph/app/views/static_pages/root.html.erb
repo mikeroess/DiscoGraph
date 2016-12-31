@@ -10,13 +10,107 @@
     <script type="text/javascript">
       $(document).ready(() => {
 
-        const GenreQuery = (data) => {
+        const genreQuery = (data) => {
           return $.ajax({
             method: "GET",
             url: "api/genreQuery",
             data: data
           });
         };
+
+        const getMaxRelease = (genres, storage) => {
+          topReleasesPerGenre = []
+          debugger
+          genres.forEach( (genre) => {
+          topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
+          })
+          return d3.max(topReleasesPerGenre);
+        }
+
+
+
+        const writeGraph = (localData, minYear, maxYear) => {
+          const genres = Object.keys(localData);
+          debugger
+          let globalData = {};
+          genres.forEach( (genre) => {
+            globalData[genre] = JSON.parse(localData[genre]);
+          });
+
+          const margin = {top: 30, right: 20, bottom: 30, left: 50};
+          const w = 950 - margin.left - margin.right;
+          const h = 500 - margin.top - margin.bottom;
+
+          const xScale = d3.scaleTime()
+                        .rangeRound([0, w - margin.left - margin.right]);
+
+          const yScale = d3.scaleLinear()
+                        .rangeRound([h - margin.bottom - margin.top, 0]);
+
+          const line = d3.line()
+                .x(function(d) { return xScale(d[0]) })
+                .y(function(d) { return yScale(d[1]) })
+
+          const parseDate = d3.timeParse("%Y");
+
+          const maxNumOfReleases = getMaxRelease(genres, globalData);
+
+          const formatData = (genre) => {
+            const keys = Object.keys(genre).sort();
+            const genreData = keys.map( (key) => {
+              return [parseDate(key), genre[key]] }
+            )
+            return genreData;
+          }
+
+          let datasets = [];
+          genres.forEach( (genre) => {
+            datasets.push(formatData(localStorage[genre]))
+          })
+          // let dataset = formatData(localStorage);
+
+          xScale.domain(minYear, maxYear);
+          yScale.domain(0, maxNumOfReleases);
+
+          const GenerateLeftAxis = (scale) => {
+            const leftAxis = d3.axisLeft(scale);
+            return leftAxis;
+          };
+
+          const GenerateBottomAxis = (scale) => {
+          const bottomAxis = d3.axisBottom(scale)
+                .ticks(maxYear - minYear);
+          return bottomAxis;
+          };
+
+
+          const leftAxis = GenerateLeftAxis(yScale);
+          const bottomAxis = GenerateBottomAxis(xScale);
+          // const dataset = formatData(localStorage);
+
+          let svg = d3.select('#d3Graph').append("svg")
+                .attr("width", w + margin.left + margin.right)
+                .attr("height", h + margin.top + margin.bottom);
+
+              svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
+                .call(leftAxis);
+
+              svg.append("g")
+              .attr("class", "axis")
+                .attr("transform", `translate(${margin.left}, ${h - margin.bottom})`)
+                .call(bottomAxis);
+
+            datasets.forEach( (genre) => {
+              svg.append("path")
+                .attr("d", line(genre))
+                .attr("stroke", "blue")
+                .attr("stroke-width", 2)
+                .attr("fill", "none")
+                .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
+            });
+        }
 
         const genreButtonClick = function (genre, clicked, startYear, endYear) {
           if  (clicked === false) {
@@ -25,21 +119,13 @@
             alert("You must provide start and end years")
           } else {
               let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
-              GenreQuery(data).then(
+              genreQuery(data).then(
                 (response) => {
                   localStorage.setItem(genre, JSON.stringify(response[genre]))
                 },
                 (error) => console.log(error)
               );
-            // WRITE CODE TO ADD LINE TO GRAPH
-            // svg.append("path")
-            //   .attr("d", line(dataset))
-            //   .attr("stroke", "blue")
-            //   .attr("stroke-width", 2)
-            //   .attr("fill", "none")
-            //   .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
-
-            // }
+              writeGraph(localStorage, startYear, endYear);
             }
           }
 
@@ -64,95 +150,9 @@
 
 
 
-        const margin = {top: 30, right: 20, bottom: 30, left: 50};
-          const w = 950 - margin.left - margin.right;
-          const h = 500 - margin.top - margin.bottom;
-
-        const setLocalStorage = () => {
-            let startYear = $('#startYear').val();
-            let endYear = $('#endYear').val();
-            let genre = $('#genre').val();
-            console.log(startYear);
-            for (var i = startYear; i <= endYear; i++) {
-              GenreQuery(genre, i).then(
-                (response) => {
-                  localStorage.setItem(response['results']['0']['year'], response['pagination']['items'])
-                },
-                (error) => console.log(error)
-              );}
-        }
 
         $("#mainForm").submit( (e) => {
           e.preventDefault();
-          // setLocalStorage();
-
-          const xScale = d3.scaleTime()
-                        .rangeRound([0, w - margin.left - margin.right]);
-
-          const yScale = d3.scaleLinear()
-                        .rangeRound([h - margin.bottom - margin.top, 0]);
-
-          const line = d3.line()
-                .x(function(d) { return xScale(d[0]) })
-                .y(function(d) { return yScale(d[1]) })
-
-          const parseDate = d3.timeParse("%Y");
-
-          const years = Object.keys(localStorage).sort();
-          const maxYear = years[years.length - 1];
-          const minYear = years[0];
-          const allNumOfReleases = years.map((year) => localStorage[year]);
-          const maxNumOfReleases = d3.max(allNumOfReleases);
-
-            const formatData = (genre) => {
-              const keys = Object.keys(genre).sort();
-              const data = keys.map( (key) => {
-                return [parseDate(key), genre[key]] }
-              )
-              return data;
-            }
-
-          let dataset = formatData(localStorage);
-
-          xScale.domain(d3.extent(dataset, (d) => d[0]));
-          yScale.domain(d3.extent(dataset, (d) => d[1]));
-
-          const GenerateLeftAxis = (scale) => {
-            const leftAxis = d3.axisLeft(scale);
-            return leftAxis;
-          };
-
-          const GenerateBottomAxis = (scale) => {
-          const bottomAxis = d3.axisBottom(scale)
-                .ticks(dataset.length);
-          return bottomAxis;
-          };
-
-
-          const leftAxis = GenerateLeftAxis(yScale);
-          const bottomAxis = GenerateBottomAxis(xScale);
-          // const dataset = formatData(localStorage);
-
-          let svg = d3.select('#d3Graph').append("svg")
-                .attr("width", w + margin.left + margin.right)
-                .attr("height", h + margin.top + margin.bottom);
-
-              svg.append("g")
-                .attr("class", "axis")
-                .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
-                .call(leftAxis);
-
-              svg.append("g")
-              .attr("class", "axis")
-                .attr("transform", `translate(${margin.left}, ${h - margin.bottom})`)
-                .call(bottomAxis);
-
-              svg.append("path")
-                .attr("d", line(dataset))
-                .attr("stroke", "blue")
-                .attr("stroke-width", 2)
-                .attr("fill", "none")
-                .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
 
       });
       });

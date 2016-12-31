@@ -1,7 +1,6 @@
 class Api::QueriesController < ApplicationController
 
   def genre_query
-    debugger
     api_token = ENV["api_token"]
     releases = {}
     genre = params["genre"]
