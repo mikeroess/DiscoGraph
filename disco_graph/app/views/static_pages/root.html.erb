@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DiscoGraph</title>
+    <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script> -->
+    <!-- <script type="text/javascript" src="../../frontend/bundle.js"></script> -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(() => {
+
+        const GenreQuery = (data) => {
+          return $.ajax({
+            method: "GET",
+            url: "api/genreQuery",
+            data: data
+          });
+        };
+
+        const genreButtonClick = function (genre, clicked, startYear, endYear) {
+          if  (clicked === false) {
+            // WRITE CODE TO REMOVE LINE FROM GRAPH
+          } else if (startYear === "" || endYear === "") {
+            alert("You must provide start and end years")
+          } else {
+              let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
+              GenreQuery(data).then(
+                (response) => {
+                  localStorage.setItem(genre, JSON.stringify(response[genre]))
+                },
+                (error) => console.log(error)
+              );
+            // WRITE CODE TO ADD LINE TO GRAPH
+            // svg.append("path")
+            //   .attr("d", line(dataset))
+            //   .attr("stroke", "blue")
+            //   .attr("stroke-width", 2)
+            //   .attr("fill", "none")
+            //   .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
+
+            // }
+            }
+          }
+
+        const rockButton = document.getElementById("rock-toggle");
+        const popButton = document.getElementById("pop-toggle");
+        const hipHopButton = document.getElementById("hip-hop-toggle");
+        const funkSoulButton = document.getElementById("funk-soul-toggle");
+        const electronicButton = document.getElementById("electronic-toggle");
+        const classicalButton = document.getElementById("classical-toggle");
+        const jazzButton = document.getElementById("jazz-toggle");
+
+        rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        funkSoulButton.addEventListener("click", () => genreButtonClick("funk/soul", funkSoulButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        electronicButton.addEventListener("click", () => genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+
+
+
+
+
+
+        const margin = {top: 30, right: 20, bottom: 30, left: 50};
+          const w = 950 - margin.left - margin.right;
+          const h = 500 - margin.top - margin.bottom;
+
+        const setLocalStorage = () => {
+            let startYear = $('#startYear').val();
+            let endYear = $('#endYear').val();
+            let genre = $('#genre').val();
+            console.log(startYear);
+            for (var i = startYear; i <= endYear; i++) {
+              GenreQuery(genre, i).then(
+                (response) => {
+                  localStorage.setItem(response['results']['0']['year'], response['pagination']['items'])
+                },
+                (error) => console.log(error)
+              );}
+        }
+
+        $("#mainForm").submit( (e) => {
+          e.preventDefault();
+          // setLocalStorage();
+
+          const xScale = d3.scaleTime()
+                        .rangeRound([0, w - margin.left - margin.right]);
+
+          const yScale = d3.scaleLinear()
+                        .rangeRound([h - margin.bottom - margin.top, 0]);
+
+          const line = d3.line()
+                .x(function(d) { return xScale(d[0]) })
+                .y(function(d) { return yScale(d[1]) })
+
+          const parseDate = d3.timeParse("%Y");
+
+          const years = Object.keys(localStorage).sort();
+          const maxYear = years[years.length - 1];
+          const minYear = years[0];
+          const allNumOfReleases = years.map((year) => localStorage[year]);
+          const maxNumOfReleases = d3.max(allNumOfReleases);
+
+            const formatData = (genre) => {
+              const keys = Object.keys(genre).sort();
+              const data = keys.map( (key) => {
+                return [parseDate(key), genre[key]] }
+              )
+              return data;
+            }
+
+          let dataset = formatData(localStorage);
+
+          xScale.domain(d3.extent(dataset, (d) => d[0]));
+          yScale.domain(d3.extent(dataset, (d) => d[1]));
+
+          const GenerateLeftAxis = (scale) => {
+            const leftAxis = d3.axisLeft(scale);
+            return leftAxis;
+          };
+
+          const GenerateBottomAxis = (scale) => {
+          const bottomAxis = d3.axisBottom(scale)
+                .ticks(dataset.length);
+          return bottomAxis;
+          };
+
+
+          const leftAxis = GenerateLeftAxis(yScale);
+          const bottomAxis = GenerateBottomAxis(xScale);
+          // const dataset = formatData(localStorage);
+
+          let svg = d3.select('#d3Graph').append("svg")
+                .attr("width", w + margin.left + margin.right)
+                .attr("height", h + margin.top + margin.bottom);
+
+              svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
+                .call(leftAxis);
+
+              svg.append("g")
+              .attr("class", "axis")
+                .attr("transform", `translate(${margin.left}, ${h - margin.bottom})`)
+                .call(bottomAxis);
+
+              svg.append("path")
+                .attr("d", line(dataset))
+                .attr("stroke", "blue")
+                .attr("stroke-width", 2)
+                .attr("fill", "none")
+                .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
+
+      });
+      });
+    </script>
+  </head>
+
+
+  <body>
+    <header><h1 class="logo">DiscoGraphs</h1></header>
+    <main>
+      <form id="mainForm">
+        <label for="year">Start Year
+          <input type="text" name="startYear" value="" id="startYear">
+        </label>
+
+        <label for="year">End Year
+          <input type="text" name="endYear" value="" id="endYear">
+        </label>
+
+        <div id="d3Graph"></div>
+
+        <section class="genre-buttons group">
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="rock-toggle">
+            <label for="rock-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="pop-toggle">
+            <label for="pop-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="hip-hop-toggle">
+            <label for="hip-hop-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle">
+            <label for="funk-soul-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="electronic-toggle">
+            <label for="electronic-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="classical-toggle">
+            <label for="classical-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="jazz-toggle">
+            <label for="jazz-toggle"></label>
+          </div>
+        </section>
+
+
+
+
+        <label for="genre">Genre
+          <input type="text" name="genre" value="" id="genre">
+        </label>
+        <button>submit!</button>
+      </form>
+
+    </main>
+
+
+  </body>
+</html>

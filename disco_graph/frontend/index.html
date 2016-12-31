@@ -11,6 +11,8 @@
     <script type="text/javascript">
       $(document).ready(() => {
 
+
+
         const genreButtonClick = function (genre, clicked, startYear, endYear) {
           if  (clicked === false) {
             // WRITE CODE TO REMOVE LINE FROM GRAPH
@@ -27,6 +29,14 @@
                 },
                 (error) => console.log(error)
               );
+            // WRITE CODE TO ADD LINE TO GRAPH
+            // svg.append("path")
+            //   .attr("d", line(dataset))
+            //   .attr("stroke", "blue")
+            //   .attr("stroke-width", 2)
+            //   .attr("fill", "none")
+            //   .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
+
             }
             }
           }
@@ -92,10 +102,10 @@
           const allNumOfReleases = years.map((year) => localStorage[year]);
           const maxNumOfReleases = d3.max(allNumOfReleases);
 
-            const formatData = (localStorage ) => {
-              const keys = Object.keys(localStorage).sort();
+            const formatData = (genre) => {
+              const keys = Object.keys(genre).sort();
               const data = keys.map( (key) => {
-                return [parseDate(key), localStorage[key]] }
+                return [parseDate(key), genre[key]] }
               )
               return data;
             }

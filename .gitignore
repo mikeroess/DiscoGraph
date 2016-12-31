@@ -14,3 +14,6 @@ app/secret.js
 node_modules/
 bundle.js
 bundle.js.map
+
+# Ignore figaro
+/disco_graph/config/application.yml
