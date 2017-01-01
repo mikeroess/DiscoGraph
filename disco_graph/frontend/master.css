@@ -119,12 +119,12 @@ body {
   content: "Hip Hop";
 }
 
-#funk-soul-toggle:checked + label:before {
+#funk\/soul-toggle:checked + label:before {
     background-color: orange;
 }
 
-#funk-soul-toggle + label:before {
-  content: "Funk/Soul";
+#funk\/soul-toggle + label:before {
+  content: "Funk\/Soul";
 }
 
 #electronic-toggle:checked + label:before {

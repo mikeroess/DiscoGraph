@@ -72,10 +72,17 @@
 
           const formatData = (genre) => {
             const keys = Object.keys(genre).sort();
-            const data = keys.map( (key) => {
+            let filteredData = keys.filter((key) => {
+              if (key >= startYear.value && key <= endYear.value) {
+                return true
+              } else {
+                return false
+              }
+            })
+            let formattedData = filteredData.map( (key) => {
               return [parseDate(key), genre[key]] }
             )
-            return data;
+            return formattedData;
           }
 
           // debugger
@@ -125,9 +132,10 @@
 
             genres.forEach( (genre) => {
               if (!isButtonClicked(genre)) return
-              
+
               const dataset = JSON.parse(localStorage[genre])
               const formattedDataset = formatData(dataset)
+              debugger
               svg.append("path")
                 .attr("d", line(formattedDataset))
                 .attr("stroke", genreColors[genre])
@@ -141,14 +149,15 @@
           if (startYear === "" || endYear === "") {
             alert("You must provide start and end years")
           } else {
-              let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
-              genreQuery(data).then(
-                (response) => {
-                  localStorage.setItem(genre, JSON.stringify(response[genre]));
-                  writeGraph(localStorage, startYear, endYear);
-                },
-                (error) => console.log(error)
-              );
+            writeGraph(localStorage, startYear, endYear);
+              // let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
+              // genreQuery(data).then(
+              //   (response) => {
+              //     localStorage.setItem(genre, JSON.stringify(response[genre]));
+              //     writeGraph(localStorage, startYear, endYear);
+              //   },
+              //   (error) => console.log(error)
+              // );
             }
           }
 
