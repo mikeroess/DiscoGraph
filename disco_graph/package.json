@@ -10,6 +10,14 @@
     "type": "git",
     "url": "git+https://github.com/mikeroess/DiscoGraph.git"
   },
+  "engines": {
+  "node": "6.2.1",
+  "npm": "3.9.3"
+},
+
+"scripts": {
+  "postinstall": "./node_modules/.bin/webpack"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
