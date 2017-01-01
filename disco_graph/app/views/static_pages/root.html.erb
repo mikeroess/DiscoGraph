@@ -14,7 +14,7 @@
           "rock": "#8ce196",
           "pop": "steelblue",
           "hip-hop": "purple",
-          "funk-soul": "orange",
+          "funk/soul": "orange",
           "electronic": "green",
           "classical": "brown",
           "jazz": "red"
@@ -34,6 +34,11 @@
           topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
           })
           return d3.max(topReleasesPerGenre);
+        }
+
+        const isButtonClicked = (genre) => {
+          buttonId = genre + "-toggle"
+          return document.getElementById(buttonId).checked
         }
 
         const clearChart = () => {
@@ -119,8 +124,10 @@
                 .call(bottomAxis);
 
             genres.forEach( (genre) => {
-              dataset = JSON.parse(localStorage[genre])
-              formattedDataset = formatData(dataset)
+              if (!isButtonClicked(genre)) return
+              
+              const dataset = JSON.parse(localStorage[genre])
+              const formattedDataset = formatData(dataset)
               svg.append("path")
                 .attr("d", line(formattedDataset))
                 .attr("stroke", genreColors[genre])
@@ -131,26 +138,24 @@
         }
 
         const genreButtonClick = function (genre, clicked, startYear, endYear) {
-          if  (clicked === false) {
-            // WRITE CODE TO REMOVE LINE FROM GRAPH
-          } else if (startYear === "" || endYear === "") {
+          if (startYear === "" || endYear === "") {
             alert("You must provide start and end years")
           } else {
-              // let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
-              // genreQuery(data).then(
-              //   (response) => {
-              //     localStorage.setItem(genre, JSON.stringify(response[genre]))
-              //   },
-              //   (error) => console.log(error)
-              // );
-              writeGraph(localStorage, startYear, endYear);
+              let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
+              genreQuery(data).then(
+                (response) => {
+                  localStorage.setItem(genre, JSON.stringify(response[genre]));
+                  writeGraph(localStorage, startYear, endYear);
+                },
+                (error) => console.log(error)
+              );
             }
           }
 
         const rockButton = document.getElementById("rock-toggle");
         const popButton = document.getElementById("pop-toggle");
         const hipHopButton = document.getElementById("hip-hop-toggle");
-        const funkSoulButton = document.getElementById("funk-soul-toggle");
+        const funkSoulButton = document.getElementById("funk/soul-toggle");
         const electronicButton = document.getElementById("electronic-toggle");
         const classicalButton = document.getElementById("classical-toggle");
         const jazzButton = document.getElementById("jazz-toggle");
@@ -209,8 +214,8 @@
           </div>
 
           <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle">
-            <label for="funk-soul-toggle"></label>
+            <input type="checkbox" class="check-to-toggle" id="funk/soul-toggle">
+            <label for="funk/soul-toggle"></label>
           </div>
 
           <div class="switch">
