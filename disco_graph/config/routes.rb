@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   end
 
   get 'api/genreQuery', to: 'api/queries#genre_query'
+  get 'api/subGenreQuery', to: 'api/queries#sub_genre_query'
+  
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

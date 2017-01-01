@@ -14,10 +14,11 @@
           "rock": "#8ce196",
           "pop": "steelblue",
           "hip-hop": "purple",
-          "funk/soul": "orange",
+          "funk-soul": "orange",
           "electronic": "green",
           "classical": "brown",
-          "jazz": "red"
+          "jazz": "red",
+          "subgenre": "black"
         }
 
         const genreQuery = (data) => {
@@ -28,9 +29,26 @@
           });
         };
 
+        const subGenreQuery = (data) => {
+          return $.ajax({
+            method: "GET",
+            url: "api/subGenreQuery",
+            data: data
+          }).then((response) => {
+            debugger
+            genre = Object.keys(response)[0]
+            releases = response[Object.keys(response)[0]]
+            tempObject = {}
+            tempObject[genre] = releases
+            localStorage.setItem("subgenre", JSON.stringify(tempObject));
+          },
+        (err) => console.log(err));
+        };
+
         const getMaxRelease = (genres, storage) => {
           topReleasesPerGenre = []
           genres.forEach( (genre) => {
+            if (genre === "subgenre") return
           topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
           })
           return d3.max(topReleasesPerGenre);
@@ -51,6 +69,7 @@
           genres.forEach( (genre) => {
             globalData[genre] = JSON.parse(localData[genre]);
           });
+          debugger
 
           const margin = {top: 30, right: 20, bottom: 30, left: 50};
           const w = 950 - margin.left - margin.right;
@@ -84,12 +103,6 @@
             )
             return formattedData;
           }
-
-          // debugger
-          // let datasets = [];
-          // genres.forEach( (genre) => {
-          //   datasets.push(JSON.parse(localStorage[genre]))
-          // })
 
           xScale.domain([parseDate(minYear), parseDate(maxYear)]);
           yScale.domain([0, maxNumOfReleases]);
@@ -131,18 +144,35 @@
                 .call(bottomAxis);
 
             genres.forEach( (genre) => {
-              if (!isButtonClicked(genre)) return
-
+              debugger
+              if (genre === 'subgenre') {
+                // const subGenreObject = JSON.parse(localStorage[genre])
+                // const genreName = Object.keys(subGenreObject)[0]
+                // const formattedDataset = formatData(subGenreObject[genreName])
+                // debugger
+                //
+                // svg.append("path")
+                //   .attr("d", line(formattedDataset))
+                //   .attr("stroke", genreColors[genre])
+                //   .attr("stroke-width", 2)
+                //   .attr("fill", "none")
+                //   .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
+                  return
+              } else if (!isButtonClicked(genre)) {
+                return
+              } else {
               const dataset = JSON.parse(localStorage[genre])
               const formattedDataset = formatData(dataset)
-              debugger
+
+
               svg.append("path")
                 .attr("d", line(formattedDataset))
                 .attr("stroke", genreColors[genre])
                 .attr("stroke-width", 2)
                 .attr("fill", "none")
                 .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
-            });
+            }}
+          )
         }
 
         const genreButtonClick = function (genre, clicked, startYear, endYear) {
@@ -150,21 +180,21 @@
             alert("You must provide start and end years")
           } else {
             writeGraph(localStorage, startYear, endYear);
-              // let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
-              // genreQuery(data).then(
-              //   (response) => {
-              //     localStorage.setItem(genre, JSON.stringify(response[genre]));
-              //     writeGraph(localStorage, startYear, endYear);
-              //   },
-              //   (error) => console.log(error)
-              // );
+              let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
+              genreQuery(data).then(
+                (response) => {
+                  localStorage.setItem(genre, JSON.stringify(response[genre]));
+                  writeGraph(localStorage, startYear, endYear);
+                },
+                (error) => console.log(error)
+              );
             }
           }
 
         const rockButton = document.getElementById("rock-toggle");
         const popButton = document.getElementById("pop-toggle");
         const hipHopButton = document.getElementById("hip-hop-toggle");
-        const funkSoulButton = document.getElementById("funk/soul-toggle");
+        const funkSoulButton = document.getElementById("funk-soul-toggle");
         const electronicButton = document.getElementById("electronic-toggle");
         const classicalButton = document.getElementById("classical-toggle");
         const jazzButton = document.getElementById("jazz-toggle");
@@ -172,7 +202,7 @@
         rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
         popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
         hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
-        funkSoulButton.addEventListener("click", () => genreButtonClick("funk/soul", funkSoulButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
+        funkSoulButton.addEventListener("click", () => genreButtonClick("funk-soul", funkSoulButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
         electronicButton.addEventListener("click", () => genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
         classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
         jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false)
@@ -183,9 +213,11 @@
 
 
 
-        $("#mainForm").submit( (e) => {
+        $("#mainForm").submit( (e, sub_genre, startYear, endYear) => {
           e.preventDefault();
-
+          let data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() }
+          subGenreQuery(data);
+          // writeGraph(localStorage, data[startYear], data[endYear]);
       });
       });
     </script>
@@ -223,8 +255,8 @@
           </div>
 
           <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="funk/soul-toggle">
-            <label for="funk/soul-toggle"></label>
+            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle">
+            <label for="funk-soul-toggle"></label>
           </div>
 
           <div class="switch">
