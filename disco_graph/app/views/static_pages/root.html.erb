@@ -20,18 +20,14 @@
 
         const getMaxRelease = (genres, storage) => {
           topReleasesPerGenre = []
-          debugger
           genres.forEach( (genre) => {
           topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
           })
           return d3.max(topReleasesPerGenre);
         }
 
-
-
         const writeGraph = (localData, minYear, maxYear) => {
           const genres = Object.keys(localData);
-          debugger
           let globalData = {};
           genres.forEach( (genre) => {
             globalData[genre] = JSON.parse(localData[genre]);
@@ -55,22 +51,24 @@
 
           const maxNumOfReleases = getMaxRelease(genres, globalData);
 
-          const formatData = (genre) => {
-            const keys = Object.keys(genre).sort();
-            const genreData = keys.map( (key) => {
-              return [parseDate(key), genre[key]] }
-            )
-            return genreData;
-          }
+
+          //   // THIS DOESN'T WORK RIGHT
+          // const formatData = (rawGenreData) => {
+          //   const years = Object.keys(rawGenreData).sort();
+          //   const genreData = years.map( (year) => {
+          //     return [parseDate(year), genre[year]] }
+          //   )
+          //   return genreData;
+          // }
 
           let datasets = [];
           genres.forEach( (genre) => {
-            datasets.push(formatData(localStorage[genre]))
+            datasets.push(JSON.parse(localStorage[genre]))
           })
-          // let dataset = formatData(localStorage);
 
-          xScale.domain(minYear, maxYear);
-          yScale.domain(0, maxNumOfReleases);
+          debugger
+          xScale.domain([parseDate(minYear), parseDate(maxYear)]);
+          yScale.domain([0, maxNumOfReleases]);
 
           const GenerateLeftAxis = (scale) => {
             const leftAxis = d3.axisLeft(scale);
@@ -83,10 +81,8 @@
           return bottomAxis;
           };
 
-
           const leftAxis = GenerateLeftAxis(yScale);
           const bottomAxis = GenerateBottomAxis(xScale);
-          // const dataset = formatData(localStorage);
 
           let svg = d3.select('#d3Graph').append("svg")
                 .attr("width", w + margin.left + margin.right)
@@ -103,6 +99,7 @@
                 .call(bottomAxis);
 
             datasets.forEach( (genre) => {
+              debugger
               svg.append("path")
                 .attr("d", line(genre))
                 .attr("stroke", "blue")
@@ -118,13 +115,13 @@
           } else if (startYear === "" || endYear === "") {
             alert("You must provide start and end years")
           } else {
-              let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
-              genreQuery(data).then(
-                (response) => {
-                  localStorage.setItem(genre, JSON.stringify(response[genre]))
-                },
-                (error) => console.log(error)
-              );
+              // let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear}
+              // genreQuery(data).then(
+              //   (response) => {
+              //     localStorage.setItem(genre, JSON.stringify(response[genre]))
+              //   },
+              //   (error) => console.log(error)
+              // );
               writeGraph(localStorage, startYear, endYear);
             }
           }
