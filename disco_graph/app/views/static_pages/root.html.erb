@@ -10,6 +10,16 @@
     <script type="text/javascript">
       $(document).ready(() => {
 
+        const genreColors = {
+          "rock": "#8ce196",
+          "pop": "steelblue",
+          "hip-hop": "purple",
+          "funk-soul": "orange",
+          "electronic": "green",
+          "classical": "brown",
+          "jazz": "red"
+        }
+
         const genreQuery = (data) => {
           return $.ajax({
             method: "GET",
@@ -51,16 +61,6 @@
 
           const maxNumOfReleases = getMaxRelease(genres, globalData);
 
-
-          //   // THIS DOESN'T WORK RIGHT
-          // const formatData = (rawGenreData) => {
-          //   const years = Object.keys(rawGenreData).sort();
-          //   const genreData = years.map( (year) => {
-          //     return [parseDate(year), genre[year]] }
-          //   )
-          //   return genreData;
-          // }
-
           const formatData = (genre) => {
             const keys = Object.keys(genre).sort();
             const data = keys.map( (key) => {
@@ -69,10 +69,11 @@
             return data;
           }
 
-          let datasets = [];
-          genres.forEach( (genre) => {
-            datasets.push(JSON.parse(localStorage[genre]))
-          })
+          // debugger
+          // let datasets = [];
+          // genres.forEach( (genre) => {
+          //   datasets.push(JSON.parse(localStorage[genre]))
+          // })
 
           xScale.domain([parseDate(minYear), parseDate(maxYear)]);
           yScale.domain([0, maxNumOfReleases]);
@@ -84,7 +85,6 @@
 
           const GenerateBottomAxis = (scale) => {
           const bottomAxis = d3.axisBottom(scale)
-                .ticks(maxYear - minYear);
           return bottomAxis;
           };
 
@@ -105,12 +105,13 @@
                 .attr("transform", `translate(${margin.left}, ${h - margin.bottom})`)
                 .call(bottomAxis);
 
-            datasets.forEach( (genre) => {
+            genres.forEach( (genre) => {
               debugger
-              dataset = formatData(genre)
+              dataset = JSON.parse(localStorage[genre])
+              formattedDataset = formatData(dataset)
               svg.append("path")
-                .attr("d", line(dataset))
-                .attr("stroke", "blue")
+                .attr("d", line(formattedDataset))
+                .attr("stroke", genreColors[genre])
                 .attr("stroke-width", 2)
                 .attr("fill", "none")
                 .attr("transform", `translate(${margin.left}, ${margin.bottom})`);
