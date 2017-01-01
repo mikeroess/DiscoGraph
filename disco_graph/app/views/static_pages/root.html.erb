@@ -36,6 +36,10 @@
           return d3.max(topReleasesPerGenre);
         }
 
+        const clearChart = () => {
+          $(".graph").remove();
+        }
+
         const writeGraph = (localData, minYear, maxYear) => {
           const genres = Object.keys(localData);
           let globalData = {};
@@ -91,14 +95,23 @@
           const leftAxis = GenerateLeftAxis(yScale);
           const bottomAxis = GenerateBottomAxis(xScale);
 
+          clearChart();
+
           let svg = d3.select('#d3Graph').append("svg")
+                .attr("class", "graph")
                 .attr("width", w + margin.left + margin.right)
                 .attr("height", h + margin.top + margin.bottom);
 
               svg.append("g")
                 .attr("class", "axis")
                 .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
-                .call(leftAxis);
+                .call(leftAxis)
+              .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "0.71em")
+                .attr("fill", "#000")
+                .text("Number of Releases");
 
               svg.append("g")
               .attr("class", "axis")
@@ -106,7 +119,6 @@
                 .call(bottomAxis);
 
             genres.forEach( (genre) => {
-              debugger
               dataset = JSON.parse(localStorage[genre])
               formattedDataset = formatData(dataset)
               svg.append("path")
