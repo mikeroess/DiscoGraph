@@ -61,12 +61,19 @@
           //   return genreData;
           // }
 
+          const formatData = (genre) => {
+            const keys = Object.keys(genre).sort();
+            const data = keys.map( (key) => {
+              return [parseDate(key), genre[key]] }
+            )
+            return data;
+          }
+
           let datasets = [];
           genres.forEach( (genre) => {
             datasets.push(JSON.parse(localStorage[genre]))
           })
 
-          debugger
           xScale.domain([parseDate(minYear), parseDate(maxYear)]);
           yScale.domain([0, maxNumOfReleases]);
 
@@ -100,8 +107,9 @@
 
             datasets.forEach( (genre) => {
               debugger
+              dataset = formatData(genre)
               svg.append("path")
-                .attr("d", line(genre))
+                .attr("d", line(dataset))
                 .attr("stroke", "blue")
                 .attr("stroke-width", 2)
                 .attr("fill", "none")
