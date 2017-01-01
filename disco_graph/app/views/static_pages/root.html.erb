@@ -35,7 +35,6 @@
             url: "api/subGenreQuery",
             data: data
           }).then((response) => {
-            debugger
             genre = Object.keys(response)[0]
             releases = response[Object.keys(response)[0]]
             tempObject = {}
@@ -69,7 +68,6 @@
           genres.forEach( (genre) => {
             globalData[genre] = JSON.parse(localData[genre]);
           });
-          debugger
 
           const margin = {top: 30, right: 20, bottom: 30, left: 50};
           const w = 950 - margin.left - margin.right;
@@ -144,20 +142,17 @@
                 .call(bottomAxis);
 
             genres.forEach( (genre) => {
-              debugger
               if (genre === 'subgenre') {
-                // const subGenreObject = JSON.parse(localStorage[genre])
-                // const genreName = Object.keys(subGenreObject)[0]
-                // const formattedDataset = formatData(subGenreObject[genreName])
-                // debugger
-                //
-                // svg.append("path")
-                //   .attr("d", line(formattedDataset))
-                //   .attr("stroke", genreColors[genre])
-                //   .attr("stroke-width", 2)
-                //   .attr("fill", "none")
-                //   .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
-                  return
+                const subGenreObject = JSON.parse(localStorage[genre])
+                const genreName = Object.keys(subGenreObject)[0]
+                const formattedDataset = formatData(subGenreObject[genreName])
+
+                svg.append("path")
+                  .attr("d", line(formattedDataset))
+                  .attr("stroke", genreColors[genre])
+                  .attr("stroke-width", 2)
+                  .attr("fill", "none")
+                  .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
               } else if (!isButtonClicked(genre)) {
                 return
               } else {
@@ -220,6 +215,7 @@
           // writeGraph(localStorage, data[startYear], data[endYear]);
       });
       });
+
     </script>
   </head>
 
@@ -227,13 +223,38 @@
   <body>
     <header><h1 class="logo">DiscoGraphs</h1></header>
     <main>
+
+
+      <script type="text/javascript">
+      const startYearUpdate = (year) => {
+        $('#startYearDisplay').val(year);
+        if (year > $('#endYearDisplay').val()) {
+          $('#endYear').val(parseInt(year) + 1)
+          $('#endYearDisplay').val(parseInt(year) + 1)
+        }
+      };
+
+      const endYearUpdate = (year) => {
+        $('#endYearDisplay').val(year);
+        if (year < $('#startYearDisplay').val()) {
+          $('#startYear').val(parseInt(year) - 1)
+          $('#startYearDisplay').val(parseInt(year) - 1)
+
+        }
+      }
+      </script>
       <form id="mainForm">
-        <label for="year">Start Year
-          <input type="text" name="startYear" value="" id="startYear">
+        <label for="startYear">Start Year
+          <input type="range" min="1950" max="2016" value="1950"
+          name="startYear" step="1" id="startYear" oninput="startYearUpdate(value)">
+          <output for="startYear" id="startYearDisplay">1950</output>
         </label>
 
-        <label for="year">End Year
-          <input type="text" name="endYear" value="" id="endYear">
+
+        <label for="endYear">End Year
+          <input type="range" min="1951" max="2017" value="2017"
+          name="endYear" id="endYear" oninput="endYearUpdate(value)">
+          <output for="endYear" id="endYearDisplay">2017</output>
         </label>
 
         <div id="d3Graph"></div>
@@ -278,10 +299,10 @@
 
 
 
-        <label for="genre">Genre
+        <label for="genre">Sub-Genre
           <input type="text" name="genre" value="" id="genre">
         </label>
-        <button>submit!</button>
+        <button>Add sub-genre</button>
       </form>
 
     </main>
