@@ -24,6 +24,28 @@
         electronicButton.addEventListener("click", () => genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
         classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
         jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
+
+        localStorage.removeItem("subgenre");
+        // prefetchData1();
+        prefetchData2();
+        // prefetchData("rock", $('#startYear').val(), $('#endYear').val());
+        // prefetchData("pop", $('#startYear').val(), $('#endYear').val());
+        // prefetchData("hip-hop", $('#startYear').val(), $('#endYear').val());
+
+        $("#mainForm").submit( (e) => {
+          e.preventDefault();
+          const data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
+          subGenreQuery(data).then((response) => {
+            const genre = Object.keys(response)[0];
+            const releases = response[Object.keys(response)[0]];
+            const tempObject = {};
+            tempObject[genre] = releases;
+            localStorage.setItem("subgenre", JSON.stringify(tempObject));
+            debugger
+            writeGraph(localStorage, data["startYear"], data["endYear"]);
+          },
+        (err) => console.log(err));;
+        });
       });
     </script>
   </head>
@@ -37,16 +59,16 @@
 
 
           <label for="startYear">Start Year
-            <input type="range" min="1950" max="2015" value="1950"
+            <input type="range" min="1960" max="2015" value="1960"
             name="startYear" step="1" id="startYear" oninput="startYearUpdate(value)">
-            <output for="startYear" id="startYearDisplay">1950</output>
+            <output for="startYear" id="startYearDisplay">1960</output>
           </label>
 
 
         <label for="endYear" id="endYearLabel">End Year
-          <input type="range" min="1951" max="2016" value="2017"
+          <input type="range" min="1961" max="2016" value="2016"
           name="endYear" id="endYear" oninput="endYearUpdate(value)">
-          <output for="endYear" id="endYearDisplay">2017</output>
+          <output for="endYear" id="endYearDisplay">2016</output>
         </label>
       </div>
 
@@ -96,30 +118,5 @@
       </form>
 
     </main>
-
-
   </body>
-  <script type="text/javascript">
-  
-
-  // const clearAndFetchData = () => {
-  //   localStorage.removeItem("subgenre");
-  //
-  //   genreQuery({'genre': "rock", 'startYear': 1950, 'endYear': 2016}).then(
-  //     (response) => {
-  //       localStorage.setItem("rock", JSON.stringify(response["rock"]));},
-  //     (err) => console.log(err)
-  //
-  //   (genreQuery({'genre': "pop", 'startYear': 1950, 'endYear': 2016}).then(
-  //     (response) => {
-  //       localStorage.setItem("pop", JSON.stringify(response["pop"]));},
-  //     (err) => console.log(err)
-  //
-  //   (genreQuery({'genre': "hip-hop", 'startYear': 1950, 'endYear': 2016}).then(
-  //     (response) => {
-  //       localStorage.setItem("hip-hop", JSON.stringify(response["hip-hop"]));
-  //     },
-  //     (err) => console.log(err);
-  // }
-  </script>
 </html>

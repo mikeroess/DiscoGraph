@@ -10,23 +10,15 @@ const genreColors = {
 };
 
 const genreButtonClick = function (genre, clicked, startYear, endYear) {
-    let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear};
-    genreQuery(data).then(
-      (response) => {
-        localStorage.setItem(genre, JSON.stringify(response[genre]));
-        writeGraph(localStorage, startYear, endYear);
-      },
-      (error) => console.log(error)
-    );
+  writeGraph(localStorage, startYear, endYear);
+    // let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear};
+    // genreQuery(data).then(
+    //   (response) => {
+    //     localStorage.setItem(genre, JSON.stringify(response[genre]));
+    //   },
+    //   (error) => console.log(error)
+    // );
   };
-
-
-$("#mainForm").submit( (e) => {
-  e.preventDefault();
-  const data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
-  subGenreQuery(data);
-  writeGraph(localStorage, data["startYear"], data["endYear"]);
-});
 
 const startYearUpdate = (year) => {
   $('#startYearDisplay').val(year);
