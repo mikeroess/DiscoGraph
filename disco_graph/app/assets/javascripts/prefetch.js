@@ -1,5 +1,5 @@
 const prefetchData1 = function () {
-    let data = {'genre': "hip-hop", 'startYear': 1960, 'endYear': 2016};
+    let data = {'genre': "hip-hop", 'startYear': 1970, 'endYear': 1985};
         genreQuery(data).then(
           (response) => {
             localStorage.setItem("hip-hop", JSON.stringify(response['hip-hop']));
@@ -15,13 +15,35 @@ const prefetchData1 = function () {
       );
 };
 
+const prefetchFunk = function () {
+  let data = {'genre': "funk-soul", 'startYear': 1970, 'endYear': 1985};
+  genreQuery(data).then(
+    (response) => {
+      localStorage.setItem("funk-soul", JSON.stringify(response['funk-soul']));
+      writeGraph(localStorage, startYear.value, endYear.value);
+    },
+(error) => console.log(error)
+);
+};
+
+const prefetchPop = function () {
+  let data = {'genre': "pop", 'startYear': 1970, 'endYear': 1985};
+  genreQuery(data).then(
+    (response) => {
+      localStorage.setItem("pop", JSON.stringify(response['pop']));
+      writeGraph(localStorage, startYear.value, endYear.value);
+    },
+(error) => console.log(error)
+);
+};
+
 
 const prefetchData2 = function () {
-    let data = {'genre': "pop", 'startYear': 1960, 'endYear': 2016};
+    let data = {'genre': "pop", 'startYear': 1970, 'endYear': 1985};
     genreQuery(data).then(
       (response) => {
         localStorage.setItem("pop", JSON.stringify(response['pop']));
-        let data = {'genre': "funk-soul", 'startYear': 1960, 'endYear': 2016};
+        let data = {'genre': "funk-soul", 'startYear': 1970, 'endYear': 1985};
         genreQuery(data).then(
           (response) => {
             localStorage.setItem("funk-soul", JSON.stringify(response['funk-soul']));

@@ -42,6 +42,11 @@
    float: right;
  }
 
+ #genreLabel{
+   margin-left: 400px;
+ }
+
+
  .genreLabel {
    font-size: 12px;
    margin: 1px 0;

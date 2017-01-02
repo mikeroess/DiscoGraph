@@ -11,13 +11,14 @@ const genreColors = {
 
 const genreButtonClick = function (genre, clicked, startYear, endYear) {
   writeGraph(localStorage, startYear, endYear);
-    // let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear};
-    // genreQuery(data).then(
-    //   (response) => {
-    //     localStorage.setItem(genre, JSON.stringify(response[genre]));
-    //   },
-    //   (error) => console.log(error)
-    // );
+    let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear};
+    genreQuery(data).then(
+      (response) => {
+        localStorage.setItem(genre, JSON.stringify(response[genre]));
+        writeGraph(localStorage, startYear, endYear);
+      },
+      (error) => console.log(error)
+    );
   };
 
 const startYearUpdate = (year) => {

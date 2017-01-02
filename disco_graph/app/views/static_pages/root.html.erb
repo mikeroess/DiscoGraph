@@ -26,12 +26,8 @@
         jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
 
         localStorage.removeItem("subgenre");
-        // prefetchData1();
-        prefetchData2();
-        // prefetchData("rock", $('#startYear').val(), $('#endYear').val());
-        // prefetchData("pop", $('#startYear').val(), $('#endYear').val());
-        // prefetchData("hip-hop", $('#startYear').val(), $('#endYear').val());
-
+        prefetchPop();
+        prefetchFunk();
         $("#mainForm").submit( (e) => {
           e.preventDefault();
           const data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
@@ -59,16 +55,16 @@
 
 
           <label for="startYear">Start Year
-            <input type="range" min="1960" max="2015" value="1960"
+            <input type="range" min="1960" max="2015" value="1970"
             name="startYear" step="1" id="startYear" oninput="startYearUpdate(value)">
-            <output for="startYear" id="startYearDisplay">1960</output>
+            <output for="startYear" id="startYearDisplay">1970</output>
           </label>
 
 
         <label for="endYear" id="endYearLabel">End Year
-          <input type="range" min="1961" max="2016" value="2016"
+          <input type="range" min="1961" max="2016" value="1985"
           name="endYear" id="endYear" oninput="endYearUpdate(value)">
-          <output for="endYear" id="endYearDisplay">2016</output>
+          <output for="endYear" id="endYearDisplay">1985</output>
         </label>
       </div>
 
@@ -81,7 +77,7 @@
           </div>
 
           <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="pop-toggle">
+            <input type="checkbox" class="check-to-toggle" id="pop-toggle" checked>
             <label for="pop-toggle"></label>
           </div>
 
@@ -91,7 +87,7 @@
           </div>
 
           <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle">
+            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle" checked>
             <label for="funk-soul-toggle"></label>
           </div>
 
@@ -111,10 +107,10 @@
           </div>
         </section>
 
-        <label for="genre">Sub-Genre
+        <label for="genre" id="genreLabel">Sub-Genre
           <input type="text" name="genre" value="" id="genre">
+          <button>Add sub-genre</button>
         </label>
-        <button>Add sub-genre</button>
       </form>
 
     </main>
