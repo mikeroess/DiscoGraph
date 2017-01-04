@@ -57,6 +57,7 @@ const startYearUpdate = (year) => {
     $('#endYear').val(parseInt(year) + 1);
     $('#endYearDisplay').val(parseInt(year) + 1);
   }
+  writeGraph(localStorage, $('#startYearDisplay').val(), $('#endYearDisplay').val() )
 };
 
 const endYearUpdate = (year) => {
@@ -65,6 +66,7 @@ const endYearUpdate = (year) => {
     $('#startYear').val(parseInt(year) - 1);
     $('#startYearDisplay').val(parseInt(year) - 1);
   }
+  writeGraph(localStorage, $('#startYearDisplay').val(), $('#endYearDisplay').val() )
 };
 
 const clearChart = () => {

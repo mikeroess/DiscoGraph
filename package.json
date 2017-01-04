@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "async": "2.1.4",
     "babel": "6.5.2",
     "babel-core": "6.21.0",
     "babel-loader": "6.2.10",
