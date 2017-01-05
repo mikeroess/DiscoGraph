@@ -1,0 +1,304 @@
+
+body {
+  /*padding: 50px;*/
+  font: 14px "Garamond", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  background-image: url('images/eggshell.jpg');
+}
+
+
+a {
+  color: #00B7FF;
+}
+
+/*html*/
+
+
+
+main {
+  width: 900px;
+  margin: 0 auto;
+}
+body header h1 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+header {
+  text-align: center;
+}
+
+body {
+  width: 100%;
+}
+
+
+.information {
+  /*font-weight: 500;*/
+  /*font: 20px;*/
+}
+
+.yearInputs {
+  margin: 0 auto;
+ /*margin-left: 200px;
+ width: 750px;*/
+}
+
+#endYearLabel {
+  float: right;
+}
+
+#genreLabel{
+  margin-left: 300px;
+}
+
+
+.genreLabel {
+  font-size: 12px;
+  margin: 1px 0;
+}
+
+/*clearfix*/
+.group{
+  overflow: auto;
+}
+
+
+/*d3*/
+.bar {
+  display: inline-block;
+  fill: green;
+  width: 20px;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+#d3Graph {
+  margin: 0 auto;
+}
+
+
+/*toggle buttons*/
+
+.switch {
+  float: left;
+  margin-right: 20px;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  margin-top: 50px;
+}
+
+.check-to-toggle {
+  display: none;
+}
+
+.check-to-toggle + label {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  padding: 2px;
+  width: 80px;
+  height: 40px;
+  background-color: #dddddd;
+  border-radius: 60px;
+}
+
+.check-to-toggle + label:before,
+ .check-to-toggle + label:after {
+  display: block;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+}
+
+.check-to-toggle + label:before {
+  background-color: #f1f1f1;
+  right: 1px;
+  border-radius: 60px;
+  transition: background 1s;
+  text-align: center;
+  line-height: 40px;
+}
+
+#rock-toggle:checked + label:before {
+  background-color: #8ce196;
+}
+
+#rock-toggle + label:before {
+  content: "Rock";
+}
+
+#pop-toggle:checked + label:before {
+    background-color: steelblue;
+}
+
+#pop-toggle + label:before {
+  content: "Pop";
+}
+
+#hip-hop-toggle:checked + label:before {
+    background-color: purple;
+}
+
+#hip-hop-toggle + label:before {
+  content: "Hip Hop";
+}
+
+#funk-soul-toggle:checked + label:before {
+    background-color: orange;
+}
+
+#funk-soul-toggle + label:before {
+  content: "Funk/Soul";
+}
+
+#electronic-toggle:checked + label:before {
+    background-color: green;
+}
+
+#electronic-toggle + label:before {
+  content: "Electronic";
+}
+
+#classical-toggle:checked + label:before {
+    background-color: brown;
+}
+
+#classical-toggle + label:before {
+  content: "Classical";
+}
+
+#jazz-toggle:checked + label:before {
+    background-color: red;
+}
+
+#jazz-toggle + label:before {
+  content: "Jazz";
+}
+
+#lights-toggle + label:before {
+  content: "Lights!"
+}
+
+#disco-toggle + label:before {
+  content: "Disco!"
+}
+
+
+/*DISCOBALL!*/
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  /*background-color: #333;*/
+  /*background: -webkit-linear-gradient(bottom left, #111, #222);*/
+  /*background: -moz-linear-gradient(bottom left, #111, #222);*/
+  /*background: linear-gradient(bottom left, #111, #222);*/
+  /*margin: 0;*/
+}
+
+.disco {
+  display: none;
+}
+
+@-webkit-keyframes rotateDiscoBall {
+    0% {-webkit-transform: rotateX(90deg) rotateZ(0deg) rotate(0deg); }
+    100% {-webkit-transform: rotateX(90deg) rotateZ(360deg) rotate(0deg); }
+}
+
+@keyframes rotateDiscoBall {
+    0% {transform: rotateX(90deg) rotateZ(0deg) rotate(0deg); }
+    100% {transform: rotateX(90deg) rotateZ(360deg) rotate(0deg); }
+}
+
+@-webkit-keyframes rotateDiscoBallMiddle {
+    0% {-webkit-transform: rotateX(90deg) rotateY(0deg) rotate(0deg); }
+    100% {-webkit-transform: rotateX(90deg) rotateY(-360deg) rotate(0deg); }
+}
+
+@keyframes rotateDiscoBallMiddle {
+    0% {transform: rotateX(90deg) rotateY(0deg) rotate(0deg); }
+    100% {transform: rotateX(90deg) rotateY(-360deg) rotate(0deg); }
+}
+
+@-webkit-keyframes reflect {
+    0% {-webkit-filter: brightness(60%);}
+    50% {-webkit-filter: brightness(120%);}
+    100% {-webkit-filter: brightness(90%);}
+}
+
+@keyframes reflect {
+    0% {opacity: 1;}
+    50% {opacity: 0.4;}
+    100% {opacity: 1;}
+}
+
+#discoBall {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  /*top: 50px;*/
+  left: 50%;
+  margin-left: -50px;
+  -webkit-animation: rotateDiscoBall 18s linear infinite;
+  animation: rotateDiscoBall 18s linear infinite;
+}
+
+#discoBallLight {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  /*top: 50px;*/
+  left: 50%;
+  margin-left: -50px;
+  border-radius: 100%;
+  background-color: white;
+  opacity: 0.2;
+  -webkit-filter: blur(20px);
+}
+
+.square {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  width: 6px;
+  height: 6px;
+  position: absolute;
+  transform: rotateX(90deg) rotateY(0deg) translateZ(0px);
+}
+
+#discoBallMiddle {
+  height: 100%;
+  border-radius: 100%;
+  background-color: #111;
+  position: absolute;
+  background: -webkit-linear-gradient(top, #111, #333);
+  background: -moz-linear-gradient(top, #111, #333);
+  background: linear-gradient(top, #111, #333);
+  -webkit-animation: rotateDiscoBallMiddle 18s linear infinite;
+  animation: rotateDiscoBallMiddle 18s linear infinite;
+}

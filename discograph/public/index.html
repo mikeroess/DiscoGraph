@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DiscoGraph</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="/javascripts/bundle.js"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+  </head>
+
+  <script type="text/javascript">
+
+  </script>
+
+
+  <body>
+    <header><h1 class="logo">DiscoGraphs</h1></header>
+    <main>
+      <form id="mainForm">
+        <section class="information displayed">
+          <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="#">d3</a> and drawing information
+          from the <a href="#"> Discogs API</a><br />
+          It should be fairly intuitive, but the sliders allow you to adjust the timescale of the graph.<br />
+          The buttons toggle which genres are displayed.
+          If the genre you're intersted in isn't present, don't fret!  Just add it as a sub-genre.  We'll gather the information from Discogs and throw it up for you.
+          Please poke around and look for anything you might find interesting.<br />
+          I was surprised to find that in 1978 there were more releases classified as funk or soul than pop!</p>
+
+          <p>If you'd like to see more things I've built, check out my <a href="#">Github</a><br />
+          If you're interested in hiring me, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.<br />
+          Feel free to dig into my professional history at <a href="#">LinkedIn</a> or <a href="#">AngelList</a> if you're interested</p>
+          <a href="#" class="informationWindow">Hide all this text -- let me get to the graph!</a>
+        <section>
+
+
+        <div class="yearInputs group">
+
+
+          <label for="startYear">Start Year
+            <input type="range" min="1960" max="2015" value="1970"
+            name="startYear" step="1" id="startYear" oninput="startYearUpdate(value)">
+            <output for="startYear" id="startYearDisplay">1970</output>
+          </label>
+
+
+        <label for="endYear" id="endYearLabel">End Year
+          <input type="range" min="1961" max="2016" value="1985"
+          name="endYear" id="endYear" oninput="endYearUpdate(value)">
+          <output for="endYear" id="endYearDisplay">1985</output>
+        </label>
+      </div>
+
+        <div class="disco">
+          <div id="discoBallLight"></div>
+          <div id="discoBall">
+            <div id="discoBallMiddle"></div>
+          </div>
+        </div>
+
+        <div id="d3Graph"></div>
+
+        <section class="genre-buttons group">
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="rock-toggle">
+            <label for="rock-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="pop-toggle" checked>
+            <label for="pop-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="hip-hop-toggle">
+            <label for="hip-hop-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle" checked>
+            <label for="funk-soul-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="electronic-toggle">
+            <label for="electronic-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="classical-toggle">
+            <label for="classical-toggle"></label>
+          </div>
+
+          <div class="switch">
+            <input type="checkbox" class="check-to-toggle" id="jazz-toggle">
+            <label for="jazz-toggle"></label>
+          </div>
+        </section>
+
+        <label for="genre" id="genreLabel">Sub-Genre
+          <input type="text" name="genre" value="" id="genre">
+          <button>Add sub-genre</button>
+        </label>
+      </form>
+
+      <div class="switch">
+        <input type="checkbox" class="check-to-toggle" id="lights-toggle">
+        <label for="lights-toggle"></label>
+      </div>
+
+      <div class="switch">
+        <input type="checkbox" class="check-to-toggle" id="disco-toggle">
+        <label for="disco-toggle"></label>
+      </div>
+    </main>
+  </body>
+</html>
