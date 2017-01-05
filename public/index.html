@@ -12,10 +12,8 @@
 
 
     const genreQuery = (data) => {
-      // const uri = `https://api.discogs.com/database/search?year=${data["year"]}&genre=${data["genre"]}&token=PjweRsihAfZimRUhZfXdCvpylIVkmjuEWFugyFbr&per_page=1&page=1`;
       return $.ajax({
         method: "GET",
-        // header: {"User-Agent": "DiscoGraph/0.1 + https://mikeroess.github.io/DiscoGraph/"},
         url: 'api',
         data: data
       })
@@ -53,6 +51,7 @@ const genreButtonClick = function (genre, clicked, startYear, endYear) {
       oldData[year] = itemsPerYear
       localStorage.setItem(genre, JSON.stringify(oldData))
       console.log(localStorage)
+      writeGraph(localStorage, startYear, endYear);
     },
     (err) => {console.log(err)}
 
@@ -83,6 +82,7 @@ const clearChart = () => {
 };
 
 const isButtonClicked = (genre) => {
+  if( genre === "subgenre") return false
   const buttonId = genre + "-toggle";
   return document.getElementById(buttonId).checked;
 };
@@ -150,7 +150,6 @@ const getMaxRelease = (genres, storage) => {
    localStorage.removeItem("subgenre");
    genres = Object.keys(genreColors);
    genres.forEach( (genre) => {
-     debugger
      if (typeof(localStorage[genre]) === "undefined")
      localStorage.setItem(genre, JSON.stringify({}));
    })
