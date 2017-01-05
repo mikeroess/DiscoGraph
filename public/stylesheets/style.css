@@ -194,6 +194,14 @@ body {
   content: "Jazz";
 }
 
+#lights-toggle + label:before {
+  content: "Lights!"
+}
+
+#disco-toggle + label:before {
+  content: "Disco!"
+}
+
 
 /*DISCOBALL!*/
 html {
@@ -202,11 +210,15 @@ html {
 }
 
 body {
-  background-color: #333;
-  background: -webkit-linear-gradient(bottom left, #111, #222);
-  background: -moz-linear-gradient(bottom left, #111, #222);
-  background: linear-gradient(bottom left, #111, #222);
-  margin: 0;
+  /*background-color: #333;*/
+  /*background: -webkit-linear-gradient(bottom left, #111, #222);*/
+  /*background: -moz-linear-gradient(bottom left, #111, #222);*/
+  /*background: linear-gradient(bottom left, #111, #222);*/
+  /*margin: 0;*/
+}
+
+.disco {
+  display: none;
 }
 
 @-webkit-keyframes rotateDiscoBall {

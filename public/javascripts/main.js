@@ -276,7 +276,23 @@ $(document).ready(() => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  const lightSwitch = (state) => {
+    if (state === true) {
+      $("body").css("background-color", "#333");
+    } else {
+      $("body").css("background-color", "white");
+    }
+  };
 
+  const discoSwitch = (state) => {
+    if (state === true) {
+      $(".disco").css("display", "block");
+      lightSwitch(true);
+    } else {
+      $(".disco").css("display", "none");
+      lightSwitch(false);
+    }
+  };
 
 
   const rockButton = document.getElementById("rock-toggle");
@@ -286,7 +302,9 @@ $(document).ready(() => {
   const electronicButton = document.getElementById("electronic-toggle");
   const classicalButton = document.getElementById("classical-toggle");
   const jazzButton = document.getElementById("jazz-toggle");
-  const startYearInput = document.getElementById("startYear");
+  const lightsButton = document.getElementById("lights-toggle");
+  const discoButton = document.getElementById("disco-toggle");
+
 
   rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
@@ -295,7 +313,8 @@ $(document).ready(() => {
   electronicButton.addEventListener("click", () => genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  startYearInput.addEventListener("update", () => startYearUpdate($('#startYear').val()));
+  lightsButton.addEventListener("click", () => lightSwitch(lightsButton.checked))
+  discoButton.addEventListener("click", () => discoSwitch(discoButton.checked))
 
   setupLocalStorage();
 

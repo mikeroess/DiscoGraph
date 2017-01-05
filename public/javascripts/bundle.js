@@ -277,6 +277,24 @@
 	    return Math.floor(Math.random() * (max - min + 1)) + min;
 	  }
 	
+	  var lightSwitch = function lightSwitch(state) {
+	    if (state === true) {
+	      $("body").css("background-color", "#333");
+	    } else {
+	      $("body").css("background-color", "white");
+	    }
+	  };
+	
+	  var discoSwitch = function discoSwitch(state) {
+	    if (state === true) {
+	      $(".disco").css("display", "block");
+	      lightSwitch(true);
+	    } else {
+	      $(".disco").css("display", "none");
+	      lightSwitch(false);
+	    }
+	  };
+	
 	  var rockButton = document.getElementById("rock-toggle");
 	  var popButton = document.getElementById("pop-toggle");
 	  var hipHopButton = document.getElementById("hip-hop-toggle");
@@ -284,7 +302,8 @@
 	  var electronicButton = document.getElementById("electronic-toggle");
 	  var classicalButton = document.getElementById("classical-toggle");
 	  var jazzButton = document.getElementById("jazz-toggle");
-	  var startYearInput = document.getElementById("startYear");
+	  var lightsButton = document.getElementById("lights-toggle");
+	  var discoButton = document.getElementById("disco-toggle");
 	
 	  rockButton.addEventListener("click", function () {
 	    return genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val());
@@ -307,8 +326,11 @@
 	  jazzButton.addEventListener("click", function () {
 	    return genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val());
 	  }, false);
-	  startYearInput.addEventListener("update", function () {
-	    return startYearUpdate($('#startYear').val());
+	  lightsButton.addEventListener("click", function () {
+	    return lightSwitch(lightsButton.checked);
+	  });
+	  discoButton.addEventListener("click", function () {
+	    return discoSwitch(discoButton.checked);
 	  });
 	
 	  setupLocalStorage();
