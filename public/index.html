@@ -42,6 +42,7 @@
 const genreButtonClick = function (genre, clicked, startYear, endYear) {
   writeGraph(localStorage, startYear, endYear);
   for (let i = startYear; i <= endYear; i++) {
+    if
     let data = {'genre': genre, 'year': i};
     genreQuery(data).then((response) => {
       debugger
