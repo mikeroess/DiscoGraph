@@ -218,6 +218,24 @@
 	  });
 	};
 	
+	var startYearUpdate = function startYearUpdate(year) {
+	  $('#startYearDisplay').val(year);
+	  if (year >= $('#endYearDisplay').val()) {
+	    $('#endYear').val(parseInt(year) + 1);
+	    $('#endYearDisplay').val(parseInt(year) + 1);
+	  }
+	  writeGraph(localStorage, year, $('#endYear').val());
+	};
+	
+	var endYearUpdate = function endYearUpdate(year) {
+	  $('#endYearDisplay').val(year);
+	  if (year <= $('#startYearDisplay').val()) {
+	    $('#startYear').val(parseInt(year) - 1);
+	    $('#startYearDisplay').val(parseInt(year) - 1);
+	  }
+	  writeGraph(localStorage, $('#startYear').val(), year);
+	};
+	
 	$(document).ready(function () {
 	
 	  var t = 1;
@@ -304,6 +322,8 @@
 	  var jazzButton = document.getElementById("jazz-toggle");
 	  var lightsButton = document.getElementById("lights-toggle");
 	  var discoButton = document.getElementById("disco-toggle");
+	  var startYear = document.getElementById("startYear");
+	  var endYear = document.getElementById("endYear");
 	
 	  rockButton.addEventListener("click", function () {
 	    return genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val());
@@ -331,6 +351,12 @@
 	  });
 	  discoButton.addEventListener("click", function () {
 	    return discoSwitch(discoButton.checked);
+	  });
+	  startYear.addEventListener("input", function () {
+	    return startYearUpdate($('#startYear').val());
+	  });
+	  endYear.addEventListener("input", function () {
+	    return endYearUpdate($('#endYear').val());
 	  });
 	
 	  setupLocalStorage();

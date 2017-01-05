@@ -211,8 +211,26 @@ const setupLocalStorage = () => {
   genres.forEach( (genre) => {
     if (typeof(localStorage[genre]) === "undefined")
     localStorage.setItem(genre, JSON.stringify({}));
-  })
+  });
 };
+
+const startYearUpdate = (year) => {
+  $('#startYearDisplay').val(year);
+  if (year >= $('#endYearDisplay').val()) {
+    $('#endYear').val(parseInt(year) + 1);
+    $('#endYearDisplay').val(parseInt(year) + 1);
+  }
+  writeGraph(localStorage, year, $('#endYear').val());
+};
+
+const endYearUpdate = (year) => {
+   $('#endYearDisplay').val(year);
+   if (year <= $('#startYearDisplay').val()) {
+     $('#startYear').val(parseInt(year) - 1);
+     $('#startYearDisplay').val(parseInt(year) - 1);
+   }
+   writeGraph(localStorage, $('#startYear').val(), year);
+ };
 
 $(document).ready(() => {
 
@@ -304,6 +322,8 @@ $(document).ready(() => {
   const jazzButton = document.getElementById("jazz-toggle");
   const lightsButton = document.getElementById("lights-toggle");
   const discoButton = document.getElementById("disco-toggle");
+  const startYear = document.getElementById("startYear");
+  const endYear = document.getElementById("endYear");
 
 
   rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
@@ -315,6 +335,8 @@ $(document).ready(() => {
   jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   lightsButton.addEventListener("click", () => lightSwitch(lightsButton.checked))
   discoButton.addEventListener("click", () => discoSwitch(discoButton.checked))
+  startYear.addEventListener("input", () => startYearUpdate($('#startYear').val()));
+  endYear.addEventListener("input", () => endYearUpdate($('#endYear').val()));
 
   setupLocalStorage();
 
