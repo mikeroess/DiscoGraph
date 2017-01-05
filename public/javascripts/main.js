@@ -23,20 +23,25 @@ const subGenreQuery = (data) => {
 
 const genreButtonClick = function (genre, clicked, startYear, endYear) {
   writeGraph(localStorage, startYear, endYear);
+  const currentRecords = JSON.parse(localStorage[genre]);
   for (let i = startYear; i <= endYear; i++) {
-    let data = {'genre': genre, 'year': i};
-    genreQuery(data).then((response) => {
-      const oldData = JSON.parse(localStorage[genre]);
-      const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-      const year = parseInt(JSON.parse(response["text"])["results"][0]["year"])
-      oldData[year] = itemsPerYear
-      localStorage.setItem(genre, JSON.stringify(oldData))
-      console.log(localStorage)
-      writeGraph(localStorage, startYear, endYear);
-    },
-    (err) => {console.log(err)}
-
-  );
+    if (typeof(currentRecords[i]) !== "number") {
+      console.log('fetchingData');
+      let data = {'genre': genre, 'year': i};
+      genreQuery(data).then((response) => {
+        const oldData = JSON.parse(localStorage[genre]);
+        const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+        const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+        oldData[year] = itemsPerYear;
+        localStorage.setItem(genre, JSON.stringify(oldData));
+        console.log(localStorage);
+        writeGraph(localStorage, startYear, endYear);
+      },
+      (err) => {console.log(err)}
+    );
+  } else {
+    console.log("already got it");
+  }
   }
 };
 

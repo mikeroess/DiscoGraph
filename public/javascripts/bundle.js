@@ -69,19 +69,25 @@
 	
 	var genreButtonClick = function genreButtonClick(genre, clicked, startYear, endYear) {
 	  writeGraph(localStorage, startYear, endYear);
+	  var currentRecords = JSON.parse(localStorage[genre]);
 	  for (var i = startYear; i <= endYear; i++) {
-	    var data = { 'genre': genre, 'year': i };
-	    genreQuery(data).then(function (response) {
-	      var oldData = JSON.parse(localStorage[genre]);
-	      var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	      var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
-	      oldData[year] = itemsPerYear;
-	      localStorage.setItem(genre, JSON.stringify(oldData));
-	      console.log(localStorage);
-	      writeGraph(localStorage, startYear, endYear);
-	    }, function (err) {
-	      console.log(err);
-	    });
+	    if (typeof currentRecords[i] !== "number") {
+	      console.log('fetchingData');
+	      var data = { 'genre': genre, 'year': i };
+	      genreQuery(data).then(function (response) {
+	        var oldData = JSON.parse(localStorage[genre]);
+	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	        var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+	        oldData[year] = itemsPerYear;
+	        localStorage.setItem(genre, JSON.stringify(oldData));
+	        console.log(localStorage);
+	        writeGraph(localStorage, startYear, endYear);
+	      }, function (err) {
+	        console.log(err);
+	      });
+	    } else {
+	      console.log("already got it");
+	    }
 	  }
 	};
 	
