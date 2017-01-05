@@ -9,13 +9,16 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
 
     <script>
+
+
     const genreQuery = (data) => {
+      // const uri = `https://api.discogs.com/database/search?year=${data["year"]}&genre=${data["genre"]}&token=PjweRsihAfZimRUhZfXdCvpylIVkmjuEWFugyFbr&per_page=1&page=1`;
       return $.ajax({
         method: "GET",
-        header: {"User-Agent": "DiscoGraph/0.1 + https://mikeroess.github.io/DiscoGraph/"},
-        url: "api",
+        // header: {"User-Agent": "DiscoGraph/0.1 + https://mikeroess.github.io/DiscoGraph/"},
+        url: 'api',
         data: data
-      });
+      })
     };
 
     const subGenreQuery = (data) => {
@@ -28,28 +31,34 @@
     };
 
     const genreColors = {
-  "rock": "#8ce196",
-  "pop": "steelblue",
-  "hip-hop": "purple",
-  "funk-soul": "orange",
-  "electronic": "green",
-  "classical": "brown",
-  "jazz": "red",
-  "subgenre": "black"
+      "rock": "#8ce196",
+      "pop": "steelblue",
+      "hip-hop": "purple",
+      "funk-soul": "orange",
+      "electronic": "green",
+      "classical": "brown",
+      "jazz": "red",
+      "subgenre": "black"
 };
 
 const genreButtonClick = function (genre, clicked, startYear, endYear) {
   writeGraph(localStorage, startYear, endYear);
-    let data = {'genre': genre, 'startYear': startYear, 'endYear': endYear};
-    genreQuery(data).then(
-      (response) => {
-        console.log(response)
-        // localStorage.setItem(genre, JSON.stringify(response[genre]));
-        // writeGraph(localStorage, startYear, endYear);
-      },
-      (error) => console.log(error)
-    );
-  };
+  for (let i = startYear; i <= endYear; i++) {
+    let data = {'genre': genre, 'year': i};
+    genreQuery(data).then((response) => {
+      debugger
+      const oldData = JSON.parse(localStorage[genre]);
+      const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+      const year = parseInt(JSON.parse(response["text"])["results"][0]["year"])
+      oldData[year] = itemsPerYear
+      localStorage.setItem(genre, JSON.stringify(oldData))
+      console.log(localStorage)
+    },
+    (err) => {console.log(err)}
+
+    )
+  }
+};
 
 const startYearUpdate = (year) => {
   $('#startYearDisplay').val(year);
@@ -128,12 +137,40 @@ const getMaxRelease = (genres, storage) => {
   return d3.max(topReleasesPerGenre);
 }
 
+//
+// const filterObjectByYear= (object, startYear, endYear) => {
+//   filteredData = {}
+//   for (var year in object) {
+//     if (year > startYear && year < endYear) {
+//       filteredData[year] = object
+//     }
+//   }
+// }
+ const setupLocalStorage = () => {
+   localStorage.removeItem("subgenre");
+   genres = Object.keys(genreColors);
+   genres.forEach( (genre) => {
+     debugger
+     if (typeof(localStorage[genre]) === "undefined")
+     localStorage.setItem(genre, JSON.stringify({}));
+   })
+ }
+
+
 const writeGraph = (localData, minYear, maxYear) => {
-  const genres = Object.keys(localData);
+
+  const genres = Object.keys(localData).filter(
+    (genre) => {
+      if (isButtonClicked(genre)) return genre;
+    }
+  );
   let globalData = {};
   genres.forEach( (genre) => {
-    globalData[genre] = JSON.parse(localData[genre]);
+    if (localData[genre]) {
+      globalData[genre] = JSON.parse(localData[genre]);
+    }
   });
+
 
   const maxNumOfReleases = getMaxRelease(genres, globalData);
 
@@ -187,8 +224,6 @@ const writeGraph = (localData, minYear, maxYear) => {
         .style("fill", "black")
         .text(genreName);
 
-      } else if (!isButtonClicked(genre)) {
-        return
       } else {
       const dataset = JSON.parse(localStorage[genre])
       const formattedDataset = formatData(dataset, minYear, maxYear)
@@ -211,72 +246,7 @@ const writeGraph = (localData, minYear, maxYear) => {
   )
 }
 
-const prefetchData1 = function () {
-    let data = {'genre': "hip-hop", 'startYear': 1970, 'endYear': 1985};
-        genreQuery(data).then(
-          (response) => {
-            localStorage.setItem("hip-hop", JSON.stringify(response['hip-hop']));
-            let data = {'genre': "electronic", 'startYear': 1960, 'endYear': 2016};
-            genreQuery(data).then(
-              (response) => {
-                localStorage.setItem("electronic", JSON.stringify(response['electronic']));
-              },
-              (error) => console.log(error)
-            );
-          },
-      (error) => console.log(error)
-      );
-};
 
-const prefetchFunk = function () {
-  let data = {'genre': "funk-soul", 'startYear': 1970, 'endYear': 1985};
-  genreQuery(data).then(
-    (response) => {
-      localStorage.setItem("funk-soul", JSON.stringify(response['funk-soul']));
-      writeGraph(localStorage, startYear.value, endYear.value);
-    },
-(error) => console.log(error)
-);
-};
-
-const prefetchPop = function () {
-  let data = {'genre': "pop", 'startYear': 1970, 'endYear': 1985};
-  genreQuery(data).then(
-    (response) => {
-      localStorage.setItem("pop", JSON.stringify(response['pop']));
-      writeGraph(localStorage, startYear.value, endYear.value);
-    },
-(error) => console.log(error)
-);
-};
-
-
-const prefetchData2 = function () {
-    let data = {'genre': "pop", 'startYear': 1970, 'endYear': 1985};
-    genreQuery(data).then(
-      (response) => {
-        localStorage.setItem("pop", JSON.stringify(response['pop']));
-        let data = {'genre': "funk-soul", 'startYear': 1970, 'endYear': 1985};
-        genreQuery(data).then(
-          (response) => {
-            localStorage.setItem("funk-soul", JSON.stringify(response['funk-soul']));
-          },
-      (error) => console.log(error)
-      );
-      },
-    (error) => console.log(error)
-);
-};
-  // const prefetchData2 = function (startYear, endYear) {
-  //   let data = {'genre': "pop", 'startYear': startYear, 'endYear': endYear};
-  //   genreQuery(data).then(
-  //     (response) => {
-  //       localStorage.setItem("pop", JSON.stringify(response['pop']))
-  //       ;
-  //     },
-  //     (error) => console.log(error)
-  //   );
-  // }
     </script>
 
     <script type="text/javascript">
@@ -297,9 +267,8 @@ const prefetchData2 = function () {
         classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
         jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
 
-        localStorage.removeItem("subgenre");
-        // prefetchPop();
-        // prefetchFunk();
+        setupLocalStorage()
+
         $("#mainForm").submit( (e) => {
           e.preventDefault();
           const data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
@@ -323,6 +292,22 @@ const prefetchData2 = function () {
     <header><h1 class="logo">DiscoGraphs</h1></header>
     <main>
       <form id="mainForm">
+        <section class="information displayed">
+          <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="#">d3</a> and drawing information
+          from the <a href="#"> Discogs API</a><br />
+          It should be fairly intuitive, but the sliders allow you to adjust the timescale of the graph.<br />
+          The buttons toggle which genres are displayed.
+          If the genre you're intersted in isn't present, don't fret!  Just add it as a sub-genre.  We'll gather the information from Discogs and throw it up for you.
+          Please poke around and look for anything you might find interesting.<br />
+          I was surprised to find that in 1978 there were more releases classified as funk or soul than pop!</p>
+
+          <p>If you'd like to see more things I've built, check out my <a href="#">Github</a><br />
+          If you're interested in hiring me, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.<br />
+          Feel free to dig into my professional history at <a href="#">LinkedIn</a> or <a href="#">AngelList</a> if you're interested</p>
+          <a href="#" class="informationWindow">Hide all this text -- let me get to the graph!</a>
+        <section>
+
+
         <div class="yearInputs group">
 
 
