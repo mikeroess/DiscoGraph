@@ -3,13 +3,13 @@ body {
   /*padding: 50px;*/
   font: 14px;
   font-family: 'Roboto', sans-serif;
-  font-weight: 200;
-  background-image: url('images/eggshell.jpg');
+  font-weight: 300;
+  background-color: #bebebf;
 }
 
 
 a {
-  color: #00B7FF;
+  /*color: #f8f7ff;*/
 }
 
 /*html*/
@@ -52,7 +52,7 @@ header {
 
 
 .yearInputs {
-  margin: 0 auto;
+  margin: 15px auto;
  /*margin-left: 200px;
  width: 750px;*/
 }
@@ -62,6 +62,7 @@ header {
 }
 
 #genreLabel{
+  margin-top: 10px;
   margin-left: 300px;
 }
 
@@ -114,7 +115,7 @@ header {
   margin-right: 20px;
   margin-left: 20px;
   margin-bottom: 10px;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .check-to-toggle {
@@ -142,10 +143,11 @@ header {
 }
 
 .check-to-toggle + label:before {
+  font-weight: 300;
   background-color: #f1f1f1;
   right: 1px;
   border-radius: 60px;
-  transition: background 1s;
+  transition: background .4s;
   text-align: center;
   line-height: 40px;
   text-transform: uppercase;
