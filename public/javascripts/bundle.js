@@ -217,7 +217,7 @@
 	  "rock": "#8ce196",
 	  "pop": "#5ED5FF",
 	  "hip-hop": "#FC78F5",
-	  "funk-soul": "#E1AF4A",
+	  "funk-soul": "#F0E95E",
 	  "electronic": "#AE73EE",
 	  "classical": "#FF5175",
 	  "jazz": "#00FFFF",
