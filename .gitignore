@@ -16,4 +16,4 @@ bundle.js
 bundle.js.map
 
 # Ignore api
-/discograph/routes/token.js
+DiscoGraph/discograph/routes/token.js
