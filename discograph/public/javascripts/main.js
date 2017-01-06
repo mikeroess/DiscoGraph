@@ -117,10 +117,17 @@ const writeGraph = (localData, minYear, maxYear) => {
   let globalData = {};
   genres.forEach( (genre) => {
     if (localData[genre]) {
-      globalData[genre] = JSON.parse(localData[genre]);
+      globalData[genre] = {};
+      const minYear = Number(startYear.value);
+      const maxYear = Number(endYear.value);
+      const parsedData = JSON.parse(localData[genre])
+      for (let i = minYear; i <= maxYear; i++) {
+        if (parsedData[i]) {
+          globalData[genre][i] = parsedData[i];
+        };
+      }
     }
   });
-
 
   const maxNumOfReleases = getMaxRelease(genres, globalData);
 
@@ -171,7 +178,7 @@ const writeGraph = (localData, minYear, maxYear) => {
         .attr("transform", "translate(" + (w + 3) + "," + yScale(formattedDataset[formattedDataset.length - 1][1]) + ")")
         .attr("dy", "0.71em")
         .attr("class", "genreLabel")
-        .style("fill", "black")
+        .style("fill", "white")
         .text(genreName);
 
       } else {
