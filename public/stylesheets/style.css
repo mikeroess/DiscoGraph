@@ -39,7 +39,11 @@ header {
 }
 
 .information > p {
-  margin-bottom: 20px;
+  margin-top: 25px;
+  text-align: justify;
+}
+.information {
+  padding-bottom: 50px;
 }
 
 
