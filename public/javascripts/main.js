@@ -310,7 +310,7 @@ $(document).ready(() => {
     if (state === true) {
       $("body").css("background-color", "#333");
     } else {
-      $("body").css("background-color", "white");
+      $("body").css("background-color", "#bebebf");
     }
   };
 

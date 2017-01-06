@@ -4,12 +4,12 @@ body {
   font: 14px;
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
-  background-image: url('images/eggshell.jpg');
+  background-color: #bebebf;
 }
 
 
 a {
-  color: #00B7FF;
+  /*color: #f8f7ff;*/
 }
 
 /*html*/
