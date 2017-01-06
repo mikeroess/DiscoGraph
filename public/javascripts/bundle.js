@@ -215,13 +215,13 @@
 	
 	var genreColors = {
 	  "rock": "#8ce196",
-	  "pop": "steelblue",
-	  "hip-hop": "purple",
-	  "funk-soul": "orange",
-	  "electronic": "green",
-	  "classical": "brown",
-	  "jazz": "red",
-	  "subgenre": "black"
+	  "pop": "#5ED5FF",
+	  "hip-hop": "#FC78F5",
+	  "funk-soul": "#E1AF4A",
+	  "electronic": "#AE73EE",
+	  "classical": "#FF5175",
+	  "jazz": "#00FFFF",
+	  "subgenre": "white"
 	};
 	
 	var setupLocalStorage = function setupLocalStorage() {

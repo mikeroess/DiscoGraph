@@ -171,7 +171,7 @@ svg {
 }
 
 #pop-toggle:checked + label:before {
-    background-color: steelblue;
+    background-color: #5ED5FF;
 }
 
 #pop-toggle + label:before {
@@ -179,7 +179,7 @@ svg {
 }
 
 #hip-hop-toggle:checked + label:before {
-    background-color: purple;
+    background-color: #FC78F5;
 }
 
 #hip-hop-toggle + label:before {
@@ -187,7 +187,7 @@ svg {
 }
 
 #funk-soul-toggle:checked + label:before {
-    background-color: orange;
+    background-color: #E1AF4A;
 }
 
 #funk-soul-toggle + label:before {
@@ -195,7 +195,7 @@ svg {
 }
 
 #electronic-toggle:checked + label:before {
-    background-color: green;
+    background-color: #AE73EE;
 }
 
 #electronic-toggle + label:before {
@@ -203,7 +203,7 @@ svg {
 }
 
 #classical-toggle:checked + label:before {
-    background-color: brown;
+    background-color: #FF5175;
 }
 
 #classical-toggle + label:before {
@@ -211,7 +211,7 @@ svg {
 }
 
 #jazz-toggle:checked + label:before {
-    background-color: red;
+    background-color: #00FFFF;
 }
 
 #jazz-toggle + label:before {
