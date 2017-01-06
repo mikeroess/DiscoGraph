@@ -34,14 +34,15 @@ body {
 }
 
 header {
-  padding-top: 50px;
-  padding-bottom: 20px;
+  margin-top: 50px;
+  margin-bottom: 20px;
 }
 
-.information {
-  /*font-weight: 500;*/
-  /*font: 20px;*/
+.information > p {
+  margin-bottom: 20px;
 }
+
+
 
 .yearInputs {
   margin: 0 auto;
