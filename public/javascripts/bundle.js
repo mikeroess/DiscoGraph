@@ -190,7 +190,7 @@
 	
 	      svg.append("path").attr("d", line(formattedDataset)).attr("stroke", genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + margin.left + ', ' + margin.bottom + ')');
 	
-	      svg.append("text").attr("transform", "translate(" + (w + 3) + "," + yScale(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "black").text(genreName);
+	      svg.append("text").attr("transform", "translate(" + (w + 3) + "," + yScale(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "white").text(genreName);
 	    } else {
 	      var dataset = JSON.parse(localStorage[genre]);
 	      var _formattedDataset = formatData(dataset, minYear, maxYear);

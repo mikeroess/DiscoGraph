@@ -171,7 +171,7 @@ const writeGraph = (localData, minYear, maxYear) => {
         .attr("transform", "translate(" + (w + 3) + "," + yScale(formattedDataset[formattedDataset.length - 1][1]) + ")")
         .attr("dy", "0.71em")
         .attr("class", "genreLabel")
-        .style("fill", "black")
+        .style("fill", "white")
         .text(genreName);
 
       } else {
