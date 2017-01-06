@@ -21,7 +21,7 @@ main {
 }
 body header h1 {
   margin: 0;
-  padding: 0;
+  padding 0;
   border: 0;
 }
 
@@ -33,6 +33,10 @@ body {
   width: 100%;
 }
 
+header {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
 
 .information {
   /*font-weight: 500;*/
