@@ -1,7 +1,8 @@
 
 body {
   /*padding: 50px;*/
-  font: 14px "Garamond", Helvetica, Arial, sans-serif;
+  font: 14px;
+  font-family: 'Roboto', sans-serif;
   font-weight: 700;
   background-image: url('images/eggshell.jpg');
 }
@@ -26,6 +27,7 @@ body header h1 {
 }
 
 header {
+  font-family: 'Bungee Shade', cursive;
   text-align: center;
 }
 
