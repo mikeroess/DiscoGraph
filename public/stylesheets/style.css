@@ -112,7 +112,9 @@ svg {
   margin: 0 auto;
 }
 
-
+.axis text {
+   fill: white;
+}
 /*toggle buttons*/
 
 .switch {
