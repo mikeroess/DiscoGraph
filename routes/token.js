@@ -1,3 +1,3 @@
-const discogsApi = "PjweRsihAfZimRUhZfXdCvpylIVkmjuEWFugyFbr";
+const discogsApi = "pAERgxHLPQFHFDSgjsiQQbKzQnEoFuTQvGGlBcCO";
 
 module.exports = discogsApi;
