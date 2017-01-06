@@ -18,77 +18,65 @@
   <body>
     <header><h1 class="logo">DiscoGraph</h1></header>
     <main>
-      <form id="mainForm">
-        <section class="information displayed">
+      <section class="information displayed">
+        <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="https://d3js.org/">d3</a> and drawing information
+        from the <a href="https://www.discogs.com/developers/">Discogs API</a>
+        It should be fairly intuitive, but the sliders allow you to adjust the timescale of the graph.
+        The buttons toggle which genres are displayed.
+        If the genre you're interested in isn't present, don't fret!  Just add it as a sub-genre.  We'll gather the information from Discogs and throw it up for you.
+        Please poke around and look for anything you might find interesting.
+        I was surprised to find that in 1978 there were more releases classified as funk or soul than pop!</p>
 
-          <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="https://d3js.org/">d3</a> and drawing information
-          from the <a href="https://www.discogs.com/developers/">Discogs API</a>
-          It should be fairly intuitive, but the sliders allow you to adjust the timescale of the graph.
-          The buttons toggle which genres are displayed.
-          If the genre you're interested in isn't present, don't fret!  Just add it as a sub-genre.  We'll gather the information from Discogs and throw it up for you.
-          Please poke around and look for anything you might find interesting.
-          I was surprised to find that in 1978 there were more releases classified as funk or soul than pop!</p>
+        <p>If you'd like to see more things I've built, check out my <a href="https://github.com/mikeroess/">Github</a>
+        If you're interested in hiring me, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.
+        Feel free to dig into my professional history at <a href="https://www.linkedin.com/in/michael-roess">LinkedIn</a> or <a href="https://angel.co/michael-roess">AngelList</a> if you're interested
+        </p>
+    </section>
 
-          <p>If you'd like to see more things I've built, check out my <a href="https://github.com/mikeroess/">Github</a>
-          If you're interested in hiring me, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.
-          Feel free to dig into my professional history at <a href="https://www.linkedin.com/in/michael-roess">LinkedIn</a> or <a href="https://angel.co/michael-roess">AngelList</a> if you're interested
-        <a href="#" class="informationWindow">Hide all this text -- let me get to the graph!</a></p>
-      </section>
-
-
-
-        <div class="disco">
-          <div id="discoBallLight"></div>
-          <div id="discoBall">
-            <div id="discoBallMiddle"></div>
-          </div>
+    <form id="mainForm">
+      <section class="genre-buttons group">
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="rock-toggle">
+          <label for="rock-toggle"></label>
         </div>
 
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="pop-toggle" checked>
+          <label for="pop-toggle"></label>
+        </div>
 
-        <section class="genre-buttons group">
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="rock-toggle">
-            <label for="rock-toggle"></label>
-          </div>
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="hip-hop-toggle">
+          <label for="hip-hop-toggle"></label>
+        </div>
 
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="pop-toggle" checked>
-            <label for="pop-toggle"></label>
-          </div>
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle" checked>
+          <label for="funk-soul-toggle"></label>
+        </div>
 
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="hip-hop-toggle">
-            <label for="hip-hop-toggle"></label>
-          </div>
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="electronic-toggle">
+          <label for="electronic-toggle"></label>
+        </div>
 
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="funk-soul-toggle" checked>
-            <label for="funk-soul-toggle"></label>
-          </div>
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="classical-toggle">
+          <label for="classical-toggle"></label>
+        </div>
 
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="electronic-toggle">
-            <label for="electronic-toggle"></label>
-          </div>
+        <div class="switch">
+          <input type="checkbox" class="check-to-toggle" id="jazz-toggle">
+          <label for="jazz-toggle"></label>
+        </div>
+      </section>
 
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="classical-toggle">
-            <label for="classical-toggle"></label>
-          </div>
+      <label for="genre" id="genreLabel">Sub-Genre
+        <input type="text" name="genre" value="" id="genre">
+        <button>Add sub-genre</button>
+      </label>
 
-          <div class="switch">
-            <input type="checkbox" class="check-to-toggle" id="jazz-toggle">
-            <label for="jazz-toggle"></label>
-          </div>
-        </section>
-
-        <label for="genre" id="genreLabel">Sub-Genre
-          <input type="text" name="genre" value="" id="genre">
-          <button>Add sub-genre</button>
-        </label>
-
-        <div class="yearInputs group">
-
+      <div class="yearInputs group">
         <label for="startYear">Start Year
           <input type="range" min="1960" max="2015" value="1970"
           name="startYear" step="1" id="startYear">
@@ -103,6 +91,13 @@
       </div>
 
       </form>
+
+      <div class="disco">
+        <div id="discoBallLight"></div>
+        <div id="discoBall">
+          <div id="discoBallMiddle"></div>
+        </div>
+      </div>
 
       <div id="d3Graph"></div>
 
