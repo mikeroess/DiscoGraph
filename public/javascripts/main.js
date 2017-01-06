@@ -16,7 +16,7 @@ const subGenreQuery = (data) => {
   localStorage.removeItem("subgenre");
   return $.ajax({
     method: "GET",
-    url: "api/subGenreQuery",
+    url: "styleApi",
     data: data
   });
 };
@@ -39,9 +39,9 @@ const genreButtonClick = function (genre, clicked, startYear, endYear) {
       },
       (err) => {console.log(err)}
     );
-  } else {
-    console.log("already got it");
-  }
+    } else {
+      console.log("already got it");
+    }
   }
 };
 
@@ -354,7 +354,44 @@ $(document).ready(() => {
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
-    const data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
+    const data = {'style': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
+    let currentSubGenre = Object.keys(JSON.parse(localStorage['subgenre']))[0];
+    let currentData = {};
+    if (currentSubGenre === data["style"]) {
+      currentData = JSON.parse(localStorage["subgenre"])[currentSubGenre]
+    } else {
+      currentData[$('#genre').val()] = {};
+      localStorage.setItem("subgenre", JSON.stringify(currentData))
+    }
+    for (let i = data["startYear"]; i <= data["endYear"]; i++) {
+      if (typeof(currentData[i]) !== "number") {
+        console.log('fetchingData');
+        let reqData = {'style': data["style"], 'year': i};
+        console.log(reqData)
+        subGenreQuery(reqData).then((response) => {
+          console.log(response)
+          console.log(localStorage)
+          debugger
+          const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
+          console.log(oldData)
+          const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+          const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+          oldData[year] = itemsPerYear;
+          console.log(oldData)
+          const packagedOldData = {};
+          packagedOldData[$('#genre').val()] = oldData;
+          console.log(packagedOldData)
+          localStorage.setItem("subgenre", packagedOldData);
+          console.log(localStorage);
+          writeGraph(localStorage, startYear, endYear);
+        },
+        (err) => {console.log(err)}
+      );
+      } else {
+        console.log("already got it");
+      }
+    }
+    const currentGenre = JSON.parse(localStorage['subgenre'])
     writeGraph(localStorage, data["startYear"], data["endYear"]);
     subGenreQuery(data).then((response) => {
       const genre = Object.keys(response)[0];

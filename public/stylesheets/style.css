@@ -4,12 +4,13 @@ body {
   font: 14px;
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
-  background-color: #bebebf;
+  background-color: #333;
+  color: white;
 }
 
 
 a {
-  /*color: #f8f7ff;*/
+  color: white;
 }
 
 /*html*/
@@ -88,7 +89,7 @@ header {
 .axis path,
 .axis line {
     fill: none;
-    stroke: black;
+    stroke: white;
     shape-rendering: crispEdges;
 }
 
@@ -101,6 +102,10 @@ header {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
+}
+
+svg {
+  color: white;
 }
 
 #d3Graph {
@@ -152,6 +157,7 @@ header {
   line-height: 40px;
   text-transform: uppercase;
   font-size: 12px;
+  color: black;
 }
 
 #rock-toggle:checked + label:before {
