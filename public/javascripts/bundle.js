@@ -159,7 +159,15 @@
 	  var globalData = {};
 	  genres.forEach(function (genre) {
 	    if (localData[genre]) {
-	      globalData[genre] = JSON.parse(localData[genre]);
+	      globalData[genre] = {};
+	      var _minYear = Number(startYear.value);
+	      var _maxYear = Number(endYear.value);
+	      var parsedData = JSON.parse(localData[genre]);
+	      for (var i = _minYear; i <= _maxYear; i++) {
+	        if (parsedData[i]) {
+	          globalData[genre][i] = parsedData[i];
+	        };
+	      }
 	    }
 	  });
 	
