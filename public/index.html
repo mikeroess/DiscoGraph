@@ -16,9 +16,15 @@
 
 
   <body>
-    <header><h1 class="logo">DiscoGraph</h1></header>
+    <header class="group"><h1 class="logo">DiscoGraph</h1> <span id="open">info</span></header>
     <main>
       <section class="information displayed">
+
+
+    </section>
+
+    <div id="aboutModal" class="modal">
+      <article class="modal-content">
         <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="https://d3js.org/">d3</a> and drawing information
         from the <a href="https://www.discogs.com/developers/">Discogs API</a>
         It should be fairly intuitive, but the sliders allow you to adjust the timescale of the graph.
@@ -31,7 +37,9 @@
         If you're interested in hiring me, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.
         Feel free to dig into my professional history at <a href="https://www.linkedin.com/in/michael-roess">LinkedIn</a> or <a href="https://angel.co/michael-roess">AngelList</a> if you're interested
         </p>
-    </section>
+        <span id="close">Close</span>
+      </article>
+    </div>
 
     <form id="mainForm">
       <section class="genre-buttons group">
@@ -78,13 +86,13 @@
 
       <div class="yearInputs group">
         <label for="startYear">Start Year
-          <input type="range" min="1960" max="2015" value="1970"
+          <input type="range" min="1950" max="2011" value="1970"
           name="startYear" step="1" id="startYear">
           <output for="startYear" id="startYearDisplay">1970</output>
         </label>
 
         <label for="endYear" id="endYearLabel">End Year
-          <input type="range" min="1961" max="2016" value="1985"
+          <input type="range" min="1955" max="2016" value="1985"
           name="endYear" id="endYear">
           <output for="endYear" id="endYearDisplay">1985</output>
         </label>

@@ -31,6 +31,7 @@ const genreButtonClick = function (genre, clicked, startYear, endYear) {
       genreQuery(data).then((response) => {
         const oldData = JSON.parse(localStorage[genre]);
         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+        debugger
         const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
         oldData[year] = itemsPerYear;
         localStorage.setItem(genre, JSON.stringify(oldData));
@@ -58,7 +59,7 @@ const isButtonClicked = (genre) => {
 };
 
 const margin = {top: 30, right: 20, bottom: 30, left: 50};
-const w = 1050 - margin.left - margin.right;
+const w = 950 - margin.left - margin.right;
 const h = 500 - margin.top - margin.bottom;
 
 const xScale = d3.scaleTime()
@@ -224,13 +225,14 @@ const setupLocalStorage = () => {
     if (typeof(localStorage[genre]) === "undefined")
     localStorage.setItem(genre, JSON.stringify({}));
   });
+  localStorage.setItem("subgenre", "{}")
 };
 
 const startYearUpdate = (year) => {
   $('#startYearDisplay').val(year);
   if (year >= $('#endYearDisplay').val()) {
-    $('#endYear').val(parseInt(year) + 1);
-    $('#endYearDisplay').val(parseInt(year) + 1);
+    $('#endYear').val(parseInt(year) + 5);
+    $('#endYearDisplay').val(parseInt(year) + 5);
   }
   writeGraph(localStorage, year, $('#endYear').val());
 };
@@ -238,8 +240,8 @@ const startYearUpdate = (year) => {
 const endYearUpdate = (year) => {
    $('#endYearDisplay').val(year);
    if (year <= $('#startYearDisplay').val()) {
-     $('#startYear').val(parseInt(year) - 1);
-     $('#startYearDisplay').val(parseInt(year) - 1);
+     $('#startYear').val(parseInt(year) - 5);
+     $('#startYearDisplay').val(parseInt(year) - 5);
    }
    writeGraph(localStorage, $('#startYear').val(), year);
  };
@@ -336,8 +338,13 @@ $(document).ready(() => {
   const discoButton = document.getElementById("disco-toggle");
   const startYear = document.getElementById("startYear");
   const endYear = document.getElementById("endYear");
+  const aboutModal = document.getElementById("aboutModal");
+  const closeModal = document.getElementById("close");
+  const openModal = document.getElementById("open");
 
 
+  closeModal.onclick = () => { aboutModal.style.display = "none"; };
+  openModal.onclick = () => { aboutModal.style.display = "absolute"; };
   rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
@@ -354,24 +361,42 @@ $(document).ready(() => {
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
-    const data = {'style': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
-    let currentSubGenre = Object.keys(JSON.parse(localStorage['subgenre']))[0];
-    let currentData = {};
-    if (currentSubGenre === data["style"]) {
-      currentData = JSON.parse(localStorage["subgenre"])[currentSubGenre]
-    } else {
-      currentData[$('#genre').val()] = {};
-      localStorage.setItem("subgenre", JSON.stringify(currentData))
-    }
-    for (let i = data["startYear"]; i <= data["endYear"]; i++) {
-      if (typeof(currentData[i]) !== "number") {
-        console.log('fetchingData');
+    const style = $('#genre').val();
+    const start = $('#startYear').val();
+    const end = $('#endYear').val();
+
+    // const data = {'style': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
+    // let currentSubGenre = Object.keys(JSON.parse(localStorage['subgenre']))[0];
+    // let currentData = {};
+    // if (currentSubGenre === data["style"]) {
+    //   debugger
+    //   currentData = JSON.parse(localStorage["subgenre"])[currentSubGenre]
+    // } else {
+    //   debugger
+    //   currentData[$('#genre').val()] = {};
+    //   localStorage.setItem("subgenre", JSON.stringify(currentData));
+    // }
+    for (let i = start; i <= end; i++) {
+      // if (typeof(currentData[i]) !== "number") {
+        // console.log('fetchingData');
         let reqData = {'style': data["style"], 'year': i};
-        console.log(reqData)
+        // console.log(reqData)
         subGenreQuery(reqData).then((response) => {
-          console.log(response)
-          console.log(localStorage)
-          debugger
+          if (localStorage["subGenre"] === undefined) {
+            // CREATE SUB GENRE ENTRY;
+            // INSERT VALUE INTO IT
+            // STRINGIFY
+            // STORE
+          } else {
+            // ACCESS SUB GENRE ENTRY
+            // INSERT VALUE INTO IT
+            // STRINGIFY
+            // STORE
+          }
+          // WRITE GRAPH
+          // console.log(response)
+          // console.log(localStorage)
+          // debugger
           const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
           console.log(oldData)
           const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
@@ -387,9 +412,9 @@ $(document).ready(() => {
         },
         (err) => {console.log(err)}
       );
-      } else {
-        console.log("already got it");
-      }
+      // } else {
+      //   console.log("already got it");
+      // }
     }
     const currentGenre = JSON.parse(localStorage['subgenre'])
     writeGraph(localStorage, data["startYear"], data["endYear"]);
