@@ -336,8 +336,8 @@
 	  var electronicButton = document.getElementById("electronic-toggle");
 	  var classicalButton = document.getElementById("classical-toggle");
 	  var jazzButton = document.getElementById("jazz-toggle");
-	  var lightsButton = document.getElementById("lights-toggle");
-	  var discoButton = document.getElementById("disco-toggle");
+	  // const lightsButton = document.getElementById("lights-toggle");
+	  // const discoButton = document.getElementById("disco-toggle");
 	  var startYear = document.getElementById("startYear");
 	  var endYear = document.getElementById("endYear");
 	  var aboutModal = document.getElementById("aboutModal");
@@ -371,12 +371,8 @@
 	  jazzButton.addEventListener("click", function () {
 	    return genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val());
 	  }, false);
-	  lightsButton.addEventListener("click", function () {
-	    return lightSwitch(lightsButton.checked);
-	  });
-	  discoButton.addEventListener("click", function () {
-	    return discoSwitch(discoButton.checked);
-	  });
+	  // lightsButton.addEventListener("click", () => lightSwitch(lightsButton.checked))
+	  // discoButton.addEventListener("click", () => discoSwitch(discoButton.checked))
 	  startYear.addEventListener("input", function () {
 	    return startYearUpdate($('#startYear').val());
 	  });
