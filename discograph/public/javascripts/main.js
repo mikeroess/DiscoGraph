@@ -16,7 +16,7 @@ const subGenreQuery = (data) => {
   localStorage.removeItem("subgenre");
   return $.ajax({
     method: "GET",
-    url: "api/subGenreQuery",
+    url: "styleApi",
     data: data
   });
 };
@@ -31,6 +31,7 @@ const genreButtonClick = function (genre, clicked, startYear, endYear) {
       genreQuery(data).then((response) => {
         const oldData = JSON.parse(localStorage[genre]);
         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+        debugger
         const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
         oldData[year] = itemsPerYear;
         localStorage.setItem(genre, JSON.stringify(oldData));
@@ -39,9 +40,9 @@ const genreButtonClick = function (genre, clicked, startYear, endYear) {
       },
       (err) => {console.log(err)}
     );
-  } else {
-    console.log("already got it");
-  }
+    } else {
+      console.log("already got it");
+    }
   }
 };
 
@@ -58,7 +59,7 @@ const isButtonClicked = (genre) => {
 };
 
 const margin = {top: 30, right: 20, bottom: 30, left: 50};
-const w = 1050 - margin.left - margin.right;
+const w = 950 - margin.left - margin.right;
 const h = 500 - margin.top - margin.bottom;
 
 const xScale = d3.scaleTime()
@@ -208,13 +209,13 @@ const writeGraph = (localData, minYear, maxYear) => {
 
 const genreColors = {
   "rock": "#8ce196",
-  "pop": "steelblue",
-  "hip-hop": "purple",
-  "funk-soul": "orange",
-  "electronic": "green",
-  "classical": "brown",
-  "jazz": "red",
-  "subgenre": "black"
+  "pop": "#5ED5FF",
+  "hip-hop": "#FC78F5",
+  "funk-soul": "#F0E95E",
+  "electronic": "#AE73EE",
+  "classical": "#FF5175",
+  "jazz": "#00FFFF",
+  "subgenre": "white"
 };
 
 const setupLocalStorage = () => {
@@ -224,13 +225,14 @@ const setupLocalStorage = () => {
     if (typeof(localStorage[genre]) === "undefined")
     localStorage.setItem(genre, JSON.stringify({}));
   });
+  localStorage.setItem("subgenre", "{}")
 };
 
 const startYearUpdate = (year) => {
   $('#startYearDisplay').val(year);
   if (year >= $('#endYearDisplay').val()) {
-    $('#endYear').val(parseInt(year) + 1);
-    $('#endYearDisplay').val(parseInt(year) + 1);
+    $('#endYear').val(parseInt(year) + 5);
+    $('#endYearDisplay').val(parseInt(year) + 5);
   }
   writeGraph(localStorage, year, $('#endYear').val());
 };
@@ -238,8 +240,8 @@ const startYearUpdate = (year) => {
 const endYearUpdate = (year) => {
    $('#endYearDisplay').val(year);
    if (year <= $('#startYearDisplay').val()) {
-     $('#startYear').val(parseInt(year) - 1);
-     $('#startYearDisplay').val(parseInt(year) - 1);
+     $('#startYear').val(parseInt(year) - 5);
+     $('#startYearDisplay').val(parseInt(year) - 5);
    }
    writeGraph(localStorage, $('#startYear').val(), year);
  };
@@ -336,8 +338,13 @@ $(document).ready(() => {
   const discoButton = document.getElementById("disco-toggle");
   const startYear = document.getElementById("startYear");
   const endYear = document.getElementById("endYear");
+  const aboutModal = document.getElementById("aboutModal");
+  const closeModal = document.getElementById("close");
+  const openModal = document.getElementById("open");
 
 
+  closeModal.onclick = () => { aboutModal.style.display = "none"; };
+  openModal.onclick = () => { aboutModal.style.display = "block"; };
   rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
@@ -354,7 +361,62 @@ $(document).ready(() => {
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
-    const data = {'sub_genre': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
+    const style = $('#genre').val();
+    const start = $('#startYear').val();
+    const end = $('#endYear').val();
+
+    // const data = {'style': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
+    // let currentSubGenre = Object.keys(JSON.parse(localStorage['subgenre']))[0];
+    // let currentData = {};
+    // if (currentSubGenre === data["style"]) {
+    //   debugger
+    //   currentData = JSON.parse(localStorage["subgenre"])[currentSubGenre]
+    // } else {
+    //   debugger
+    //   currentData[$('#genre').val()] = {};
+    //   localStorage.setItem("subgenre", JSON.stringify(currentData));
+    // }
+    for (let i = start; i <= end; i++) {
+      // if (typeof(currentData[i]) !== "number") {
+        // console.log('fetchingData');
+        let reqData = {'style': data["style"], 'year': i};
+        // console.log(reqData)
+        subGenreQuery(reqData).then((response) => {
+          if (localStorage["subGenre"] === undefined) {
+            // CREATE SUB GENRE ENTRY;
+            // INSERT VALUE INTO IT
+            // STRINGIFY
+            // STORE
+          } else {
+            // ACCESS SUB GENRE ENTRY
+            // INSERT VALUE INTO IT
+            // STRINGIFY
+            // STORE
+          }
+          // WRITE GRAPH
+          // console.log(response)
+          // console.log(localStorage)
+          // debugger
+          const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
+          console.log(oldData)
+          const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+          const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+          oldData[year] = itemsPerYear;
+          console.log(oldData)
+          const packagedOldData = {};
+          packagedOldData[$('#genre').val()] = oldData;
+          console.log(packagedOldData)
+          localStorage.setItem("subgenre", packagedOldData);
+          console.log(localStorage);
+          writeGraph(localStorage, startYear, endYear);
+        },
+        (err) => {console.log(err)}
+      );
+      // } else {
+      //   console.log("already got it");
+      // }
+    }
+    const currentGenre = JSON.parse(localStorage['subgenre'])
     writeGraph(localStorage, data["startYear"], data["endYear"]);
     subGenreQuery(data).then((response) => {
       const genre = Object.keys(response)[0];

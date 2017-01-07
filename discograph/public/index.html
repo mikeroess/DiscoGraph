@@ -16,22 +16,39 @@
 
 
   <body>
-    <header><h1 class="logo">DiscoGraph</h1></header>
+    <header class="group"><h1 class="logo">DiscoGraph</h1> <span id="open">about</span></header>
     <main>
       <section class="information displayed">
-        <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="https://d3js.org/">d3</a> and drawing information
-        from the <a href="https://www.discogs.com/developers/">Discogs API</a>
-        It should be fairly intuitive, but the sliders allow you to adjust the timescale of the graph.
-        The buttons toggle which genres are displayed.
-        If the genre you're interested in isn't present, don't fret!  Just add it as a sub-genre.  We'll gather the information from Discogs and throw it up for you.
-        Please poke around and look for anything you might find interesting.
-        I was surprised to find that in 1978 there were more releases classified as funk or soul than pop!</p>
 
-        <p>If you'd like to see more things I've built, check out my <a href="https://github.com/mikeroess/">Github</a>
-        If you're interested in hiring me, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.
-        Feel free to dig into my professional history at <a href="https://www.linkedin.com/in/michael-roess">LinkedIn</a> or <a href="https://angel.co/michael-roess">AngelList</a> if you're interested
-        </p>
+
     </section>
+
+    <div id="aboutModal" class="modal">
+      <article class="modal-content">
+        <span id="close">X</span>
+        <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="https://d3js.org/">d3</a> and the <a href="https://www.discogs.com/developers/">Discogs API.</a>
+        </p>
+        <p>
+          To use the graph:
+        <ul>
+          <li>Adjust the sliders to the years you're interested in viewing (between 1950 and 2016)</li>
+          <li>Click the buttons to display or hide a particular genre</li>
+          <li>Use the style field to look for a style* you don't see</li>
+        </ul>
+        You can find all kind of cool information this way.  Did you know that in 1978
+          there were more releases in the funk/soul genre than pop?  I didn't!</p>
+
+        <p>If you'd like to see more things I've built, check out my <a href="https://github.com/mikeroess/">Github</a>.
+        If you're interested in hiring me or just want to chat about music or technology, shoot me an email: <a href="mailto:michael.roess@gmail.com">Michael.Roess@gmail.com</a>.
+        Feel free to dig into my professional history at <a href="https://www.linkedin.com/in/michael-roess">LinkedIn</a> or <a href="https://angel.co/michael-roess">AngelList</a>.
+        </p>
+
+
+
+        <p>* We rely on the Discogs API where many things you or I might call a genre are classified as a style, for example punk or disco.
+        </p>
+      </article>
+    </div>
 
     <form id="mainForm">
       <section class="genre-buttons group">
@@ -78,13 +95,13 @@
 
       <div class="yearInputs group">
         <label for="startYear">Start Year
-          <input type="range" min="1960" max="2015" value="1970"
+          <input type="range" min="1950" max="2011" value="1970"
           name="startYear" step="1" id="startYear">
           <output for="startYear" id="startYearDisplay">1970</output>
         </label>
 
         <label for="endYear" id="endYearLabel">End Year
-          <input type="range" min="1961" max="2016" value="1985"
+          <input type="range" min="1955" max="2016" value="1985"
           name="endYear" id="endYear">
           <output for="endYear" id="endYearDisplay">1985</output>
         </label>

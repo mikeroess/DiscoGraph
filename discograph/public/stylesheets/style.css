@@ -4,12 +4,13 @@ body {
   font: 14px;
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
-  background-color: #bebebf;
+  background-color: #333;
+  color: white;
 }
 
 
 a {
-  /*color: #f8f7ff;*/
+  color: white;
 }
 
 /*html*/
@@ -30,25 +31,22 @@ header {
   font-family: 'Bungee Shade', cursive;
   text-align: center;
   font-size: 24px;
+  position: relative;
+  margin-top: 50px;
+  /*margin-bottom: 20px;*/
+}
+
+h1 {
+  display: inline-block;
 }
 
 body {
   width: 100%;
 }
 
-header {
-  margin-top: 50px;
-  margin-bottom: 20px;
+.contact_info {
+  float: right;
 }
-
-.information > p {
-  margin-top: 25px;
-  text-align: justify;
-}
-.information {
-  padding-bottom: 50px;
-}
-
 
 
 .yearInputs {
@@ -59,6 +57,7 @@ header {
 
 #endYearLabel {
   float: right;
+  margin-right: 40px;
 }
 
 #genreLabel{
@@ -71,6 +70,52 @@ header {
   font-size: 12px;
   margin: 1px 0;
 }
+
+.modal {
+    /*display: none;*/
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+
+.modal-content {
+    background-color: white;
+    color: black;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 70%;
+    font-size: 18px;
+    height: 60%;
+    text-align: justify;
+}
+
+.modal-content a {
+  color: black;
+}
+
+#close:hover {
+  cursor: pointer;
+}
+
+#open {
+  font-size: 12px;
+  padding: 0 10px;
+  width: 10px;
+  font-family: roboto;
+}
+
+#open:hover {
+  cursor: pointer;
+}
+
 
 /*clearfix*/
 .group{
@@ -88,7 +133,7 @@ header {
 .axis path,
 .axis line {
     fill: none;
-    stroke: black;
+    stroke: white;
     shape-rendering: crispEdges;
 }
 
@@ -103,11 +148,17 @@ header {
   stroke-width: 1.5px;
 }
 
+svg {
+  color: white;
+}
+
 #d3Graph {
   margin: 0 auto;
 }
 
-
+.axis text {
+   fill: white;
+}
 /*toggle buttons*/
 
 .switch {
@@ -152,6 +203,7 @@ header {
   line-height: 40px;
   text-transform: uppercase;
   font-size: 12px;
+  color: black;
 }
 
 #rock-toggle:checked + label:before {
@@ -163,7 +215,7 @@ header {
 }
 
 #pop-toggle:checked + label:before {
-    background-color: steelblue;
+    background-color: #5ED5FF;
 }
 
 #pop-toggle + label:before {
@@ -171,7 +223,7 @@ header {
 }
 
 #hip-hop-toggle:checked + label:before {
-    background-color: purple;
+    background-color: #FC78F5;
 }
 
 #hip-hop-toggle + label:before {
@@ -179,7 +231,7 @@ header {
 }
 
 #funk-soul-toggle:checked + label:before {
-    background-color: orange;
+    background-color: #F0E95E;
 }
 
 #funk-soul-toggle + label:before {
@@ -187,7 +239,7 @@ header {
 }
 
 #electronic-toggle:checked + label:before {
-    background-color: green;
+    background-color: #AE73EE;
 }
 
 #electronic-toggle + label:before {
@@ -195,7 +247,7 @@ header {
 }
 
 #classical-toggle:checked + label:before {
-    background-color: brown;
+    background-color: #FF5175;
 }
 
 #classical-toggle + label:before {
@@ -203,7 +255,7 @@ header {
 }
 
 #jazz-toggle:checked + label:before {
-    background-color: red;
+    background-color: #00FFFF;
 }
 
 #jazz-toggle + label:before {
