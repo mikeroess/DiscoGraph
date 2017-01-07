@@ -348,7 +348,7 @@
 	    aboutModal.style.display = "none";
 	  };
 	  openModal.onclick = function () {
-	    aboutModal.style.display = "absolute";
+	    aboutModal.style.display = "block";
 	  };
 	  rockButton.addEventListener("click", function () {
 	    return genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val());

@@ -344,7 +344,7 @@ $(document).ready(() => {
 
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
-  openModal.onclick = () => { aboutModal.style.display = "absolute"; };
+  openModal.onclick = () => { aboutModal.style.display = "block"; };
   rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
   hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
