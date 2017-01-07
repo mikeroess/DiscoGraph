@@ -31,7 +31,6 @@ const genreButtonClick = function (genre, clicked, startYear, endYear) {
       genreQuery(data).then((response) => {
         const oldData = JSON.parse(localStorage[genre]);
         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-        debugger
         const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
         oldData[year] = itemsPerYear;
         localStorage.setItem(genre, JSON.stringify(oldData));
@@ -109,7 +108,6 @@ const getMaxRelease = (genres, storage) => {
 };
 
 const writeGraph = (localData, minYear, maxYear) => {
-
   const genres = Object.keys(localData).filter(
     (genre) => {
       if (isButtonClicked(genre)) return genre;
@@ -129,6 +127,20 @@ const writeGraph = (localData, minYear, maxYear) => {
       }
     }
   });
+
+
+    if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+    } else {
+      const subgenreEntry = JSON.parse(localStorage["subgenre"]);
+      const subgenre = Object.keys(subgenreEntry)[0];
+      const subgenreData = subgenreEntry[subgenre];
+      globalData[subgenre] = subgenreData;
+      genres.push("subgenre");
+    }
+
+
+
+
 
   const maxNumOfReleases = getMaxRelease(genres, globalData);
 
@@ -364,71 +376,35 @@ $(document).ready(() => {
     const style = $('#genre').val();
     const start = $('#startYear').val();
     const end = $('#endYear').val();
-
-    // const data = {'style': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
-    // let currentSubGenre = Object.keys(JSON.parse(localStorage['subgenre']))[0];
-    // let currentData = {};
-    // if (currentSubGenre === data["style"]) {
-    //   debugger
-    //   currentData = JSON.parse(localStorage["subgenre"])[currentSubGenre]
-    // } else {
-    //   debugger
-    //   currentData[$('#genre').val()] = {};
-    //   localStorage.setItem("subgenre", JSON.stringify(currentData));
-    // }
     for (let i = start; i <= end; i++) {
-      // if (typeof(currentData[i]) !== "number") {
-        // console.log('fetchingData');
         let reqData = {'style': style, 'year': i};
-        // console.log(reqData)
-        subGenreQuery(reqData).then((response) => {
+
+        subGenreQuery(reqData).then(
+          (response) => {
           const subgenre = genre.value;
           const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
           const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
           if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
-            debugger
             const newData = {};
             newData[subgenre] = {};
             const updatingData = newData[subgenre];
             updatingData[year] = itemsPerYear;
             localStorage.setItem("subgenre", JSON.stringify(newData));
           } else {
-            debugger
             const oldEntry = JSON.parse(localStorage["subgenre"]);
             const oldData = oldEntry[subgenre];
             oldData[year] = itemsPerYear;
             localStorage.setItem("subgenre", JSON.stringify(oldEntry));
           }
-          // WRITE GRAPH
-          // console.log(response)
-          // console.log(localStorage)
-          // debugger
-          // const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
-          // console.log(oldData)
-          // oldData[year] = itemsPerYear;
-          // console.log(oldData)
-          // const packagedOldData = {};
-          // packagedOldData[$('#genre').val()] = oldData;
-          // console.log(packagedOldData)
-          // localStorage.setItem("subgenre", packagedOldData);
-          // console.log(localStorage);
+          debugger
           writeGraph(localStorage, startYear, endYear);
         },
-        (err) => {console.log(err)}
+
+        (err) => {
+          console.log(err)
+        }
       );
-      // } else {
-      //   console.log("already got it");
-      // }
     }
-    const currentGenre = JSON.parse(localStorage['subgenre'])
-    writeGraph(localStorage, data["startYear"], data["endYear"]);
-    subGenreQuery(data).then((response) => {
-      const genre = Object.keys(response)[0];
-      const releases = response[Object.keys(response)[0]];
-      const tempObject = {};
-      tempObject[genre] = releases;
-      localStorage.setItem("subgenre", JSON.stringify(tempObject));
-    },
-  (err) => console.log(err));;
-  });
+  }
+);
 });

@@ -73,11 +73,10 @@
 	  for (var i = startYear; i <= endYear; i++) {
 	    if (typeof currentRecords[i] !== "number") {
 	      console.log('fetchingData');
-	      var _data = { 'genre': genre, 'year': i };
-	      genreQuery(_data).then(function (response) {
+	      var data = { 'genre': genre, 'year': i };
+	      genreQuery(data).then(function (response) {
 	        var oldData = JSON.parse(localStorage[genre]);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	        debugger;
 	        var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
 	        oldData[year] = itemsPerYear;
 	        localStorage.setItem(genre, JSON.stringify(oldData));
@@ -153,7 +152,6 @@
 	};
 	
 	var writeGraph = function writeGraph(localData, minYear, maxYear) {
-	
 	  var genres = Object.keys(localData).filter(function (genre) {
 	    if (isButtonClicked(genre)) return genre;
 	  });
@@ -171,6 +169,14 @@
 	      }
 	    }
 	  });
+	
+	  if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {} else {
+	    var subgenreEntry = JSON.parse(localStorage["subgenre"]);
+	    var subgenre = Object.keys(subgenreEntry)[0];
+	    var subgenreData = subgenreEntry[subgenre];
+	    globalData[subgenre] = subgenreData;
+	    genres.push("subgenre");
+	  }
 	
 	  var maxNumOfReleases = getMaxRelease(genres, globalData);
 	
@@ -387,73 +393,31 @@
 	    var style = $('#genre').val();
 	    var start = $('#startYear').val();
 	    var end = $('#endYear').val();
-	
-	    // const data = {'style': $('#genre').val(), 'startYear': $('#startYear').val(), 'endYear': $('#endYear').val() };
-	    // let currentSubGenre = Object.keys(JSON.parse(localStorage['subgenre']))[0];
-	    // let currentData = {};
-	    // if (currentSubGenre === data["style"]) {
-	    //   debugger
-	    //   currentData = JSON.parse(localStorage["subgenre"])[currentSubGenre]
-	    // } else {
-	    //   debugger
-	    //   currentData[$('#genre').val()] = {};
-	    //   localStorage.setItem("subgenre", JSON.stringify(currentData));
-	    // }
 	    for (var _i = start; _i <= end; _i++) {
-	      // if (typeof(currentData[i]) !== "number") {
-	      // console.log('fetchingData');
 	      var reqData = { 'style': style, 'year': _i };
-	      // console.log(reqData)
+	
 	      subGenreQuery(reqData).then(function (response) {
 	        var subgenre = genre.value;
 	        var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
 	        if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
-	          debugger;
 	          var newData = {};
 	          newData[subgenre] = {};
 	          var updatingData = newData[subgenre];
 	          updatingData[year] = itemsPerYear;
 	          localStorage.setItem("subgenre", JSON.stringify(newData));
 	        } else {
-	          debugger;
 	          var oldEntry = JSON.parse(localStorage["subgenre"]);
 	          var oldData = oldEntry[subgenre];
 	          oldData[year] = itemsPerYear;
 	          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
 	        }
-	        // WRITE GRAPH
-	        // console.log(response)
-	        // console.log(localStorage)
-	        // debugger
-	        // const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
-	        // console.log(oldData)
-	        // oldData[year] = itemsPerYear;
-	        // console.log(oldData)
-	        // const packagedOldData = {};
-	        // packagedOldData[$('#genre').val()] = oldData;
-	        // console.log(packagedOldData)
-	        // localStorage.setItem("subgenre", packagedOldData);
-	        // console.log(localStorage);
+	        debugger;
 	        writeGraph(localStorage, startYear, endYear);
 	      }, function (err) {
 	        console.log(err);
 	      });
-	      // } else {
-	      //   console.log("already got it");
-	      // }
 	    }
-	    var currentGenre = JSON.parse(localStorage['subgenre']);
-	    writeGraph(localStorage, data["startYear"], data["endYear"]);
-	    subGenreQuery(data).then(function (response) {
-	      var genre = Object.keys(response)[0];
-	      var releases = response[Object.keys(response)[0]];
-	      var tempObject = {};
-	      tempObject[genre] = releases;
-	      localStorage.setItem("subgenre", JSON.stringify(tempObject));
-	    }, function (err) {
-	      return console.log(err);
-	    });;
 	  });
 	});
 
