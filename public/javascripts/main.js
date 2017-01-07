@@ -379,35 +379,39 @@ $(document).ready(() => {
     for (let i = start; i <= end; i++) {
       // if (typeof(currentData[i]) !== "number") {
         // console.log('fetchingData');
-        let reqData = {'style': data["style"], 'year': i};
+        let reqData = {'style': style, 'year': i};
         // console.log(reqData)
         subGenreQuery(reqData).then((response) => {
-          if (localStorage["subGenre"] === undefined) {
-            // CREATE SUB GENRE ENTRY;
-            // INSERT VALUE INTO IT
-            // STRINGIFY
-            // STORE
+          const subgenre = genre.value;
+          const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+          const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+          if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+            debugger
+            const newData = {};
+            newData[subgenre] = {};
+            const updatingData = newData[subgenre];
+            updatingData[year] = itemsPerYear;
+            localStorage.setItem("subgenre", JSON.stringify(newData));
           } else {
-            // ACCESS SUB GENRE ENTRY
-            // INSERT VALUE INTO IT
-            // STRINGIFY
-            // STORE
+            debugger
+            const oldEntry = JSON.parse(localStorage["subgenre"]);
+            const oldData = oldEntry[subgenre];
+            oldData[year] = itemsPerYear;
+            localStorage.setItem("subgenre", JSON.stringify(oldEntry));
           }
           // WRITE GRAPH
           // console.log(response)
           // console.log(localStorage)
           // debugger
-          const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
-          console.log(oldData)
-          const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-          const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
-          oldData[year] = itemsPerYear;
-          console.log(oldData)
-          const packagedOldData = {};
-          packagedOldData[$('#genre').val()] = oldData;
-          console.log(packagedOldData)
-          localStorage.setItem("subgenre", packagedOldData);
-          console.log(localStorage);
+          // const oldData = JSON.parse(localStorage["subgenre"])[currentSubGenre];
+          // console.log(oldData)
+          // oldData[year] = itemsPerYear;
+          // console.log(oldData)
+          // const packagedOldData = {};
+          // packagedOldData[$('#genre').val()] = oldData;
+          // console.log(packagedOldData)
+          // localStorage.setItem("subgenre", packagedOldData);
+          // console.log(localStorage);
           writeGraph(localStorage, startYear, endYear);
         },
         (err) => {console.log(err)}
