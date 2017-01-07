@@ -46,26 +46,14 @@
 
 	'use strict';
 	
+	var _api = __webpack_require__(2);
+	
+	var _dom_methods = __webpack_require__(3);
+	
+	var _graph = __webpack_require__(4);
+	
 	var d3 = __webpack_require__(1);
-	// import {genreQuery, subGenreQuery } from './api.js';
 	
-	
-	var genreQuery = function genreQuery(data) {
-	  return $.ajax({
-	    method: "GET",
-	    url: 'api',
-	    data: data
-	  });
-	};
-	
-	var subGenreQuery = function subGenreQuery(data) {
-	  localStorage.removeItem("subgenre");
-	  return $.ajax({
-	    method: "GET",
-	    url: "styleApi",
-	    data: data
-	  });
-	};
 	
 	var genreButtonClick = function genreButtonClick(genre, clicked, startYear, endYear) {
 	  writeGraph(localStorage, startYear, endYear);
@@ -74,7 +62,7 @@
 	    if (typeof currentRecords[i] !== "number") {
 	      console.log('fetchingData');
 	      var data = { 'genre': genre, 'year': i };
-	      genreQuery(data).then(function (response) {
+	      (0, _api.genreQuery)(data).then(function (response) {
 	        var oldData = JSON.parse(localStorage[genre]);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
 	        var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
@@ -91,70 +79,11 @@
 	  }
 	};
 	
-	var clearChart = function clearChart() {
-	  $(".graph").remove();
-	};
-	
-	var isButtonClicked = function isButtonClicked(genre) {
-	  if (genre === "subgenre") return false;
-	  var buttonId = genre + "-toggle";
-	  return document.getElementById(buttonId).checked;
-	};
-	
-	var margin = { top: 30, right: 20, bottom: 30, left: 50 };
-	var w = 950 - margin.left - margin.right;
-	var h = 500 - margin.top - margin.bottom;
-	
-	var xScale = d3.scaleTime().rangeRound([0, w - margin.left - margin.right]);
-	
-	var yScale = d3.scaleLinear().rangeRound([h - margin.bottom - margin.top, 0]);
-	
-	var line = d3.line().x(function (d) {
-	  return xScale(d[0]);
-	}).y(function (d) {
-	  return yScale(d[1]);
-	});
-	
-	var parseDate = d3.timeParse("%Y");
-	
-	var formatData = function formatData(genre, startYear, endYear) {
-	  var keys = Object.keys(genre).sort();
-	  var filteredData = keys.filter(function (key) {
-	    if (key >= startYear && key <= endYear) {
-	      return true;
-	    } else {
-	      return false;
-	    }
-	  });
-	  var formattedData = filteredData.map(function (key) {
-	    return [parseDate(key), genre[key]];
-	  });
-	  return formattedData;
-	};
-	
-	var GenerateLeftAxis = function GenerateLeftAxis(scale) {
-	  var leftAxis = d3.axisLeft(scale);
-	  return leftAxis;
-	};
-	
-	var GenerateBottomAxis = function GenerateBottomAxis(scale) {
-	  var bottomAxis = d3.axisBottom(scale);
-	  return bottomAxis;
-	};
-	
-	var getMaxRelease = function getMaxRelease(genres, storage) {
-	  var topReleasesPerGenre = [];
-	  genres.forEach(function (genre) {
-	    if (genre === "subgenre") return;
-	    topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
-	  });
-	  return d3.max(topReleasesPerGenre);
-	};
-	
 	var writeGraph = function writeGraph(localData, minYear, maxYear) {
 	  var genres = Object.keys(localData).filter(function (genre) {
-	    if (isButtonClicked(genre)) return genre;
+	    if ((0, _dom_methods.isButtonClicked)(genre)) return genre;
 	  });
+	
 	  var globalData = {};
 	  genres.forEach(function (genre) {
 	    if (localData[genre]) {
@@ -178,163 +107,49 @@
 	    genres.push("subgenre");
 	  }
 	
-	  var maxNumOfReleases = getMaxRelease(genres, globalData);
+	  var maxNumOfReleases = (0, _graph.getMaxRelease)(genres, globalData);
 	
-	  xScale.domain([parseDate(minYear), parseDate(maxYear)]);
-	  yScale.domain([0, maxNumOfReleases]);
+	  _graph.xScale.domain([(0, _graph.parseDate)(minYear), (0, _graph.parseDate)(maxYear)]);
+	  _graph.yScale.domain([0, maxNumOfReleases]);
 	
-	  var leftAxis = GenerateLeftAxis(yScale);
-	  var bottomAxis = GenerateBottomAxis(xScale);
+	  var leftAxis = (0, _graph.GenerateLeftAxis)(_graph.yScale);
+	  var bottomAxis = (0, _graph.GenerateBottomAxis)(_graph.xScale);
 	
-	  clearChart();
+	  (0, _dom_methods.clearChart)();
 	
-	  var svg = d3.select('#d3Graph').append("svg").attr("class", "graph").attr("width", w + margin.left + margin.right).attr("height", h + margin.top + margin.bottom);
+	  var svg = d3.select('#d3Graph').append("svg").attr("class", "graph").attr("width", _graph.w + _graph.margin.left + _graph.margin.right).attr("height", _graph.h + _graph.margin.top + _graph.margin.bottom);
 	
-	  svg.append("g").attr("class", "axis").attr("transform", 'translate(' + margin.left + ', ' + margin.bottom + ')').call(leftAxis).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("fill", "#000").text("Number of Releases");
+	  svg.append("g").attr("class", "axis").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')').call(leftAxis).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("fill", "#000").text("Number of Releases");
 	
-	  svg.append("g").attr("class", "axis").attr("transform", 'translate(' + margin.left + ', ' + (h - margin.bottom) + ')').call(bottomAxis);
+	  svg.append("g").attr("class", "axis").attr("transform", 'translate(' + _graph.margin.left + ', ' + (_graph.h - _graph.margin.bottom) + ')').call(bottomAxis);
 	
 	  genres.forEach(function (genre) {
 	    if (genre === 'subgenre') {
 	      var subGenreObject = JSON.parse(localStorage[genre]);
 	      var genreName = Object.keys(subGenreObject)[0];
-	      var formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
+	      var formattedDataset = (0, _graph.formatData)(subGenreObject[genreName], minYear, maxYear);
 	      if (formattedDataset.length === 0) {
 	        return;
 	      }
 	
-	      svg.append("path").attr("d", line(formattedDataset)).attr("stroke", genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + margin.left + ', ' + margin.bottom + ')');
+	      svg.append("path").attr("d", (0, _graph.line)(formattedDataset)).attr("stroke", _dom_methods.genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')');
 	
-	      svg.append("text").attr("transform", "translate(" + (w + 3) + "," + yScale(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "white").text(genreName);
+	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "white").text(genreName);
 	    } else {
 	      var dataset = JSON.parse(localStorage[genre]);
-	      var _formattedDataset = formatData(dataset, minYear, maxYear);
+	      var _formattedDataset = (0, _graph.formatData)(dataset, minYear, maxYear);
 	      if (_formattedDataset.length === 0) {
 	        return;
 	      }
 	
-	      svg.append("path").attr("d", line(_formattedDataset)).attr("stroke", genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + margin.left + ', ' + margin.bottom + ')');
+	      svg.append("path").attr("d", (0, _graph.line)(_formattedDataset)).attr("stroke", _dom_methods.genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')');
 	
-	      svg.append("text").attr("transform", "translate(" + (w + 3) + "," + yScale(_formattedDataset[_formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", genreColors[genre]).text(genre);
+	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(_formattedDataset[_formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", _dom_methods.genreColors[genre]).text(genre);
 	    }
 	  });
-	};
-	
-	var genreColors = {
-	  "rock": "#8ce196",
-	  "pop": "#5ED5FF",
-	  "hip-hop": "#FC78F5",
-	  "funk-soul": "#F0E95E",
-	  "electronic": "#AE73EE",
-	  "classical": "#FF5175",
-	  "jazz": "#00FFFF",
-	  "subgenre": "white"
-	};
-	
-	var setupLocalStorage = function setupLocalStorage() {
-	  localStorage.removeItem("subgenre");
-	  var genres = Object.keys(genreColors);
-	  genres.forEach(function (genre) {
-	    if (typeof localStorage[genre] === "undefined") localStorage.setItem(genre, JSON.stringify({}));
-	  });
-	  localStorage.setItem("subgenre", "{}");
-	};
-	
-	var startYearUpdate = function startYearUpdate(year) {
-	  $('#startYearDisplay').val(year);
-	  if (year >= $('#endYearDisplay').val()) {
-	    $('#endYear').val(parseInt(year) + 5);
-	    $('#endYearDisplay').val(parseInt(year) + 5);
-	  }
-	  writeGraph(localStorage, year, $('#endYear').val());
-	};
-	
-	var endYearUpdate = function endYearUpdate(year) {
-	  $('#endYearDisplay').val(year);
-	  if (year <= $('#startYearDisplay').val()) {
-	    $('#startYear').val(parseInt(year) - 5);
-	    $('#startYearDisplay').val(parseInt(year) - 5);
-	  }
-	  writeGraph(localStorage, $('#startYear').val(), year);
 	};
 	
 	$(document).ready(function () {
-	
-	  var t = 1;
-	  var radius = 50;
-	  var squareSize = 6.5;
-	  var prec = 19.55;
-	  var fuzzy = 0.001;
-	  var inc = (Math.PI - fuzzy) / prec;
-	  var discoBall = document.getElementById("discoBall");
-	
-	  for (var t = fuzzy; t < Math.PI; t += inc) {
-	    var z = radius * Math.cos(t);
-	    var currentRadius = Math.abs(radius * Math.cos(0) * Math.sin(t) - radius * Math.cos(Math.PI) * Math.sin(t)) / 2.5;
-	    var circumference = Math.abs(2 * Math.PI * currentRadius);
-	    var squaresThatFit = Math.floor(circumference / squareSize);
-	    var angleInc = (Math.PI * 2 - fuzzy) / squaresThatFit;
-	    for (var i = angleInc / 2 + fuzzy; i < Math.PI * 2; i += angleInc) {
-	      var square = document.createElement("div");
-	      var squareTile = document.createElement("div");
-	      squareTile.style.width = squareSize + "px";
-	      squareTile.style.height = squareSize + "px";
-	      squareTile.style.transformOrigin = "0 0 0";
-	      squareTile.style.webkitTransformOrigin = "0 0 0";
-	      squareTile.style.webkitTransform = "rotate(" + i + "rad) rotateY(" + t + "rad)";
-	      squareTile.style.transform = "rotate(" + i + "rad) rotateY(" + t + "rad)";
-	      if (t > 1.3 && t < 1.9 || t < -1.3 && t > -1.9) {
-	        squareTile.style.backgroundColor = randomColor("bright");
-	      } else {
-	        squareTile.style.backgroundColor = randomColor("any");
-	      }
-	      square.appendChild(squareTile);
-	      square.className = "square";
-	      squareTile.style.webkitAnimation = "reflect 2s linear infinite";
-	      squareTile.style.webkitAnimationDelay = String(randomNumber(0, 20) / 10) + "s";
-	      squareTile.style.animation = "reflect 2s linear infinite";
-	      squareTile.style.animationDelay = String(randomNumber(0, 20) / 10) + "s";
-	      squareTile.style.backfaceVisibility = "hidden";
-	      var x = radius * Math.cos(i) * Math.sin(t);
-	      var y = radius * Math.sin(i) * Math.sin(t);
-	      square.style.webkitTransform = "translateX(" + Math.ceil(x) + "px) translateY(" + y + "px) translateZ(" + z + "px)";
-	      square.style.transform = "translateX(" + x + "px) translateY(" + y + "px) translateZ(" + z + "px)";
-	      discoBall.appendChild(square);
-	    }
-	  }
-	
-	  function randomColor(type) {
-	    var c;
-	    if (type == "bright") {
-	      c = randomNumber(130, 255);
-	    } else {
-	      c = randomNumber(110, 190);
-	    }
-	    return "rgb(" + c + "," + c + "," + c + ")";
-	  }
-	
-	  function randomNumber(min, max) {
-	    return Math.floor(Math.random() * (max - min + 1)) + min;
-	  }
-	
-	  var lightSwitch = function lightSwitch(state) {
-	    if (state === true) {
-	      $("body").css("background-color", "#333");
-	    } else {
-	      $("body").css("background-color", "#bebebf");
-	    }
-	  };
-	
-	  var discoSwitch = function discoSwitch(state) {
-	    if (state === true) {
-	      $(".disco").css("display", "block");
-	      lightSwitch(true);
-	    } else {
-	      $(".disco").css("display", "none");
-	      lightSwitch(false);
-	    }
-	  };
-	
 	  var rockButton = document.getElementById("rock-toggle");
 	  var popButton = document.getElementById("pop-toggle");
 	  var hipHopButton = document.getElementById("hip-hop-toggle");
@@ -342,8 +157,6 @@
 	  var electronicButton = document.getElementById("electronic-toggle");
 	  var classicalButton = document.getElementById("classical-toggle");
 	  var jazzButton = document.getElementById("jazz-toggle");
-	  // const lightsButton = document.getElementById("lights-toggle");
-	  // const discoButton = document.getElementById("disco-toggle");
 	  var startYear = document.getElementById("startYear");
 	  var endYear = document.getElementById("endYear");
 	  var aboutModal = document.getElementById("aboutModal");
@@ -356,6 +169,7 @@
 	  openModal.onclick = function () {
 	    aboutModal.style.display = "block";
 	  };
+	
 	  rockButton.addEventListener("click", function () {
 	    return genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val());
 	  }, false);
@@ -377,26 +191,28 @@
 	  jazzButton.addEventListener("click", function () {
 	    return genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val());
 	  }, false);
-	  // lightsButton.addEventListener("click", () => lightSwitch(lightsButton.checked))
-	  // discoButton.addEventListener("click", () => discoSwitch(discoButton.checked))
+	
 	  startYear.addEventListener("input", function () {
-	    return startYearUpdate($('#startYear').val());
-	  });
-	  endYear.addEventListener("input", function () {
-	    return endYearUpdate($('#endYear').val());
+	    (0, _dom_methods.startYearUpdate)($('#startYear').val());
+	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  });
 	
-	  setupLocalStorage();
+	  endYear.addEventListener("input", function () {
+	    (0, _dom_methods.endYearUpdate)($('#endYear').val());
+	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	  });
+	
+	  (0, _dom_methods.setupLocalStorage)();
 	
 	  $("#mainForm").submit(function (e) {
 	    e.preventDefault();
 	    var style = $('#genre').val();
 	    var start = $('#startYear').val();
 	    var end = $('#endYear').val();
-	    for (var _i = start; _i <= end; _i++) {
-	      var reqData = { 'style': style, 'year': _i };
+	    for (var i = start; i <= end; i++) {
+	      var reqData = { 'style': style, 'year': i };
 	
-	      subGenreQuery(reqData).then(function (response) {
+	      (0, _api.subGenreQuery)(reqData).then(function (response) {
 	        var subgenre = genre.value;
 	        var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
@@ -412,8 +228,7 @@
 	          oldData[year] = itemsPerYear;
 	          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
 	        }
-	        debugger;
-	        writeGraph(localStorage, startYear, endYear);
+	        writeGraph(localStorage, startYear.value, endYear.value);
 	      }, function (err) {
 	        console.log(err);
 	      });
@@ -16819,6 +16634,148 @@
 	
 	})));
 
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var genreQuery = exports.genreQuery = function genreQuery(data) {
+	  return $.ajax({
+	    method: "GET",
+	    url: 'api',
+	    data: data
+	  });
+	};
+	
+	var subGenreQuery = exports.subGenreQuery = function subGenreQuery(data) {
+	  localStorage.removeItem("subgenre");
+	  return $.ajax({
+	    method: "GET",
+	    url: "styleApi",
+	    data: data
+	  });
+	};
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var clearChart = exports.clearChart = function clearChart() {
+	  $(".graph").remove();
+	};
+	
+	var isButtonClicked = exports.isButtonClicked = function isButtonClicked(genre) {
+	  if (genre === "subgenre") return false;
+	  var buttonId = genre + "-toggle";
+	  return document.getElementById(buttonId).checked;
+	};
+	
+	var genreColors = exports.genreColors = {
+	  "rock": "#8ce196",
+	  "pop": "#5ED5FF",
+	  "hip-hop": "#FC78F5",
+	  "funk-soul": "#F0E95E",
+	  "electronic": "#AE73EE",
+	  "classical": "#FF5175",
+	  "jazz": "#00FFFF",
+	  "subgenre": "white"
+	};
+	
+	var setupLocalStorage = exports.setupLocalStorage = function setupLocalStorage() {
+	  localStorage.removeItem("subgenre");
+	  var genres = Object.keys(genreColors);
+	  genres.forEach(function (genre) {
+	    if (typeof localStorage[genre] === "undefined") localStorage.setItem(genre, JSON.stringify({}));
+	  });
+	  localStorage.setItem("subgenre", "{}");
+	};
+	
+	var startYearUpdate = exports.startYearUpdate = function startYearUpdate(year) {
+	  $('#startYearDisplay').val(year);
+	  if (year >= $('#endYearDisplay').val()) {
+	    $('#endYear').val(parseInt(year) + 5);
+	    $('#endYearDisplay').val(parseInt(year) + 5);
+	  }
+	};
+	
+	var endYearUpdate = exports.endYearUpdate = function endYearUpdate(year) {
+	  $('#endYearDisplay').val(year);
+	  if (year <= $('#startYearDisplay').val()) {
+	    $('#startYear').val(parseInt(year) - 5);
+	    $('#startYearDisplay').val(parseInt(year) - 5);
+	  }
+	};
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var d3 = __webpack_require__(1);
+	
+	var margin = exports.margin = { top: 30, right: 20, bottom: 30, left: 50 };
+	var w = exports.w = 950 - margin.left - margin.right;
+	var h = exports.h = 500 - margin.top - margin.bottom;
+	
+	var xScale = exports.xScale = d3.scaleTime().rangeRound([0, w - margin.left - margin.right]);
+	
+	var yScale = exports.yScale = d3.scaleLinear().rangeRound([h - margin.bottom - margin.top, 0]);
+	
+	var line = exports.line = d3.line().x(function (d) {
+	  return xScale(d[0]);
+	}).y(function (d) {
+	  return yScale(d[1]);
+	});
+	
+	var parseDate = exports.parseDate = d3.timeParse("%Y");
+	
+	var formatData = exports.formatData = function formatData(genre, startYear, endYear) {
+	  var keys = Object.keys(genre).sort();
+	  var filteredData = keys.filter(function (key) {
+	    if (key >= startYear && key <= endYear) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  });
+	  var formattedData = filteredData.map(function (key) {
+	    return [parseDate(key), genre[key]];
+	  });
+	  return formattedData;
+	};
+	
+	var GenerateLeftAxis = exports.GenerateLeftAxis = function GenerateLeftAxis(scale) {
+	  var leftAxis = d3.axisLeft(scale);
+	  return leftAxis;
+	};
+	
+	var GenerateBottomAxis = exports.GenerateBottomAxis = function GenerateBottomAxis(scale) {
+	  var bottomAxis = d3.axisBottom(scale);
+	  return bottomAxis;
+	};
+	
+	var getMaxRelease = exports.getMaxRelease = function getMaxRelease(genres, storage) {
+	  var topReleasesPerGenre = [];
+	  genres.forEach(function (genre) {
+	    if (genre === "subgenre") return;
+	    topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
+	  });
+	  return d3.max(topReleasesPerGenre);
+	};
 
 /***/ }
 /******/ ]);
