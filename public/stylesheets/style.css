@@ -93,7 +93,7 @@ footer li {
 /*modal*/
 
 .modal {
-    display: none;
+    /*display: none;*/
     position: fixed;
     z-index: 1;
     left: 0;
@@ -112,9 +112,9 @@ footer li {
     margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 70%;
+    width: 75%;
     font-size: 18px;
-    height: 60%;
+    height: 80%;
     text-align: justify;
 }
 
