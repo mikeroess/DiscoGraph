@@ -55,26 +55,80 @@
 	var d3 = __webpack_require__(1);
 	
 	
-	var genreButtonClick = function genreButtonClick(genre, clicked, startYear, endYear) {
+	var allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
+	
+	var updateStartYear = function updateStartYear(startYear) {
+	  var genresToUpdate = getClickedGenres();
+	  genresToUpdate.forEach(function (genre) {
+	    var earliestData = getEarliestData(genre, localStorage);
+	    if (startYear < earliestData) {
+	      genreButtonClick(genre, startYear, earliestData);
+	    }
+	  });
+	};
+	
+	var updateEndYear = function updateEndYear(endYear) {
+	  var genresToUpdate = getClickedGenres();
+	  genresToUpdate.forEach(function (genre) {
+	    var latestData = getLatestData(genre, localStorage);
+	    if (endYear > latestData) {
+	      genreButtonClick(genre, latestData, endYear);
+	    }
+	  });
+	};
+	
+	var getEarliestData = function getEarliestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 2015;
+	};
+	
+	var getLatestData = function getLatestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 1951;
+	};
+	
+	var getClickedGenres = function getClickedGenres() {
+	  var clickedGenres = [];
+	  allGenres.forEach(function (genre) {
+	    if ((0, _dom_methods.isButtonClicked)(genre)) {
+	      clickedGenres.push(genre);
+	    }
+	  });
+	  return clickedGenres;
+	};
+	
+	var getUnclickedGenres = function getUnclickedGenres() {
+	  var clickedGenres = [];
+	  allGenres.forEach(function (genre) {
+	    if (!(0, _dom_methods.isButtonClicked)(genre)) {
+	      clickedGenres.push(genre);
+	    }
+	  });
+	  return clickedGenres;
+	};
+	
+	var genreButtonClick = function genreButtonClick(genre, startYear, endYear) {
 	  writeGraph(localStorage, startYear, endYear);
 	  var currentRecords = JSON.parse(localStorage[genre]);
 	  for (var i = startYear; i <= endYear; i++) {
 	    if (typeof currentRecords[i] !== "number") {
-	      console.log('fetchingData');
 	      var data = { 'genre': genre, 'year': i };
 	      (0, _api.genreQuery)(data).then(function (response) {
 	        var oldData = JSON.parse(localStorage[genre]);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	        var year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+	        var year = void 0;
+	        debugger;
+	        if (JSON.parse(response["text"])["results"][0] !== undefined) {
+	          year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+	        }
 	        oldData[year] = itemsPerYear;
 	        localStorage.setItem(genre, JSON.stringify(oldData));
-	        console.log(localStorage);
 	        writeGraph(localStorage, startYear, endYear);
 	      }, function (err) {
 	        console.log(err);
 	      });
-	    } else {
-	      console.log("already got it");
 	    }
 	  }
 	};
@@ -171,29 +225,30 @@
 	  };
 	
 	  rockButton.addEventListener("click", function () {
-	    return genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("rock", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	  popButton.addEventListener("click", function () {
-	    return genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("pop", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	  hipHopButton.addEventListener("click", function () {
-	    return genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	  funkSoulButton.addEventListener("click", function () {
-	    return genreButtonClick("funk-soul", funkSoulButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	  electronicButton.addEventListener("click", function () {
-	    return genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	  classicalButton.addEventListener("click", function () {
-	    return genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("classical", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	  jazzButton.addEventListener("click", function () {
-	    return genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val());
+	    return genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val());
 	  }, false);
 	
 	  startYear.addEventListener("input", function () {
 	    (0, _dom_methods.startYearUpdate)($('#startYear').val());
+	    updateStartYear($('#startYear').val());
 	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  });
 	

@@ -6,27 +6,84 @@ import { margin, w, h, xScale, yScale, line, parseDate,
   formatData, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease } from './graph.js';
 
+const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
 
-const genreButtonClick = function (genre, clicked, startYear, endYear) {
+const updateStartYear = (startYear) => {
+  const genresToUpdate = getClickedGenres();
+  genresToUpdate.forEach( (genre) => {
+    const earliestData = getEarliestData(genre, localStorage);
+    if (startYear < earliestData) {
+      genreButtonClick(genre, startYear, earliestData);
+    }
+  });
+};
+
+const updateEndYear = (endYear) => {
+  const genresToUpdate = getClickedGenres();
+  genresToUpdate.forEach( (genre) => {
+    const latestData = getLatestData(genre, localStorage);
+    if (endYear > latestData) {
+      genreButtonClick(genre, latestData, endYear);
+    }
+  });
+}
+
+const getEarliestData = (genre, store) => {
+  if (store[genre]) {
+    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
+  }
+  else return 2015;
+};
+
+const getLatestData = (genre, store) => {
+  if (store[genre]) {
+    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
+  }
+  else return 1951;
+};
+
+const getClickedGenres = () => {
+  const clickedGenres = [];
+  allGenres.forEach( (genre) => {
+    if (isButtonClicked(genre)) {
+      clickedGenres.push(genre);
+    }
+  });
+  return clickedGenres;
+};
+
+const getUnclickedGenres = () => {
+  const clickedGenres = [];
+  allGenres.forEach( (genre) => {
+    if (!isButtonClicked(genre)) {
+      clickedGenres.push(genre);
+    }
+  });
+  return clickedGenres;
+};
+
+
+
+const genreButtonClick = function (genre, startYear, endYear) {
   writeGraph(localStorage, startYear, endYear);
   const currentRecords = JSON.parse(localStorage[genre]);
   for (let i = startYear; i <= endYear; i++) {
     if (typeof(currentRecords[i]) !== "number") {
-      console.log('fetchingData');
       let data = {'genre': genre, 'year': i};
       genreQuery(data).then((response) => {
         const oldData = JSON.parse(localStorage[genre]);
         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-        const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+        let year;
+        debugger
+        if (JSON.parse(response["text"])["results"][0] !== undefined) {
+          year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+        }
         oldData[year] = itemsPerYear;
         localStorage.setItem(genre, JSON.stringify(oldData));
-        console.log(localStorage);
         writeGraph(localStorage, startYear, endYear);
       },
       (err) => {console.log(err)}
     );
-    } else {
-      console.log("already got it");
     }
   }
 };
@@ -160,16 +217,17 @@ $(document).ready(() => {
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
 
-  rockButton.addEventListener("click", () => genreButtonClick("rock", rockButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  popButton.addEventListener("click", () => genreButtonClick("pop", popButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", hipHopButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  funkSoulButton.addEventListener("click", () => genreButtonClick("funk-soul", funkSoulButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  electronicButton.addEventListener("click", () => genreButtonClick("electronic", electronicButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  classicalButton.addEventListener("click", () => genreButtonClick("classical", classicalButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
-  jazzButton.addEventListener("click", () => genreButtonClick("jazz", jazzButton.clicked, $('#startYear').val(), $('#endYear').val()), false);
+  rockButton.addEventListener("click", () => genreButtonClick("rock", $('#startYear').val(), $('#endYear').val()), false);
+  popButton.addEventListener("click", () => genreButtonClick("pop", $('#startYear').val(), $('#endYear').val()), false);
+  hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val()), false);
+  funkSoulButton.addEventListener("click", () => genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val()), false);
+  electronicButton.addEventListener("click", () => genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val()), false);
+  classicalButton.addEventListener("click", () => genreButtonClick("classical", $('#startYear').val(), $('#endYear').val()), false);
+  jazzButton.addEventListener("click", () => genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val()), false);
 
   startYear.addEventListener("input", () => {
     startYearUpdate($('#startYear').val());
+    updateStartYear($('#startYear').val());
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
   });
 
