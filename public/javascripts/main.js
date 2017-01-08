@@ -1,4 +1,5 @@
 const d3 = require('d3');
+const Bottleneck = require("bottleneck");
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked, setupLocalStorage,
   genreColors, startYearUpdate, endYearUpdate } from './dom_methods.js';
@@ -6,12 +7,15 @@ import { margin, w, h, xScale, yScale, line, parseDate,
   formatData, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease } from './graph.js';
 
+  const limiter = new Bottleneck(240, 60000);
+
 const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
 
 const updateStartYear = (startYear) => {
   const genresToUpdate = getClickedGenres();
   genresToUpdate.forEach( (genre) => {
     const earliestData = getEarliestData(genre, localStorage);
+    // debugger
     if (startYear < earliestData) {
       genreButtonClick(genre, startYear, earliestData);
     }
@@ -71,13 +75,14 @@ const genreButtonClick = function (genre, startYear, endYear) {
     if (typeof(currentRecords[i]) !== "number") {
       let data = {'genre': genre, 'year': i};
       genreQuery(data).then((response) => {
+        const yearRexep = /year=\d\d\d\d/;
+        const reqUrl = response.req["url"];
         const oldData = JSON.parse(localStorage[genre]);
         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-        let year;
-        debugger
-        if (JSON.parse(response["text"])["results"][0] !== undefined) {
-          year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
-        }
+        const year = reqUrl.match(yearRexep)[0].slice(5,9);
+        // if (JSON.parse(response["text"])["results"][0] !== undefined) {
+        //   year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+        // }
         oldData[year] = itemsPerYear;
         localStorage.setItem(genre, JSON.stringify(oldData));
         writeGraph(localStorage, startYear, endYear);
@@ -197,7 +202,25 @@ const writeGraph = (localData, minYear, maxYear) => {
         .text(genre);
     }}
   )
-}
+};
+
+// const prefetchData = () => {
+//   console.log("prefetching");
+//   console.log(localStorage);
+//   allGenres.forEach( (genre) => {
+//     genreButtonClick (genre, 1970, 1985);
+//   });
+//   console.log("done");
+//   console.log(localStorage);
+// };
+
+const prefetchData = () => {
+  console.log("prefetching");
+  console.log(localStorage);
+    genreButtonClick ("hip-hop", 1970, 1972);
+  console.log("done");
+  console.log(localStorage);
+};
 
 $(document).ready(() => {
   const rockButton = document.getElementById("rock-toggle");
@@ -237,9 +260,12 @@ $(document).ready(() => {
   });
 
   setupLocalStorage();
+  prefetchData();
+  writeGraph(localStorage, startYear.value, endYear.value);
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
+    debugger
     const style = $('#genre').val();
     const start = $('#startYear').val();
     const end = $('#endYear').val();
@@ -249,7 +275,9 @@ $(document).ready(() => {
         subGenreQuery(reqData).then(
           (response) => {
           const subgenre = genre.value;
-          const year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
+          const yearRexep = /year=\d\d\d\d/;
+          const reqUrl = response.req["url"];
+          const year = reqUrl.match(yearRexep)[0].slice(5,9);
           const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
           if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
             const newData = {};
@@ -265,7 +293,6 @@ $(document).ready(() => {
           }
           writeGraph(localStorage, startYear.value, endYear.value);
         },
-
         (err) => {
           console.log(err)
         }

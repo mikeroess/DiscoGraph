@@ -4,7 +4,7 @@
 
 DiscoGraph is a light weight graphing application designed to illustrate changes in genre popularity across time.  It is built with <a href="d3js.org">d3</a>, pulls its data from the <a href="https://www.discogs.com/developers/">discogs API</a>, and uses Express.js to handle the API calls.
 
-![DiscoGraph](public/images/discograph.png)
+![DiscoGraph](discograph.png)
 
 # Current Features & Implementation Details
 
