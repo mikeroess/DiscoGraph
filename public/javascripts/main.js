@@ -201,26 +201,24 @@ const writeGraph = (localData, minYear, maxYear) => {
         .style("fill", genreColors[genre])
         .text(genre);
     }}
-  )
+  );
 };
-
-// const prefetchData = () => {
-//   console.log("prefetching");
-//   console.log(localStorage);
-//   allGenres.forEach( (genre) => {
-//     genreButtonClick (genre, 1970, 1985);
-//   });
-//   console.log("done");
-//   console.log(localStorage);
-// };
 
 const prefetchData = () => {
   console.log("prefetching");
   console.log(localStorage);
-    genreButtonClick ("hip-hop", 1970, 1972);
+  allGenres.forEach( (genre) => {
+    genreButtonClick (genre, 1970, 1990);
+  });
   console.log("done");
   console.log(localStorage);
 };
+
+// const prefetchData = () => {
+//
+//     genreButtonClick ("hip-hop", 1970, 1972);
+//
+// };
 
 $(document).ready(() => {
   const rockButton = document.getElementById("rock-toggle");
