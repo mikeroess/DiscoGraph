@@ -16,7 +16,7 @@ As the user adjusts the timescale or removes data from the graph, the graph is a
 y axes.  
 
 ## Data fetching and storage
-The Discogs API can only return the results of 1 genre or style per year per request and throttles restricts their API to 240 requests per minute.  To avoid slow loading times or user-noticable throttling data is pre-fetched on an schedule as soon as the page is loaded.  Fetched data is stored in the client's localstorage.  This enables data to persist on the client's browser without traversing the wire, and the restriction of new queries to only those not currently stored.  
+The Discogs API can only return the results of 1 genre or style per year per request and restricts their API to 240 requests per minute.  To avoid slow loading times or user-noticable throttling, data is pre-fetched on an schedule as soon as the page is loaded.  Fetched data is stored in the client's localStorage.  This enables data to persist on the client's browser without traversing the wire, and the restriction of new queries to only those not currently stored.  
 
 # Data discussion
 All data is pulled from a user generated dataset.  This leads to a number of advantages (more democratic, captures smaller releases that might go un-recorded), as well as a few possible disadvantages (the over-representation of electronic music).  Caveats aside, there is some very cool data to be found in this graph.  
@@ -26,6 +26,6 @@ All data is pulled from a user generated dataset.  This leads to a number of adv
 # Features In the Making
 In the future I plan to:
 - [ ] Switch from Bottleneck to Limiter for better API request throttling
-- [ ] Enable the Addition of multiple styles and the selection of each style's color
+- [ ] Enable the addition of multiple styles and the selection of each style's color
 - [ ] Automatically generate pie charts (of genre data only) for each year displayed
 - [ ] Throw in a nice disco easter egg
