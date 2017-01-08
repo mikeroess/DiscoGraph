@@ -1,58 +1,31 @@
 # DiscoGraph
 
-## Description
+<a href="https://discograph7.herokuapp.com/">DiscoGraph</a>
 
-An interactive timeline to visualize genre popularity.  Data is pulled from the Discogs API, hence the name.
+DiscoGraph is a light weight graphing application designed to illustrate changes in genre popularity across time.  It is built with <a href="d3js.org">d3</a>, pulls its data from the <a href="https://www.discogs.com/developers/">discogs API</a>, and uses Express.js to handle the API calls.
 
-## Functionality & MVP
+![DiscoGraph](public/images/discograph.png)
 
-Users will be able to:
-- [ ] input years to graph (between 1950 and present)
-- [ ] click buttons representing a genre to graph along that timeline (by # of releases)
-- [ ] view multiple genres on the same graph
-- [ ] search for any sub-genre (style) in the Discogs and graph it along the same timeline
+# Current Features & Implementation Details
 
-In addition this app will have a
-- [ ] production README
+## Genre selection and style search
+Discogs classifies music according to genre, of which is has 15, and style, of which there are nearly 2,000.  The graph allows users to display data for the 7 most popular genres (excluding "Folk, World & Country", which felt too mixed to be useful) with a simple button-click, and search for any style.
 
-## Wireframes
+## Adjustable timescale and dynamic rendering
+As the user adjusts the timescale or removes data from the graph, the graph is automatically re-rendered with adjusted x and
+y axes.  
 
-This app will consist of a single screen with inputs for start and end years, buttons for popular genres, and a search field for sub-genres
+## Data fetching and storage
+The Discogs API can only return the results of 1 genre or style per year per request and throttles restricts their API to 240 requests per minute.  To avoid slow loading times or user-noticable throttling data is pre-fetched on an schedule as soon as the page is loaded.  Fetched data is stored in the client's localstorage.  This enables data to persist on the client's browser without traversing the wire, and the restriction of new queries to only those not currently stored.  
 
-![wireframe](wireframe.JPG)
+# Data discussion
+All data is pulled from a user generated dataset.  This leads to a number of advantages (more democratic, captures smaller releases that might go un-recorded), as well as a few possible disadvantages (the over-representation of electronic music).  Caveats aside, there is some very cool data to be found in this graph.  
+  * in 1978 more music was released in the Funk/Soul genres than in Pop.  
+  * The rise and fall of Disco tracks that of Funk/Soul quite closely.  
 
-## Architecture and Technologies
-
-This project will be implemented with the following technologies:
-
-* D3 for the visualization of the data
-* JQuery, Vanilla JavaScript, and Discogs API for the data gathering and shaping
-
-## Implementation Timeline
-
-**Day 1:**
-- [ ] Setups Discogs API account and learn syntax for API calls and searches.
-- [ ] Write javascript forms to collect API call parameters for start/end and primary genres
-- [ ] Write functions to construct & execute API calls from collected parameters and receive results.
-
-Goal for the day: have UI for API call construction complete
-
-**Day 2:**
-- [ ] Learn enough D3 to create graph of timelines
-- [ ] Learn enough D3 to plot single genre on graph
-
-Goal for the day: User should be able to input start & end years, click on buttons, and see a chart for a single genre
-
-**Day 3:**
-- [ ] Learn enough D3 to superimpose multiple datasets on single graph
-- [ ] write javascript functions for sub-genre (style) search and superimpose results onto same graph.
-- [ ] add cool transitions to graph as data is updated.
-- [ ] style, polish, and professionalize appearance.  
-- [ ] If time permits, allow user to select color for each input
-
-## Bonus Features
-There are many additional visualizations I would like to implement including:
-- [ ] Display detailed data about releases on mouseover of datapoint.
-- [ ] Allow user to input a single year, and generate a pie chart of genre representation for that year (including specified sup-genres)
-- [ ] Allow user to search by label and create a 'node' whose child nodes are artists represented by that label.  Artists can have multiple parent nodes if on multiple labels.  
-- [ ] Allow user to search for artists and obtain same results as above.
+# Features In the Making
+In the future I plan to:
+- [ ] Switch from Bottleneck to Limiter for better API request throttling
+- [ ] Enable the Addition of multiple styles and the selection of each style's color
+- [ ] Automatically generate pie charts (of genre data only) for each year displayed
+- [ ] Throw in a nice disco easter egg
