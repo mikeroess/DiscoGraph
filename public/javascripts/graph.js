@@ -49,18 +49,3 @@ export const getMaxRelease = (genres, storage) => {
   });
   return d3.max(topReleasesPerGenre);
 };
-
-
-const getEarliestData = (genre, store) => {
-  if (store[genre]) {
-    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
-  }
-  else return 2015;
-};
-
-const getLatestData = (genre, store) => {
-  if (store[genre]) {
-    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
-  }
-  else return 1951;
-};

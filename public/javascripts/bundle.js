@@ -58,10 +58,22 @@
 	
 	var allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
 	
+	var getEarliestData = function getEarliestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 2015;
+	};
+	
+	var getLatestData = function getLatestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 1951;
+	};
+	
 	var updateStartYear = function updateStartYear(startYear) {
 	  var genresToUpdate = getClickedGenres();
 	  genresToUpdate.forEach(function (genre) {
-	    var earliestData = (0, _graph.getEarliestData)(genre, localStorage);
+	    var earliestData = getEarliestData(genre, localStorage);
 	    if (startYear < earliestData) {
 	      genreButtonClick(genre, startYear, earliestData, _dom_methods.removeSpinner);
 	    }
@@ -71,7 +83,7 @@
 	var updateEndYear = function updateEndYear(endYear) {
 	  var genresToUpdate = getClickedGenres();
 	  genresToUpdate.forEach(function (genre) {
-	    var latestData = (0, _graph.getLatestData)(genre, localStorage);
+	    var latestData = getLatestData(genre, localStorage);
 	    if (endYear > latestData) {
 	      genreButtonClick(genre, latestData, endYear, _dom_methods.removeSpinner);
 	    }
@@ -478,18 +490,6 @@
 	    topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
 	  });
 	  return d3.max(topReleasesPerGenre);
-	};
-	
-	var getEarliestData = function getEarliestData(genre, store) {
-	  if (store[genre]) {
-	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
-	  } else return 2015;
-	};
-	
-	var getLatestData = function getLatestData(genre, store) {
-	  if (store[genre]) {
-	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
-	  } else return 1951;
 	};
 
 /***/ },
