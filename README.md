@@ -15,6 +15,8 @@ Discogs classifies music according to genre, of which is has 15, and style, of w
 As the user adjusts the timescale or removes data from the graph, the graph is automatically re-rendered with adjusted x and
 y axes.  
 
+![DiscoGraph GIF](http://gph.is/2jiY8AH)
+
 ## Data fetching and storage
 The Discogs API can only return the results of 1 genre or style per year per request and restricts their API to 240 requests per minute.  To avoid slow loading times or user-noticable throttling, data is pre-fetched on an schedule as soon as the page is loaded.  Fetched data is stored in the client's localStorage.  This enables data to persist on the client's browser without traversing the wire, and the restriction of new queries to only those not currently stored.  
 
