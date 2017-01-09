@@ -1,5 +1,5 @@
+/*html*/
 body {
-  /*padding: 50px;*/
   font: 14px;
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
@@ -11,10 +11,6 @@ body {
 a {
   color: white;
 }
-
-/*html*/
-
-
 
 main {
   width: 900px;
@@ -32,7 +28,6 @@ header {
   font-size: 24px;
   position: relative;
   margin-top: 50px;
-  /*margin-bottom: 20px;*/
 }
 
 h1 {
@@ -47,11 +42,8 @@ body {
   float: right;
 }
 
-
 .yearInputs {
   margin: 15px auto;
- /*margin-left: 200px;
- width: 750px;*/
 }
 
 #endYearLabel {
@@ -64,17 +56,13 @@ body {
   margin-left: 300px;
 }
 
-
 .genreLabel {
   font-size: 12px;
-  margin: 1px 0;
+  margin: 7px;
 }
-
-
 
 /*footer*/
 footer li {
-	/*border-left: solid 1px rgba(255, 255, 255, 0.25);*/
 	display: inline-block;
 	line-height: 1em;
 	margin-left: 0.75em;
@@ -90,8 +78,12 @@ footer li {
     font-family: roboto;
 	}
 
-/*modal*/
+  /*clearfix*/
+  .group{
+    overflow: auto;
+  }
 
+/*modal*/
 .modal {
     /*display: none;*/
     position: fixed;
@@ -104,7 +96,6 @@ footer li {
     background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
 }
-
 
 .modal-content {
     background-color: white;
@@ -137,13 +128,6 @@ footer li {
 #open:hover {
   cursor: pointer;
 }
-
-
-/*clearfix*/
-.group{
-  overflow: auto;
-}
-
 
 /*d3*/
 .bar {
@@ -181,8 +165,8 @@ svg {
 .axis text {
    fill: white;
 }
-/*toggle buttons*/
 
+/*toggle buttons*/
 .switch {
   float: left;
   margin-right: 20px;

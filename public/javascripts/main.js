@@ -3,12 +3,10 @@ const Bottleneck = require("bottleneck");
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked, setupLocalStorage,
   genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
-addTriviaModal, removetriviaModal, removeSpinner, addSpinner } from './dom_methods.js';
+  addTriviaModal, removetriviaModal, removeSpinner, addSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate,
   formatData, GenerateLeftAxis, GenerateBottomAxis,
-  getMaxRelease } from './graph.js';
-
-const limiter = new Bottleneck(240, 60000);
+  getMaxRelease, getEarliestData, getLatestData } from './graph.js';
 
 const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
 
@@ -32,20 +30,6 @@ const updateEndYear = (endYear) => {
   });
 };
 
-const getEarliestData = (genre, store) => {
-  if (store[genre]) {
-    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
-  }
-  else return 2015;
-};
-
-const getLatestData = (genre, store) => {
-  if (store[genre]) {
-    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
-  }
-  else return 1951;
-};
-
 const getClickedGenres = () => {
   const clickedGenres = [];
   allGenres.forEach( (genre) => {
@@ -65,8 +49,6 @@ const getUnclickedGenres = () => {
   });
   return clickedGenres;
 };
-
-
 
 const genreButtonClick = function (genre, startYear, endYear, cb) {
   writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
@@ -103,7 +85,6 @@ const writeGraph = (localData, minYear, maxYear) => {
     }
   );
 
-
   let globalData = {};
   genres.forEach( (genre) => {
     if (localData[genre]) {
@@ -119,7 +100,6 @@ const writeGraph = (localData, minYear, maxYear) => {
     }
   });
 
-
     if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
     } else {
       const subgenreEntry = JSON.parse(localStorage["subgenre"]);
@@ -128,10 +108,6 @@ const writeGraph = (localData, minYear, maxYear) => {
       globalData[subgenre] = subgenreData;
       genres.push("subgenre");
     }
-
-
-
-
 
   const maxNumOfReleases = getMaxRelease(genres, globalData);
 
@@ -273,7 +249,8 @@ $(document).ready(() => {
     const end = $('#endYear').val();
     for (let i = start; i <= end; i++) {
         let reqData = {'style': style, 'year': i};
-
+        addSpinner();
+        addTriviaModal();
         subGenreQuery(reqData).then(
           (response) => {
           const subgenre = genre.value;
@@ -296,11 +273,10 @@ $(document).ready(() => {
           writeGraph(localStorage, startYear.value, endYear.value);
         },
         (err) => {
-          console.log(err)
+          console.log(err);
         }
       );
     }
   }
 );
-
 });

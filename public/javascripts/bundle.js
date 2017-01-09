@@ -56,14 +56,12 @@
 	var Bottleneck = __webpack_require__(5);
 	
 	
-	var limiter = new Bottleneck(240, 60000);
-	
 	var allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
 	
 	var updateStartYear = function updateStartYear(startYear) {
 	  var genresToUpdate = getClickedGenres();
 	  genresToUpdate.forEach(function (genre) {
-	    var earliestData = getEarliestData(genre, localStorage);
+	    var earliestData = (0, _graph.getEarliestData)(genre, localStorage);
 	    if (startYear < earliestData) {
 	      genreButtonClick(genre, startYear, earliestData, _dom_methods.removeSpinner);
 	    }
@@ -73,23 +71,11 @@
 	var updateEndYear = function updateEndYear(endYear) {
 	  var genresToUpdate = getClickedGenres();
 	  genresToUpdate.forEach(function (genre) {
-	    var latestData = getLatestData(genre, localStorage);
+	    var latestData = (0, _graph.getLatestData)(genre, localStorage);
 	    if (endYear > latestData) {
 	      genreButtonClick(genre, latestData, endYear, _dom_methods.removeSpinner);
 	    }
 	  });
-	};
-	
-	var getEarliestData = function getEarliestData(genre, store) {
-	  if (store[genre]) {
-	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
-	  } else return 2015;
-	};
-	
-	var getLatestData = function getLatestData(genre, store) {
-	  if (store[genre]) {
-	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
-	  } else return 1951;
 	};
 	
 	var getClickedGenres = function getClickedGenres() {
@@ -294,7 +280,8 @@
 	    var end = $('#endYear').val();
 	    for (var i = start; i <= end; i++) {
 	      var reqData = { 'style': style, 'year': i };
-	
+	      (0, _dom_methods.addSpinner)();
+	      (0, _dom_methods.addTriviaModal)();
 	      (0, _api.subGenreQuery)(reqData).then(function (response) {
 	        var subgenre = genre.value;
 	        var yearRexep = /year=\d\d\d\d/;
@@ -491,6 +478,18 @@
 	    topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
 	  });
 	  return d3.max(topReleasesPerGenre);
+	};
+	
+	var getEarliestData = function getEarliestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 2015;
+	};
+	
+	var getLatestData = function getLatestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 1951;
 	};
 
 /***/ },
