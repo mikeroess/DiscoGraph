@@ -6,9 +6,27 @@ import { clearChart, isButtonClicked, setupLocalStorage,
   addTriviaModal, removetriviaModal, removeSpinner, addSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate,
   formatData, GenerateLeftAxis, GenerateBottomAxis,
-  getMaxRelease, getEarliestData, getLatestData } from './graph.js';
+  getMaxRelease } from './graph.js';
 
 const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
+
+
+
+const getEarliestData = (genre, store) => {
+  if (store[genre]) {
+    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
+  }
+  else return 2015;
+};
+
+const getLatestData = (genre, store) => {
+  if (store[genre]) {
+    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
+  }
+  else return 1951;
+};
+
+
 
 const updateStartYear = (startYear) => {
   const genresToUpdate = getClickedGenres();
