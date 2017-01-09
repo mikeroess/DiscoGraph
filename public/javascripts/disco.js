@@ -71,4 +71,4 @@
   //     $(".disco").css("display", "none");
   //     lightSwitch(false);
   //   }
-  // };
+  };

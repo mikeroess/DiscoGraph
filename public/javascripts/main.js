@@ -2,12 +2,13 @@ const d3 = require('d3');
 const Bottleneck = require("bottleneck");
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked, setupLocalStorage,
-  genreColors, startYearUpdate, endYearUpdate } from './dom_methods.js';
+  genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
+addTriviaModal, removetriviaModal, removeSpinner, addSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate,
   formatData, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease } from './graph.js';
 
-  const limiter = new Bottleneck(240, 60000);
+const limiter = new Bottleneck(240, 60000);
 
 const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
 
@@ -15,9 +16,8 @@ const updateStartYear = (startYear) => {
   const genresToUpdate = getClickedGenres();
   genresToUpdate.forEach( (genre) => {
     const earliestData = getEarliestData(genre, localStorage);
-    // debugger
     if (startYear < earliestData) {
-      genreButtonClick(genre, startYear, earliestData);
+      genreButtonClick(genre, startYear, earliestData, removeSpinner);
     }
   });
 };
@@ -27,10 +27,10 @@ const updateEndYear = (endYear) => {
   genresToUpdate.forEach( (genre) => {
     const latestData = getLatestData(genre, localStorage);
     if (endYear > latestData) {
-      genreButtonClick(genre, latestData, endYear);
+      genreButtonClick(genre, latestData, endYear, removeSpinner);
     }
   });
-}
+};
 
 const getEarliestData = (genre, store) => {
   if (store[genre]) {
@@ -68,11 +68,13 @@ const getUnclickedGenres = () => {
 
 
 
-const genreButtonClick = function (genre, startYear, endYear) {
-  writeGraph(localStorage, startYear, endYear);
+const genreButtonClick = function (genre, startYear, endYear, cb) {
+  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
   const currentRecords = JSON.parse(localStorage[genre]);
   for (let i = startYear; i <= endYear; i++) {
     if (typeof(currentRecords[i]) !== "number") {
+      addSpinner();
+      addTriviaModal();
       let data = {'genre': genre, 'year': i};
       genreQuery(data).then((response) => {
         const yearRexep = /year=\d\d\d\d/;
@@ -80,17 +82,18 @@ const genreButtonClick = function (genre, startYear, endYear) {
         const oldData = JSON.parse(localStorage[genre]);
         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
         const year = reqUrl.match(yearRexep)[0].slice(5,9);
-        // if (JSON.parse(response["text"])["results"][0] !== undefined) {
-        //   year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
-        // }
         oldData[year] = itemsPerYear;
         localStorage.setItem(genre, JSON.stringify(oldData));
-        writeGraph(localStorage, startYear, endYear);
+        writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+        if (typeof(cb) === "function" && (year === endYear || year === startYear)) {
+          cb();
+        }
       },
-      (err) => {console.log(err)}
+      (err) => {console.log(err);}
     );
     }
   }
+
 };
 
 const writeGraph = (localData, minYear, maxYear) => {
@@ -205,20 +208,10 @@ const writeGraph = (localData, minYear, maxYear) => {
 };
 
 const prefetchData = () => {
-  console.log("prefetching");
-  console.log(localStorage);
   allGenres.forEach( (genre) => {
     genreButtonClick (genre, 1970, 1990);
   });
-  console.log("done");
-  console.log(localStorage);
 };
-
-// const prefetchData = () => {
-//
-//     genreButtonClick ("hip-hop", 1970, 1972);
-//
-// };
 
 $(document).ready(() => {
   const rockButton = document.getElementById("rock-toggle");
@@ -233,10 +226,13 @@ $(document).ready(() => {
   const aboutModal = document.getElementById("aboutModal");
   const closeModal = document.getElementById("close");
   const openModal = document.getElementById("open");
+  const triviaModal = document.getElementById("triviaModal");
+  const closeTrivia = document.getElementById("triviaClose");
 
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
+  closeTrivia.onclick = () => {triviaModal.style.display = "none"; };
 
   rockButton.addEventListener("click", () => genreButtonClick("rock", $('#startYear').val(), $('#endYear').val()), false);
   popButton.addEventListener("click", () => genreButtonClick("pop", $('#startYear').val(), $('#endYear').val()), false);
@@ -248,8 +244,11 @@ $(document).ready(() => {
 
   startYear.addEventListener("input", () => {
     startYearUpdate($('#startYear').val());
-    updateStartYear($('#startYear').val());
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+  });
+
+  startYear.addEventListener("change", () => {
+    updateStartYear($('#startYear').val());
   });
 
   endYear.addEventListener("input", () => {
@@ -257,13 +256,18 @@ $(document).ready(() => {
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
   });
 
+  endYear.addEventListener("change", () => {
+    updateEndYear($('#endYear').val());
+  });
+
   setupLocalStorage();
   prefetchData();
   writeGraph(localStorage, startYear.value, endYear.value);
+  removetriviaModal();
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
-    debugger
+
     const style = $('#genre').val();
     const start = $('#startYear').val();
     const end = $('#endYear').val();
@@ -298,4 +302,5 @@ $(document).ready(() => {
     }
   }
 );
+
 });

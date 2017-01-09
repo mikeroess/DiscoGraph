@@ -32,7 +32,7 @@ export const setupLocalStorage = () => {
 
 export const startYearUpdate = (year) => {
   $('#startYearDisplay').val(year);
-  if (year >= $('#endYearDisplay').val()) {
+  if (year >= $('#endYearDisplay').val() - 5) {
     $('#endYear').val(parseInt(year) + 5);
     $('#endYearDisplay').val(parseInt(year) + 5);
   }
@@ -40,8 +40,39 @@ export const startYearUpdate = (year) => {
 
 export const endYearUpdate = (year) => {
    $('#endYearDisplay').val(year);
-   if (year <= $('#startYearDisplay').val()) {
+   if (Number(year) <= Number($('#startYearDisplay').val()) + 5) {
      $('#startYear').val(parseInt(year) - 5);
      $('#startYearDisplay').val(parseInt(year) - 5);
    }
+ };
+
+
+export const addModal = () => {
+   const aboutModal = document.getElementById("aboutModal");
+   aboutModal.style.display = "block";
+ };
+
+export const removeModal = () => {
+     const aboutModal = document.getElementById("aboutModal");
+     aboutModal.style.display = "none";
+ };
+
+export const addTriviaModal = () => {
+   const TriviaModal = document.getElementById("triviaModal");
+   TriviaModal.style.display = "block";
+ };
+
+export const removetriviaModal = () => {
+     const TriviaModal = document.getElementById("triviaModal");
+     TriviaModal.style.display = "none";
+ };
+
+ export const removeSpinner = () => {
+   const spinner = document.getElementById("spinner");
+   spinner.style.display = "none";
+ };
+
+ export const addSpinner = () => {
+   const spinner = document.getElementById("spinner");
+   spinner.style.display = "absolute";
  };

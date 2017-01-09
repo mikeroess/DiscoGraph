@@ -64,9 +64,8 @@
 	  var genresToUpdate = getClickedGenres();
 	  genresToUpdate.forEach(function (genre) {
 	    var earliestData = getEarliestData(genre, localStorage);
-	    // debugger
 	    if (startYear < earliestData) {
-	      genreButtonClick(genre, startYear, earliestData);
+	      genreButtonClick(genre, startYear, earliestData, _dom_methods.removeSpinner);
 	    }
 	  });
 	};
@@ -76,7 +75,7 @@
 	  genresToUpdate.forEach(function (genre) {
 	    var latestData = getLatestData(genre, localStorage);
 	    if (endYear > latestData) {
-	      genreButtonClick(genre, latestData, endYear);
+	      genreButtonClick(genre, latestData, endYear, _dom_methods.removeSpinner);
 	    }
 	  });
 	};
@@ -113,11 +112,13 @@
 	  return clickedGenres;
 	};
 	
-	var genreButtonClick = function genreButtonClick(genre, startYear, endYear) {
-	  writeGraph(localStorage, startYear, endYear);
+	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
+	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  var currentRecords = JSON.parse(localStorage[genre]);
 	  for (var i = startYear; i <= endYear; i++) {
 	    if (typeof currentRecords[i] !== "number") {
+	      (0, _dom_methods.addSpinner)();
+	      (0, _dom_methods.addTriviaModal)();
 	      var data = { 'genre': genre, 'year': i };
 	      (0, _api.genreQuery)(data).then(function (response) {
 	        var yearRexep = /year=\d\d\d\d/;
@@ -125,12 +126,12 @@
 	        var oldData = JSON.parse(localStorage[genre]);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
 	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
-	        // if (JSON.parse(response["text"])["results"][0] !== undefined) {
-	        //   year = parseInt(JSON.parse(response["text"])["results"][0]["year"]);
-	        // }
 	        oldData[year] = itemsPerYear;
 	        localStorage.setItem(genre, JSON.stringify(oldData));
-	        writeGraph(localStorage, startYear, endYear);
+	        writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	        if (typeof cb === "function" && (year === endYear || year === startYear)) {
+	          cb();
+	        }
 	      }, function (err) {
 	        console.log(err);
 	      });
@@ -208,22 +209,10 @@
 	  });
 	};
 	
-	// const prefetchData = () => {
-	//   console.log("prefetching");
-	//   console.log(localStorage);
-	//   allGenres.forEach( (genre) => {
-	//     genreButtonClick (genre, 1970, 1985);
-	//   });
-	//   console.log("done");
-	//   console.log(localStorage);
-	// };
-	
 	var prefetchData = function prefetchData() {
-	  console.log("prefetching");
-	  console.log(localStorage);
-	  genreButtonClick("hip-hop", 1970, 1972);
-	  console.log("done");
-	  console.log(localStorage);
+	  allGenres.forEach(function (genre) {
+	    genreButtonClick(genre, 1970, 1990);
+	  });
 	};
 	
 	$(document).ready(function () {
@@ -239,12 +228,17 @@
 	  var aboutModal = document.getElementById("aboutModal");
 	  var closeModal = document.getElementById("close");
 	  var openModal = document.getElementById("open");
+	  var triviaModal = document.getElementById("triviaModal");
+	  var closeTrivia = document.getElementById("triviaClose");
 	
 	  closeModal.onclick = function () {
 	    aboutModal.style.display = "none";
 	  };
 	  openModal.onclick = function () {
 	    aboutModal.style.display = "block";
+	  };
+	  closeTrivia.onclick = function () {
+	    triviaModal.style.display = "none";
 	  };
 	
 	  rockButton.addEventListener("click", function () {
@@ -271,8 +265,11 @@
 	
 	  startYear.addEventListener("input", function () {
 	    (0, _dom_methods.startYearUpdate)($('#startYear').val());
-	    updateStartYear($('#startYear').val());
 	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	  });
+	
+	  startYear.addEventListener("change", function () {
+	    updateStartYear($('#startYear').val());
 	  });
 	
 	  endYear.addEventListener("input", function () {
@@ -280,13 +277,18 @@
 	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  });
 	
+	  endYear.addEventListener("change", function () {
+	    updateEndYear($('#endYear').val());
+	  });
+	
 	  (0, _dom_methods.setupLocalStorage)();
 	  prefetchData();
 	  writeGraph(localStorage, startYear.value, endYear.value);
+	  (0, _dom_methods.removetriviaModal)();
 	
 	  $("#mainForm").submit(function (e) {
 	    e.preventDefault();
-	    debugger;
+	
 	    var style = $('#genre').val();
 	    var start = $('#startYear').val();
 	    var end = $('#endYear').val();
@@ -386,7 +388,7 @@
 	
 	var startYearUpdate = exports.startYearUpdate = function startYearUpdate(year) {
 	  $('#startYearDisplay').val(year);
-	  if (year >= $('#endYearDisplay').val()) {
+	  if (year >= $('#endYearDisplay').val() - 5) {
 	    $('#endYear').val(parseInt(year) + 5);
 	    $('#endYearDisplay').val(parseInt(year) + 5);
 	  }
@@ -394,10 +396,40 @@
 	
 	var endYearUpdate = exports.endYearUpdate = function endYearUpdate(year) {
 	  $('#endYearDisplay').val(year);
-	  if (year <= $('#startYearDisplay').val()) {
+	  if (Number(year) <= Number($('#startYearDisplay').val()) + 5) {
 	    $('#startYear').val(parseInt(year) - 5);
 	    $('#startYearDisplay').val(parseInt(year) - 5);
 	  }
+	};
+	
+	var addModal = exports.addModal = function addModal() {
+	  var aboutModal = document.getElementById("aboutModal");
+	  aboutModal.style.display = "block";
+	};
+	
+	var removeModal = exports.removeModal = function removeModal() {
+	  var aboutModal = document.getElementById("aboutModal");
+	  aboutModal.style.display = "none";
+	};
+	
+	var addTriviaModal = exports.addTriviaModal = function addTriviaModal() {
+	  var TriviaModal = document.getElementById("triviaModal");
+	  TriviaModal.style.display = "block";
+	};
+	
+	var removetriviaModal = exports.removetriviaModal = function removetriviaModal() {
+	  var TriviaModal = document.getElementById("triviaModal");
+	  TriviaModal.style.display = "none";
+	};
+	
+	var removeSpinner = exports.removeSpinner = function removeSpinner() {
+	  var spinner = document.getElementById("spinner");
+	  spinner.style.display = "none";
+	};
+	
+	var addSpinner = exports.addSpinner = function addSpinner() {
+	  var spinner = document.getElementById("spinner");
+	  spinner.style.display = "absolute";
 	};
 
 /***/ },
