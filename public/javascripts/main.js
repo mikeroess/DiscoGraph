@@ -78,14 +78,14 @@ const filterFetch = (oldEntry, genre, startYear, endYear) => {
       if (oldEntry[i] !== undefined) {
         continue;
       } else {
-        start = i
+        start = i;
       }
     } else {
       if (oldEntry[i] === undefined) {
         continue;
       } else {
         end = i - 1;
-        missingYears.push([start, end])
+        missingYears.push([start, end]);
         start = null;
       }
     }
