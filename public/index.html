@@ -3,8 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title>DiscoGraph</title>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-    <script type="text/javascript" src="/javascripts/bundle.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Bungee+Shade" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/style.css">
@@ -16,16 +14,14 @@
 
 
   <body>
-    <header class="group"><h1 class="logo">DiscoGraph</h1> <span id="open">about</span></header>
+    <header class="group"><h1 class="logo">DiscoGraph</h1> <span id="aboutOpen">about</span></header>
     <main>
       <section class="information displayed">
-
-
     </section>
 
     <div id="aboutModal" class="modal">
-      <article class="modal-content">
-        <span id="close">X</span>
+      <article class="modal-content"><span class="spinner" id="aboutSpinner"></span>
+        <span id="aboutClose">X</span>
         <p>Welcome to DiscoGraph, a simple interactive data-visualization built with <a href="https://d3js.org/">d3</a> and the <a href="https://www.discogs.com/developers/">Discogs API.</a>
         </p>
         <p>
@@ -56,13 +52,13 @@
 
     <div id="triviaModal" class="modal">
       <article class="modal-content">
-        <span id="triviaClose">X</span><span id="spinner"></span>
+        <span id="triviaClose">X</span><span class="spinner" id="triviaSpinner"></span>
         <p>Music is swell!  But, as glamorous as practicing hours on end in a hot basement or tweaking the same beat for a month straight is, it's also a lot of work.
           A typical album costs ~ $10 and runs about an hour long.  If you listen to it twice, you've gotten about as much direct engagement as a hollywood movie for a little bit less than the price of a ticket.
         </p>
         <p>
           By its own admission Spotify pays 'rights holders' (i.e. often not artists), on average, less than a penny (btw $.006 and $.0084) per stream per song.
-          To get to that $10 mark, you'd have to stream a song for 70 hours.
+          To get to that $10 mark, you'd have to stream a song for 70 hours.  I'm not picking on Spotify either, they are just the most open with their rates.
         </p>
         <p>
           Imagine how much you would hate sitting through a 70 hour movie.
@@ -70,7 +66,7 @@
           Put differently, if you stream music for 1 hour every single day of the year, you've gotten money to rights-holders for about 5 albums a year.
         </p>
           <p>
-            Sure, streaming is more convenient.  But, it turns out you can still stream after you've bought an album.
+            This isn't to put streaming down.  I stream all the time, and I love it.  Companies that provide this service need to make ends meet as well.  But, you can stream an album even after you've bought it.
           </p>
         <p><a href="https://bandcamp.com/">Support good music!</a></p>
       </p>
@@ -148,5 +144,7 @@
     					</ul>
     				</div>
     			</footer>
+          <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+          <script type="text/javascript" src="/javascripts/bundle.js"></script>
   </body>
 </html>

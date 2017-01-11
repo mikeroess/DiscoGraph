@@ -108,16 +108,12 @@ footer li {
     text-align: justify;
 }
 
-.modal-content a {
-  color: black;
-}
-
 #aboutClose:hover {
   cursor: pointer;
 }
 
 #aboutOpen {
-  font-size: 12px;
+  font-size: 14px;
   padding: 0 10px;
   width: 10px;
   font-family: roboto;

@@ -3,14 +3,13 @@ const Bottleneck = require("bottleneck");
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked, setupLocalStorage,
   genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
-  addTriviaModal, removetriviaModal, removeSpinner, addSpinner } from './dom_methods.js';
+  addTriviaModal, removeTriviaSpinner, allowTriviaClose, removeTriviaModal,
+  addTriviaSpinner, addAboutSpinner, removeAboutSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate,
   formatData, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease } from './graph.js';
 
 const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
-
-
 
 const getEarliestData = (genre, store) => {
   if (store[genre]) {
@@ -26,14 +25,12 @@ const getLatestData = (genre, store) => {
   else return 1951;
 };
 
-
-
 const updateStartYear = (startYear) => {
   const genresToUpdate = getClickedGenres();
   genresToUpdate.forEach( (genre) => {
     const earliestData = getEarliestData(genre, localStorage);
     if (startYear < earliestData) {
-      genreButtonClick(genre, startYear, earliestData, removeSpinner);
+      genreButtonClick(genre, startYear, earliestData, allowTriviaClose);
     }
   });
 };
@@ -68,32 +65,86 @@ const getUnclickedGenres = () => {
   return clickedGenres;
 };
 
-const genreButtonClick = function (genre, startYear, endYear, cb) {
-  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-  const currentRecords = JSON.parse(localStorage[genre]);
-  for (let i = startYear; i <= endYear; i++) {
-    if (typeof(currentRecords[i]) !== "number") {
-      addSpinner();
-      addTriviaModal();
-      let data = {'genre': genre, 'year': i};
-      genreQuery(data).then((response) => {
-        const yearRexep = /year=\d\d\d\d/;
-        const reqUrl = response.req["url"];
-        const oldData = JSON.parse(localStorage[genre]);
-        const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-        const year = reqUrl.match(yearRexep)[0].slice(5,9);
-        oldData[year] = itemsPerYear;
-        localStorage.setItem(genre, JSON.stringify(oldData));
-        writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-        if (typeof(cb) === "function" && (year === endYear || year === startYear)) {
-          cb();
-        }
-      },
-      (err) => {console.log(err);}
-    );
+const filterFetch = (oldEntry, genre, startYear, endYear) => {
+  const missingYears = [];
+  let start = null;
+  let end = null;
+  for (let i = startYear; i < endYear; i++ ) {
+    if ( start === null ) {
+      if (oldEntry[i] !== undefined) {
+        continue
+      } else {
+        start = i
+      }
+    } else {
+      if (oldEntry[i] === undefined) {
+        continue
+      } else {
+        end = i - 1;
+        missingYears.push([start, end])
+        start = null;
+      }
+    }
+  }
+  if ( start !== null ) {
+    if (oldEntry[endYear] !== undefined) {
+      missingYears.push([start, endYear - 1]);
+    } else {
+      missingYears.push([start, endYear]);
+    }
+  } else {
+    if (oldEntry[endYear] !== undefined) {
+    } else {
+      missingYears.push([endYear, endYear]);
     }
   }
 
+  return missingYears
+};
+
+const genreButtonClick = function (genre, startYear, endYear, cb) {
+  debugger
+  const callback = cb;
+  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+  const currentRecords = JSON.parse(localStorage[genre]);
+  const yearsToFetch = filterFetch(currentRecords, genre, startYear, endYear);
+  let finalYear;
+  if (yearsToFetch.length > 0) finalYear = yearsToFetch[yearsToFetch.length - 1][1];
+  yearsToFetch.forEach( (range) => {
+    debugger
+    for (let i = range[0]; i <= range[1]; i++) {
+      debugger
+      if (typeof(currentRecords[i]) !== "number") {
+
+
+        const triviaSpinner = document.getElementById("triviaSpinner");
+        debugger
+        triviaSpinner.style.display = "block";
+
+
+        addTriviaModal();
+        let data = {'genre': genre, 'year': i};
+        genreQuery(data).then((response) => {
+          const yearRexep = /year=\d\d\d\d/;
+          const reqUrl = response.req["url"];
+          const oldData = JSON.parse(localStorage[genre]);
+          const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+          const reqYear = reqUrl.match(yearRexep)[0].slice(5,9);
+          oldData[i] = itemsPerYear;
+          localStorage.setItem(genre, JSON.stringify(oldData));
+          writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+          debugger
+          if (typeof(callback) === "function" && finalYear === Number(reqYear)) {
+            debugger
+            callback();
+          }
+
+        },
+        (err) => {console.log(err);}
+      );
+      }
+    }
+  });
 };
 
 const writeGraph = (localData, minYear, maxYear) => {
@@ -203,7 +254,7 @@ const writeGraph = (localData, minYear, maxYear) => {
 
 const prefetchData = () => {
   allGenres.forEach( (genre) => {
-    genreButtonClick (genre, 1970, 1990);
+    genreButtonClick (genre, 1970, 1990, () => {document.getElementById("aboutModal").style.display = "none"; });
   });
 };
 
@@ -218,8 +269,8 @@ $(document).ready(() => {
   const startYear = document.getElementById("startYear");
   const endYear = document.getElementById("endYear");
   const aboutModal = document.getElementById("aboutModal");
-  const closeModal = document.getElementById("close");
-  const openModal = document.getElementById("open");
+  const closeModal = document.getElementById("aboutClose");
+  const openModal = document.getElementById("aboutOpen");
   const triviaModal = document.getElementById("triviaModal");
   const closeTrivia = document.getElementById("triviaClose");
 
@@ -257,7 +308,7 @@ $(document).ready(() => {
   setupLocalStorage();
   prefetchData();
   writeGraph(localStorage, startYear.value, endYear.value);
-  removetriviaModal();
+  removeTriviaModal();
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
