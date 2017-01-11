@@ -75,7 +75,7 @@
 	  genresToUpdate.forEach(function (genre) {
 	    var earliestData = getEarliestData(genre, localStorage);
 	    if (startYear < earliestData) {
-	      genreButtonClick(genre, startYear, earliestData, _dom_methods.removeSpinner);
+	      genreButtonClick(genre, startYear, earliestData, _dom_methods.allowTriviaClose);
 	    }
 	  });
 	};
@@ -85,7 +85,7 @@
 	  genresToUpdate.forEach(function (genre) {
 	    var latestData = getLatestData(genre, localStorage);
 	    if (endYear > latestData) {
-	      genreButtonClick(genre, latestData, endYear, _dom_methods.removeSpinner);
+	      genreButtonClick(genre, latestData, endYear, removeSpinner);
 	    }
 	  });
 	};
@@ -110,31 +110,87 @@
 	  return clickedGenres;
 	};
 	
-	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
-	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-	  var currentRecords = JSON.parse(localStorage[genre]);
-	  for (var i = startYear; i <= endYear; i++) {
-	    if (typeof currentRecords[i] !== "number") {
-	      (0, _dom_methods.addSpinner)();
-	      (0, _dom_methods.addTriviaModal)();
-	      var data = { 'genre': genre, 'year': i };
-	      (0, _api.genreQuery)(data).then(function (response) {
-	        var yearRexep = /year=\d\d\d\d/;
-	        var reqUrl = response.req["url"];
-	        var oldData = JSON.parse(localStorage[genre]);
-	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
-	        oldData[year] = itemsPerYear;
-	        localStorage.setItem(genre, JSON.stringify(oldData));
-	        writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-	        if (typeof cb === "function" && (year === endYear || year === startYear)) {
-	          cb();
-	        }
-	      }, function (err) {
-	        console.log(err);
-	      });
+	var filterFetch = function filterFetch(oldEntry, genre, startYear, endYear) {
+	  var missingYears = [];
+	  var start = null;
+	  var end = null;
+	  for (var i = startYear; i < endYear; i++) {
+	    if (start === null) {
+	      if (oldEntry[i] !== undefined) {
+	        continue;
+	      } else {
+	        start = i;
+	      }
+	    } else {
+	      if (oldEntry[i] === undefined) {
+	        continue;
+	      } else {
+	        end = i - 1;
+	        missingYears.push([start, end]);
+	        start = null;
+	      }
 	    }
 	  }
+	  if (start !== null) {
+	    if (oldEntry[endYear] !== undefined) {
+	      missingYears.push([start, endYear - 1]);
+	    } else {
+	      missingYears.push([start, endYear]);
+	    }
+	  } else {
+	    if (oldEntry[endYear] !== undefined) {} else {
+	      missingYears.push([endYear, endYear]);
+	    }
+	  }
+	
+	  return missingYears;
+	};
+	
+	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
+	  debugger;
+	  var callback = cb;
+	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	  var currentRecords = JSON.parse(localStorage[genre]);
+	  var yearsToFetch = filterFetch(currentRecords, genre, startYear, endYear);
+	  var finalYear = void 0;
+	  if (yearsToFetch.length > 0) finalYear = yearsToFetch[yearsToFetch.length - 1][1];
+	  yearsToFetch.forEach(function (range) {
+	    debugger;
+	
+	    var _loop = function _loop(i) {
+	      debugger;
+	      if (typeof currentRecords[i] !== "number") {
+	
+	        var triviaSpinner = document.getElementById("triviaSpinner");
+	        debugger;
+	        triviaSpinner.style.display = "block";
+	
+	        (0, _dom_methods.addTriviaModal)();
+	        var data = { 'genre': genre, 'year': i };
+	        (0, _api.genreQuery)(data).then(function (response) {
+	          var yearRexep = /year=\d\d\d\d/;
+	          var reqUrl = response.req["url"];
+	          var oldData = JSON.parse(localStorage[genre]);
+	          var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	          var reqYear = reqUrl.match(yearRexep)[0].slice(5, 9);
+	          oldData[i] = itemsPerYear;
+	          localStorage.setItem(genre, JSON.stringify(oldData));
+	          writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	          debugger;
+	          if (typeof callback === "function" && finalYear === Number(reqYear)) {
+	            debugger;
+	            callback();
+	          }
+	        }, function (err) {
+	          console.log(err);
+	        });
+	      }
+	    };
+	
+	    for (var i = range[0]; i <= range[1]; i++) {
+	      _loop(i);
+	    }
+	  });
 	};
 	
 	var writeGraph = function writeGraph(localData, minYear, maxYear) {
@@ -209,7 +265,9 @@
 	
 	var prefetchData = function prefetchData() {
 	  allGenres.forEach(function (genre) {
-	    genreButtonClick(genre, 1970, 1990);
+	    genreButtonClick(genre, 1970, 1990, function () {
+	      document.getElementById("aboutModal").style.display = "none";
+	    });
 	  });
 	};
 	
@@ -224,8 +282,8 @@
 	  var startYear = document.getElementById("startYear");
 	  var endYear = document.getElementById("endYear");
 	  var aboutModal = document.getElementById("aboutModal");
-	  var closeModal = document.getElementById("close");
-	  var openModal = document.getElementById("open");
+	  var closeModal = document.getElementById("aboutClose");
+	  var openModal = document.getElementById("aboutOpen");
 	  var triviaModal = document.getElementById("triviaModal");
 	  var closeTrivia = document.getElementById("triviaClose");
 	
@@ -282,7 +340,7 @@
 	  (0, _dom_methods.setupLocalStorage)();
 	  prefetchData();
 	  writeGraph(localStorage, startYear.value, endYear.value);
-	  (0, _dom_methods.removetriviaModal)();
+	  (0, _dom_methods.removeTriviaModal)();
 	
 	  $("#mainForm").submit(function (e) {
 	    e.preventDefault();
@@ -292,7 +350,7 @@
 	    var end = $('#endYear').val();
 	    for (var i = start; i <= end; i++) {
 	      var reqData = { 'style': style, 'year': i };
-	      (0, _dom_methods.addSpinner)();
+	      addSpinner();
 	      (0, _dom_methods.addTriviaModal)();
 	      (0, _api.subGenreQuery)(reqData).then(function (response) {
 	        var subgenre = genre.value;
@@ -414,21 +472,48 @@
 	var addTriviaModal = exports.addTriviaModal = function addTriviaModal() {
 	  var TriviaModal = document.getElementById("triviaModal");
 	  TriviaModal.style.display = "block";
+	  addTriviaSpinner();
+	  document.getElementById("triviaClose").style.display = "none";
 	};
 	
-	var removetriviaModal = exports.removetriviaModal = function removetriviaModal() {
+	var removeTriviaModal = exports.removeTriviaModal = function removeTriviaModal() {
 	  var TriviaModal = document.getElementById("triviaModal");
 	  TriviaModal.style.display = "none";
 	};
 	
-	var removeSpinner = exports.removeSpinner = function removeSpinner() {
-	  var spinner = document.getElementById("spinner");
-	  spinner.style.display = "none";
+	var allowTriviaClose = exports.allowTriviaClose = function allowTriviaClose() {
+	  var triviaSpinner = document.getElementById("triviaSpinner");
+	  var triviaClose = document.getElementById("triviaClose");
+	  triviaSpinner.style.display = "none";
+	  triviaClose.style.display = "block";
 	};
 	
-	var addSpinner = exports.addSpinner = function addSpinner() {
-	  var spinner = document.getElementById("spinner");
-	  spinner.style.display = "absolute";
+	var removeAboutSpinner = exports.removeAboutSpinner = function removeAboutSpinner() {
+	  var aboutClose = document.getElementById("aboutclose");
+	  var aboutSpinner = document.getElementById("aboutSpinner");
+	  aboutClose.style.diplay = "none";
+	  aboutSpinner.style.diplay = "block";
+	};
+	
+	var addAboutSpinner = exports.addAboutSpinner = function addAboutSpinner() {
+	  var aboutClose = document.getElementById("aboutclose");
+	  var aboutSpinner = document.getElementById("aboutSpinner");
+	  aboutClose.style.diplay = "none";
+	  aboutSpinner.style.diplay = "block";
+	};
+	
+	var removeTriviaSpinner = exports.removeTriviaSpinner = function removeTriviaSpinner() {
+	  var triviaClose = document.getElementById("triviaclose");
+	  var triviaSpinner = document.getElementById("triviaSpinner");
+	  triviaClose.style.diplay = "none";
+	  triviaSpinner.style.diplay = "block";
+	};
+	
+	var addTriviaSpinner = exports.addTriviaSpinner = function addTriviaSpinner() {
+	  var closeTrivia = document.getElementById("triviaClose");
+	  var triviaSpinner = document.getElementById("triviaSpinner");
+	  closeTrivia.style.diplay = "none";
+	  triviaSpinner.style.diplay = "block";
 	};
 
 /***/ },

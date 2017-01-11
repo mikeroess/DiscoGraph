@@ -60,19 +60,48 @@ export const removeModal = () => {
 export const addTriviaModal = () => {
    const TriviaModal = document.getElementById("triviaModal");
    TriviaModal.style.display = "block";
+   addTriviaSpinner();
+   document.getElementById("triviaClose").style.display = "none";
+
  };
 
-export const removetriviaModal = () => {
+export const removeTriviaModal = () => {
      const TriviaModal = document.getElementById("triviaModal");
      TriviaModal.style.display = "none";
  };
 
- export const removeSpinner = () => {
-   const spinner = document.getElementById("spinner");
-   spinner.style.display = "none";
- };
+export const allowTriviaClose = () => {
+      const triviaSpinner = document.getElementById("triviaSpinner");
+      const triviaClose = document.getElementById("triviaClose");
+      triviaSpinner.style.display = "none";
+      triviaClose.style.display = "block";
+  };
 
- export const addSpinner = () => {
-   const spinner = document.getElementById("spinner");
-   spinner.style.display = "absolute";
- };
+
+export const removeAboutSpinner = () => {
+  const aboutClose = document.getElementById("aboutclose");
+  const aboutSpinner = document.getElementById("aboutSpinner");
+  aboutClose.style.diplay = "none";
+  aboutSpinner.style.diplay = "block";
+};
+
+export const addAboutSpinner = () => {
+  const aboutClose = document.getElementById("aboutclose");
+  const aboutSpinner = document.getElementById("aboutSpinner");
+  aboutClose.style.diplay = "none";
+  aboutSpinner.style.diplay = "block";
+};
+
+export const removeTriviaSpinner = () => {
+  const triviaClose = document.getElementById("triviaclose");
+  const triviaSpinner = document.getElementById("triviaSpinner");
+  triviaClose.style.diplay = "none";
+  triviaSpinner.style.diplay = "block";
+};
+
+export const addTriviaSpinner = () => {
+  const closeTrivia = document.getElementById("triviaClose");
+  const triviaSpinner = document.getElementById("triviaSpinner");
+  closeTrivia.style.diplay = "none";
+  triviaSpinner.style.diplay = "block";
+};
