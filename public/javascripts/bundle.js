@@ -85,7 +85,7 @@
 	  genresToUpdate.forEach(function (genre) {
 	    var latestData = getLatestData(genre, localStorage);
 	    if (endYear > latestData) {
-	      genreButtonClick(genre, latestData, endYear, removeSpinner);
+	      genreButtonClick(genre, latestData, endYear, _dom_methods.allowTriviaClose);
 	    }
 	  });
 	};
@@ -147,7 +147,6 @@
 	};
 	
 	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
-	  debugger;
 	  var callback = cb;
 	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  var currentRecords = JSON.parse(localStorage[genre]);
@@ -155,17 +154,14 @@
 	  var finalYear = void 0;
 	  if (yearsToFetch.length > 0) finalYear = yearsToFetch[yearsToFetch.length - 1][1];
 	  yearsToFetch.forEach(function (range) {
-	    debugger;
-	
 	    var _loop = function _loop(i) {
-	      debugger;
 	      if (typeof currentRecords[i] !== "number") {
 	
 	        var triviaSpinner = document.getElementById("triviaSpinner");
-	        debugger;
 	        triviaSpinner.style.display = "block";
 	
 	        (0, _dom_methods.addTriviaModal)();
+	
 	        var data = { 'genre': genre, 'year': i };
 	        (0, _api.genreQuery)(data).then(function (response) {
 	          var yearRexep = /year=\d\d\d\d/;
@@ -176,9 +172,7 @@
 	          oldData[i] = itemsPerYear;
 	          localStorage.setItem(genre, JSON.stringify(oldData));
 	          writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-	          debugger;
-	          if (typeof callback === "function" && finalYear === Number(reqYear)) {
-	            debugger;
+	          if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
 	            callback();
 	          }
 	        }, function (err) {
@@ -197,7 +191,7 @@
 	  var genres = Object.keys(localData).filter(function (genre) {
 	    if ((0, _dom_methods.isButtonClicked)(genre)) return genre;
 	  });
-	
+	  debugger;
 	  var globalData = {};
 	  genres.forEach(function (genre) {
 	    if (localData[genre]) {
@@ -286,6 +280,7 @@
 	  var openModal = document.getElementById("aboutOpen");
 	  var triviaModal = document.getElementById("triviaModal");
 	  var closeTrivia = document.getElementById("triviaClose");
+	  var triviaSpinner = document.getElementById("triviaSpinner");
 	
 	  closeModal.onclick = function () {
 	    aboutModal.style.display = "none";
@@ -297,27 +292,32 @@
 	    triviaModal.style.display = "none";
 	  };
 	
+	  var testingCallback = function testingCallback() {
+	    triviaSpinner.style.display = "none";
+	    closeTrivia.style.display = "block";
+	  };
+	
 	  rockButton.addEventListener("click", function () {
-	    return genreButtonClick("rock", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("rock", $('#startYear').val(), testingCallback);
+	  });
 	  popButton.addEventListener("click", function () {
-	    return genreButtonClick("pop", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("pop", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	  });
 	  hipHopButton.addEventListener("click", function () {
-	    return genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	  });
 	  funkSoulButton.addEventListener("click", function () {
-	    return genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	  });
 	  electronicButton.addEventListener("click", function () {
-	    return genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	  });
 	  classicalButton.addEventListener("click", function () {
-	    return genreButtonClick("classical", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("classical", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	  });
 	  jazzButton.addEventListener("click", function () {
-	    return genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val());
-	  }, false);
+	    return genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	  });
 	
 	  startYear.addEventListener("input", function () {
 	    (0, _dom_methods.startYearUpdate)($('#startYear').val());
@@ -348,13 +348,15 @@
 	    var style = $('#genre').val();
 	    var start = $('#startYear').val();
 	    var end = $('#endYear').val();
+	    var subgenre = genre.value;
+	    var yearRexep = /year=\d\d\d\d/;
+	    var callback = testingCallback;
+	    var currentEntry = JSON.parse(localStorage["subgenre"]);
 	    for (var i = start; i <= end; i++) {
 	      var reqData = { 'style': style, 'year': i };
-	      addSpinner();
+	      triviaSpinner.style.display = "";
 	      (0, _dom_methods.addTriviaModal)();
 	      (0, _api.subGenreQuery)(reqData).then(function (response) {
-	        var subgenre = genre.value;
-	        var yearRexep = /year=\d\d\d\d/;
 	        var reqUrl = response.req["url"];
 	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
 	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
@@ -371,6 +373,9 @@
 	          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
 	        }
 	        writeGraph(localStorage, startYear.value, endYear.value);
+	        if (Number(end) === Number(year)) {
+	          callback();
+	        }
 	      }, function (err) {
 	        console.log(err);
 	      });
