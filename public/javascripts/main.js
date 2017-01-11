@@ -26,21 +26,25 @@ const getLatestData = (genre, store) => {
 };
 
 const updateStartYear = (startYear) => {
-  const genresToUpdate = getClickedGenres();
+  const genresToUpdate = getClickedGenres().filter( (genre) => getEarliestData(genre, localStorage) > startYear);
   genresToUpdate.forEach( (genre) => {
     const earliestData = getEarliestData(genre, localStorage);
-    if (startYear < earliestData) {
+    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
       genreButtonClick(genre, startYear, earliestData, allowTriviaClose);
+    } else {
+      genreButtonClick(genre, startYear, earliestData);
     }
   });
 };
 
 const updateEndYear = (endYear) => {
-  const genresToUpdate = getClickedGenres();
+  const genresToUpdate = getClickedGenres().filter( (genre) => getLatestData(genre, localStorage) < endYear);
   genresToUpdate.forEach( (genre) => {
     const latestData = getLatestData(genre, localStorage);
-    if (endYear > latestData) {
+    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
       genreButtonClick(genre, latestData, endYear, allowTriviaClose);
+    } else {
+      genreButtonClick(genre, latestData, endYear);
     }
   });
 };
@@ -149,7 +153,6 @@ const writeGraph = (localData, minYear, maxYear) => {
       if (isButtonClicked(genre)) return genre;
     }
   );
-  debugger
   let globalData = {};
   genres.forEach( (genre) => {
     if (localData[genre]) {
@@ -248,11 +251,6 @@ const writeGraph = (localData, minYear, maxYear) => {
   );
 };
 
-const prefetchData = () => {
-  allGenres.forEach( (genre) => {
-    genreButtonClick (genre, 1970, 1990, () => {document.getElementById("aboutModal").style.display = "none"; });
-  });
-};
 
 $(document).ready(() => {
   const rockButton = document.getElementById("rock-toggle");
@@ -270,13 +268,32 @@ $(document).ready(() => {
   const triviaModal = document.getElementById("triviaModal");
   const closeTrivia = document.getElementById("triviaClose");
   const triviaSpinner = document.getElementById("triviaSpinner");
+  const aboutSpinner = document.getElementById("aboutSpinner");
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
   closeTrivia.onclick = () => {triviaModal.style.display = "none"; };
 
+  const prefetchCallback = () => {
+    aboutSpinner.style.display = "none";
+    closeModal.style.display = "block";
+  };
 
 
+  const prefetchData = () => {
+    aboutSpinner.style.display = "none";
+    closeModal.style.display = "block";
+
+    allGenres.forEach( (genre) => {
+      if (filterFetch(JSON.parse(localStorage[genre]), genre, 1970, 1990).length > 0) {
+        aboutModal.style.display = "block";
+        aboutSpinner.style.display = "block";
+        closeModal.style.display = "none";
+      }
+
+      genreButtonClick (genre, 1970, 1990, prefetchCallback);
+    });
+  };
 
   const testingCallback = () => {
         triviaSpinner.style.display = "none";

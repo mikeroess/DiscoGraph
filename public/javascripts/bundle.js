@@ -71,21 +71,29 @@
 	};
 	
 	var updateStartYear = function updateStartYear(startYear) {
-	  var genresToUpdate = getClickedGenres();
+	  var genresToUpdate = getClickedGenres().filter(function (genre) {
+	    return getEarliestData(genre, localStorage) > startYear;
+	  });
 	  genresToUpdate.forEach(function (genre) {
 	    var earliestData = getEarliestData(genre, localStorage);
-	    if (startYear < earliestData) {
+	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
 	      genreButtonClick(genre, startYear, earliestData, _dom_methods.allowTriviaClose);
+	    } else {
+	      genreButtonClick(genre, startYear, earliestData);
 	    }
 	  });
 	};
 	
 	var updateEndYear = function updateEndYear(endYear) {
-	  var genresToUpdate = getClickedGenres();
+	  var genresToUpdate = getClickedGenres().filter(function (genre) {
+	    return getLatestData(genre, localStorage) < endYear;
+	  });
 	  genresToUpdate.forEach(function (genre) {
 	    var latestData = getLatestData(genre, localStorage);
-	    if (endYear > latestData) {
+	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
 	      genreButtonClick(genre, latestData, endYear, _dom_methods.allowTriviaClose);
+	    } else {
+	      genreButtonClick(genre, latestData, endYear);
 	    }
 	  });
 	};
@@ -191,7 +199,6 @@
 	  var genres = Object.keys(localData).filter(function (genre) {
 	    if ((0, _dom_methods.isButtonClicked)(genre)) return genre;
 	  });
-	  debugger;
 	  var globalData = {};
 	  genres.forEach(function (genre) {
 	    if (localData[genre]) {
@@ -257,14 +264,6 @@
 	  });
 	};
 	
-	var prefetchData = function prefetchData() {
-	  allGenres.forEach(function (genre) {
-	    genreButtonClick(genre, 1970, 1990, function () {
-	      document.getElementById("aboutModal").style.display = "none";
-	    });
-	  });
-	};
-	
 	$(document).ready(function () {
 	  var rockButton = document.getElementById("rock-toggle");
 	  var popButton = document.getElementById("pop-toggle");
@@ -281,6 +280,7 @@
 	  var triviaModal = document.getElementById("triviaModal");
 	  var closeTrivia = document.getElementById("triviaClose");
 	  var triviaSpinner = document.getElementById("triviaSpinner");
+	  var aboutSpinner = document.getElementById("aboutSpinner");
 	
 	  closeModal.onclick = function () {
 	    aboutModal.style.display = "none";
@@ -290,6 +290,26 @@
 	  };
 	  closeTrivia.onclick = function () {
 	    triviaModal.style.display = "none";
+	  };
+	
+	  var prefetchCallback = function prefetchCallback() {
+	    aboutSpinner.style.display = "none";
+	    closeModal.style.display = "block";
+	  };
+	
+	  var prefetchData = function prefetchData() {
+	    aboutSpinner.style.display = "none";
+	    closeModal.style.display = "block";
+	
+	    allGenres.forEach(function (genre) {
+	      if (filterFetch(JSON.parse(localStorage[genre]), genre, 1970, 1990).length > 0) {
+	        aboutModal.style.display = "block";
+	        aboutSpinner.style.display = "block";
+	        closeModal.style.display = "none";
+	      }
+	
+	      genreButtonClick(genre, 1970, 1990, prefetchCallback);
+	    });
 	  };
 	
 	  var testingCallback = function testingCallback() {
