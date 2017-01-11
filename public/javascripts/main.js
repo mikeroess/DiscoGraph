@@ -40,7 +40,7 @@ const updateEndYear = (endYear) => {
   genresToUpdate.forEach( (genre) => {
     const latestData = getLatestData(genre, localStorage);
     if (endYear > latestData) {
-      genreButtonClick(genre, latestData, endYear, removeSpinner);
+      genreButtonClick(genre, latestData, endYear, allowTriviaClose);
     }
   });
 };
@@ -72,13 +72,13 @@ const filterFetch = (oldEntry, genre, startYear, endYear) => {
   for (let i = startYear; i < endYear; i++ ) {
     if ( start === null ) {
       if (oldEntry[i] !== undefined) {
-        continue
+        continue;
       } else {
         start = i
       }
     } else {
       if (oldEntry[i] === undefined) {
-        continue
+        continue;
       } else {
         end = i - 1;
         missingYears.push([start, end])
@@ -99,11 +99,10 @@ const filterFetch = (oldEntry, genre, startYear, endYear) => {
     }
   }
 
-  return missingYears
+  return missingYears;
 };
 
 const genreButtonClick = function (genre, startYear, endYear, cb) {
-  debugger
   const callback = cb;
   writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
   const currentRecords = JSON.parse(localStorage[genre]);
@@ -111,18 +110,17 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
   let finalYear;
   if (yearsToFetch.length > 0) finalYear = yearsToFetch[yearsToFetch.length - 1][1];
   yearsToFetch.forEach( (range) => {
-    debugger
     for (let i = range[0]; i <= range[1]; i++) {
-      debugger
       if (typeof(currentRecords[i]) !== "number") {
 
 
         const triviaSpinner = document.getElementById("triviaSpinner");
-        debugger
         triviaSpinner.style.display = "block";
 
 
         addTriviaModal();
+
+
         let data = {'genre': genre, 'year': i};
         genreQuery(data).then((response) => {
           const yearRexep = /year=\d\d\d\d/;
@@ -133,9 +131,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
           oldData[i] = itemsPerYear;
           localStorage.setItem(genre, JSON.stringify(oldData));
           writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-          debugger
-          if (typeof(callback) === "function" && finalYear === Number(reqYear)) {
-            debugger
+          if (typeof(callback) === "function" && Number(finalYear) === Number(reqYear)) {
             callback();
           }
 
@@ -153,7 +149,7 @@ const writeGraph = (localData, minYear, maxYear) => {
       if (isButtonClicked(genre)) return genre;
     }
   );
-
+  debugger
   let globalData = {};
   genres.forEach( (genre) => {
     if (localData[genre]) {
@@ -211,9 +207,9 @@ const writeGraph = (localData, minYear, maxYear) => {
 
     genres.forEach( (genre) => {
       if (genre === 'subgenre') {
-        const subGenreObject = JSON.parse(localStorage[genre])
+        const subGenreObject = JSON.parse(localStorage[genre]);
         const genreName = Object.keys(subGenreObject)[0];
-        const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear)
+        const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
         if (formattedDataset.length === 0) { return; }
 
         svg.append("path")
@@ -273,19 +269,28 @@ $(document).ready(() => {
   const openModal = document.getElementById("aboutOpen");
   const triviaModal = document.getElementById("triviaModal");
   const closeTrivia = document.getElementById("triviaClose");
-
+  const triviaSpinner = document.getElementById("triviaSpinner");
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
   closeTrivia.onclick = () => {triviaModal.style.display = "none"; };
 
-  rockButton.addEventListener("click", () => genreButtonClick("rock", $('#startYear').val(), $('#endYear').val()), false);
-  popButton.addEventListener("click", () => genreButtonClick("pop", $('#startYear').val(), $('#endYear').val()), false);
-  hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val()), false);
-  funkSoulButton.addEventListener("click", () => genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val()), false);
-  electronicButton.addEventListener("click", () => genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val()), false);
-  classicalButton.addEventListener("click", () => genreButtonClick("classical", $('#startYear').val(), $('#endYear').val()), false);
-  jazzButton.addEventListener("click", () => genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val()), false);
+
+
+
+  const testingCallback = () => {
+        triviaSpinner.style.display = "none";
+        closeTrivia.style.display = "block";
+    };
+
+
+  rockButton.addEventListener("click", () => genreButtonClick("rock", $('#startYear').val(), testingCallback ));
+  popButton.addEventListener("click", () => genreButtonClick("pop", $('#startYear').val(), $('#endYear').val(), testingCallback));
+  hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val(), testingCallback));
+  funkSoulButton.addEventListener("click", () => genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val(), testingCallback));
+  electronicButton.addEventListener("click", () => genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val(), testingCallback));
+  classicalButton.addEventListener("click", () => genreButtonClick("classical", $('#startYear').val(), $('#endYear').val(), testingCallback));
+  jazzButton.addEventListener("click", () => genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val(), testingCallback));
 
   startYear.addEventListener("input", () => {
     startYearUpdate($('#startYear').val());
@@ -316,14 +321,16 @@ $(document).ready(() => {
     const style = $('#genre').val();
     const start = $('#startYear').val();
     const end = $('#endYear').val();
+    const subgenre = genre.value;
+    const yearRexep = /year=\d\d\d\d/;
+    const callback = testingCallback;
+    const currentEntry = JSON.parse(localStorage["subgenre"]);
     for (let i = start; i <= end; i++) {
         let reqData = {'style': style, 'year': i};
-        addSpinner();
+        triviaSpinner.style.display = "";
         addTriviaModal();
         subGenreQuery(reqData).then(
           (response) => {
-          const subgenre = genre.value;
-          const yearRexep = /year=\d\d\d\d/;
           const reqUrl = response.req["url"];
           const year = reqUrl.match(yearRexep)[0].slice(5,9);
           const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
@@ -340,6 +347,9 @@ $(document).ready(() => {
             localStorage.setItem("subgenre", JSON.stringify(oldEntry));
           }
           writeGraph(localStorage, startYear.value, endYear.value);
+          if (Number(end) === Number(year)) {
+            callback();
+          }
         },
         (err) => {
           console.log(err);
