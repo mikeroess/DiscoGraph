@@ -5,6 +5,7 @@ body {
   font-weight: 300;
   background-color: #333;
   color: white;
+  overflow-x: hidden;
 }
 
 
@@ -13,8 +14,9 @@ a {
 }
 
 main {
-  width: 900px;
+  width: 950px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 body header h1 {
   margin: 0;
@@ -44,6 +46,7 @@ body {
 
 .yearInputs {
   margin: 15px auto;
+  width: 900px;
 }
 
 #endYearLabel {
@@ -113,7 +116,7 @@ footer li {
 }
 
 #aboutOpen {
-  font-size: 14px;
+  font-size: 18px;
   padding: 0 10px;
   width: 10px;
   font-family: roboto;
