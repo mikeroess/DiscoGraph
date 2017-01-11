@@ -93,16 +93,15 @@ footer li {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
-    background-color: white;
-    color: black;
+    background-color: #333;
+    color: white;
     margin: 10% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 2px solid white;
+    /*border-radius: 5px;*/
     width: 75%;
     font-size: 18px;
     height: 80%;
@@ -113,11 +112,11 @@ footer li {
   color: black;
 }
 
-#close:hover {
+#aboutClose:hover {
   cursor: pointer;
 }
 
-#open {
+#aboutOpen {
   font-size: 12px;
   padding: 0 10px;
   width: 10px;
@@ -125,7 +124,7 @@ footer li {
   color: grey;
 }
 
-#open:hover {
+#aboutOpen:hover {
   cursor: pointer;
 }
 
@@ -281,7 +280,7 @@ svg {
   to {transform: rotate(360deg);}
 }
 
-#spinner:before {
+.spinner:before {
   content: '';
   box-sizing: border-box;
   position: absolute;
