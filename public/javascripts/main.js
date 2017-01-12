@@ -5,8 +5,7 @@ import { clearChart, isButtonClicked, setupLocalStorage,
   genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
   addTriviaModal, removeTriviaSpinner, allowTriviaClose, removeTriviaModal,
   addTriviaSpinner, addAboutSpinner, removeAboutSpinner } from './dom_methods.js';
-import { margin, w, h, xScale, yScale, line, parseDate,
-  formatData, GenerateLeftAxis, GenerateBottomAxis,
+import { margin, w, h, xScale, yScale, line, parseDate, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease } from './graph.js';
 
 const allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
@@ -104,6 +103,22 @@ const filterFetch = (oldEntry, genre, startYear, endYear) => {
   }
 
   return missingYears;
+};
+
+
+export const formatData = (genre, startYear, endYear) => {
+  const keys = Object.keys(genre).sort();
+  let filteredData = keys.filter((key) => {
+    if (key >= startYear && key <= endYear) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  let formattedData = filteredData.map( (key) => {
+    return [parseDate(key), genre[key]]; }
+  );
+  return formattedData;
 };
 
 const genreButtonClick = function (genre, startYear, endYear, cb) {
@@ -223,7 +238,7 @@ const writeGraph = (localData, minYear, maxYear) => {
 
         svg.append("path")
           .attr("d", line(formattedDataset))
-          .attr("stroke", genreColors[genre])
+          .attr("stroke", "white")
           .attr("stroke-width", 2)
           .attr("fill", "none")
           .attr("transform", `translate(${margin.left}, ${margin.bottom})`)
