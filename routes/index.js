@@ -11,7 +11,6 @@ router.get('/', function(req, res, next) {
 router.get('/api', function(req, res, next) {
   const genre = req.query["genre"];
   const year = req.query["year"];
-  // console.log(year);
   let token = null;
   if (discogsApi) {
     token = discogsApi;
