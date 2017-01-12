@@ -107,7 +107,6 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
 
         let data = {'genre': genre, 'year': i};
         limiter.removeTokens(1, function(err, remainingRequests) {
-          console.log(remainingRequests);
           genreQuery(data).then((response) => {
             const yearRexep = /year=\d\d\d\d/;
             const reqUrl = response.req["url"];

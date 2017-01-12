@@ -72,7 +72,6 @@ export const getClickedGenres = () => {
 };
 
 export const getUnclickedGenres = () => {
-  console.log("here");
   const clickedGenres = [];
   allGenres.forEach( (genre) => {
     if (!isButtonClicked(genre)) {
