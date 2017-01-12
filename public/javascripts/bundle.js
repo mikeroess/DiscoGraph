@@ -160,7 +160,6 @@
 	
 	          var data = { 'genre': genre, 'year': i };
 	          limiter.removeTokens(1, function (err, remainingRequests) {
-	            console.log(remainingRequests);
 	            (0, _api.genreQuery)(data).then(function (response) {
 	              var yearRexep = /year=\d\d\d\d/;
 	              var reqUrl = response.req["url"];
@@ -17555,7 +17554,6 @@
 	};
 	
 	var getUnclickedGenres = exports.getUnclickedGenres = function getUnclickedGenres() {
-	  console.log("here");
 	  var clickedGenres = [];
 	  allGenres.forEach(function (genre) {
 	    if (!(0, _dom_methods.isButtonClicked)(genre)) {
