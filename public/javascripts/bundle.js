@@ -75,7 +75,51 @@
 	  } else return 1951;
 	};
 	
+	var fetchAndUpdateSubgenre = function fetchAndUpdateSubgenre() {
+	  var style = $('#genre').val();
+	  var start = $('#startYear').val();
+	  var end = $('#endYear').val();
+	  var subgenre = genre.value;
+	  var yearRexep = /year=\d\d\d\d/;
+	  var callback = function callback() {
+	    document.getElementById("triviaModal").style.display = "none";
+	  };
+	  var currentEntry = JSON.parse(localStorage["subgenre"]);
+	  for (var i = start; i <= end; i++) {
+	    var reqData = { 'style': style, 'year': i };
+	    // triviaSpinner.style.display = "triviaModal";
+	    (0, _dom_methods.addTriviaModal)();
+	    (0, _api.subGenreQuery)(reqData).then(function (response) {
+	      var reqUrl = response.req["url"];
+	      var year = reqUrl.match(yearRexep)[0].slice(5, 9);
+	      var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	      if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+	        var newData = {};
+	        newData[subgenre] = {};
+	        var updatingData = newData[subgenre];
+	        updatingData[year] = itemsPerYear;
+	        localStorage.setItem("subgenre", JSON.stringify(newData));
+	      } else {
+	        var oldEntry = JSON.parse(localStorage["subgenre"]);
+	        var oldData = oldEntry[subgenre];
+	        oldData[year] = itemsPerYear;
+	        localStorage.setItem("subgenre", JSON.stringify(oldEntry));
+	      }
+	      writeGraph(localStorage, startYear.value, endYear.value);
+	      if (Number(end) === Number(year)) {
+	        callback();
+	      }
+	      removeSubgenre.style.display = "inline-block";
+	    }, function (err) {
+	      console.log(err);
+	    });
+	  }
+	};
+	
 	var updateStartYear = function updateStartYear(startYear) {
+	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
+	    fetchAndUpdateSubgenre();
+	  }
 	  var genresToUpdate = getClickedGenres().filter(function (genre) {
 	    return getEarliestData(genre, localStorage) > startYear;
 	  });
@@ -90,6 +134,9 @@
 	};
 	
 	var updateEndYear = function updateEndYear(endYear) {
+	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
+	    fetchAndUpdateSubgenre();
+	  }
 	  var genresToUpdate = getClickedGenres().filter(function (genre) {
 	    return getLatestData(genre, localStorage) < endYear;
 	  });
@@ -260,19 +307,14 @@
 	
 	  genres.forEach(function (genre) {
 	    if (!allGenres.includes(genre)) {
-	      // console.log(globalData);
-	      // console.log(globalData[genre]);
-	      //   // FOR SOME REASON WE'RE NOT EVALUATING globalData[genre];
 	      var formattedDataset = formatData(globalData[genre], minYear, maxYear);
 	      //
 	      if (formattedDataset.length === 0) {
 	        return;
 	      }
-	      // const subGenreObject = JSON.parse(localStorage[genre]);
-	      // const genreName = Object.keys(subGenreObject)[0];
-	      // const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
-	      // if (formattedDataset.length === 0) { return; }
-	
+	      if (genre === "") {
+	        genre = "unclassified";
+	      }
 	      svg.append("path").attr("d", (0, _graph.line)(formattedDataset)).attr("stroke", "white").attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')');
 	
 	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "white").text(genre);
@@ -291,6 +333,49 @@
 	};
 	
 	$(document).ready(function () {
+	
+	  // const fetchAndUpdateSubgenre = () => {
+	  //   const style = $('#genre').val();
+	  //   const start = $('#startYear').val();
+	  //   const end = $('#endYear').val();
+	  //   const subgenre = genre.value;
+	  //   const yearRexep = /year=\d\d\d\d/;
+	  //   const callback = testingCallback;
+	  //   const currentEntry = JSON.parse(localStorage["subgenre"]);
+	  //   for (let i = start; i <= end; i++) {
+	  //       let reqData = {'style': style, 'year': i};
+	  //       triviaSpinner.style.display = "";
+	  //       addTriviaModal();
+	  //       subGenreQuery(reqData).then(
+	  //         (response) => {
+	  //         const reqUrl = response.req["url"];
+	  //         const year = reqUrl.match(yearRexep)[0].slice(5,9);
+	  //         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	  //         if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+	  //           const newData = {};
+	  //           newData[subgenre] = {};
+	  //           const updatingData = newData[subgenre];
+	  //           updatingData[year] = itemsPerYear;
+	  //           localStorage.setItem("subgenre", JSON.stringify(newData));
+	  //         } else {
+	  //           const oldEntry = JSON.parse(localStorage["subgenre"]);
+	  //           const oldData = oldEntry[subgenre];
+	  //           oldData[year] = itemsPerYear;
+	  //           localStorage.setItem("subgenre", JSON.stringify(oldEntry));
+	  //         }
+	  //         writeGraph(localStorage, startYear.value, endYear.value);
+	  //         if (Number(end) === Number(year)) {
+	  //           callback();
+	  //         }
+	  //         removeSubgenre.style.display = "inline-block";
+	  //       }
+	  //       ,
+	  //       (err) => {
+	  //         console.log(err);
+	  //       }
+	  //     );
+	  //   }
+	  // };
 	  var rockButton = document.getElementById("rock-toggle");
 	  var popButton = document.getElementById("pop-toggle");
 	  var hipHopButton = document.getElementById("hip-hop-toggle");
@@ -308,6 +393,7 @@
 	  var triviaSpinner = document.getElementById("triviaSpinner");
 	  var aboutSpinner = document.getElementById("aboutSpinner");
 	  var removeSubgenre = document.getElementById("removeSubgenre");
+	  var subgenreInput = document.getElementById("genre");
 	
 	  closeModal.onclick = function () {
 	    aboutModal.style.display = "none";
@@ -344,6 +430,7 @@
 	    localStorage.setItem("subgenre", "{}");
 	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	    removeSubgenre.style.display = "none";
+	    subgenreInput.value = "";
 	  });
 	
 	  var testingCallback = function testingCallback() {
@@ -397,43 +484,7 @@
 	
 	  $("#mainForm").submit(function (e) {
 	    e.preventDefault();
-	
-	    var style = $('#genre').val();
-	    var start = $('#startYear').val();
-	    var end = $('#endYear').val();
-	    var subgenre = genre.value;
-	    var yearRexep = /year=\d\d\d\d/;
-	    var callback = testingCallback;
-	    var currentEntry = JSON.parse(localStorage["subgenre"]);
-	    for (var i = start; i <= end; i++) {
-	      var reqData = { 'style': style, 'year': i };
-	      triviaSpinner.style.display = "";
-	      (0, _dom_methods.addTriviaModal)();
-	      (0, _api.subGenreQuery)(reqData).then(function (response) {
-	        var reqUrl = response.req["url"];
-	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
-	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	        if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
-	          var newData = {};
-	          newData[subgenre] = {};
-	          var updatingData = newData[subgenre];
-	          updatingData[year] = itemsPerYear;
-	          localStorage.setItem("subgenre", JSON.stringify(newData));
-	        } else {
-	          var oldEntry = JSON.parse(localStorage["subgenre"]);
-	          var oldData = oldEntry[subgenre];
-	          oldData[year] = itemsPerYear;
-	          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
-	        }
-	        writeGraph(localStorage, startYear.value, endYear.value);
-	        if (Number(end) === Number(year)) {
-	          callback();
-	        }
-	        removeSubgenre.style.display = "inline-block";
-	      }, function (err) {
-	        console.log(err);
-	      });
-	    }
+	    fetchAndUpdateSubgenre();
 	  });
 	});
 
@@ -602,20 +653,20 @@
 	
 	var parseDate = exports.parseDate = d3.timeParse("%Y");
 	
-	var formatData = exports.formatData = function formatData(genre, startYear, endYear) {
-	  var keys = Object.keys(genre).sort();
-	  var filteredData = keys.filter(function (key) {
-	    if (key >= startYear && key <= endYear) {
-	      return true;
-	    } else {
-	      return false;
-	    }
-	  });
-	  var formattedData = filteredData.map(function (key) {
-	    return [parseDate(key), genre[key]];
-	  });
-	  return formattedData;
-	};
+	// export const formatData = (genre, startYear, endYear) => {
+	//   const keys = Object.keys(genre).sort();
+	//   let filteredData = keys.filter((key) => {
+	//     if (key >= startYear && key <= endYear) {
+	//       return true;
+	//     } else {
+	//       return false;
+	//     }
+	//   });
+	//   let formattedData = filteredData.map( (key) => {
+	//     return [parseDate(key), genre[key]]; }
+	//   );
+	//   return formattedData;
+	// };
 	
 	var GenerateLeftAxis = exports.GenerateLeftAxis = function GenerateLeftAxis(scale) {
 	  var leftAxis = d3.axisLeft(scale);

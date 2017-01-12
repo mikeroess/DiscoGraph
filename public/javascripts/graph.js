@@ -16,20 +16,20 @@ export const line = d3.line()
 
 export const parseDate = d3.timeParse("%Y");
 
-export const formatData = (genre, startYear, endYear) => {
-  const keys = Object.keys(genre).sort();
-  let filteredData = keys.filter((key) => {
-    if (key >= startYear && key <= endYear) {
-      return true;
-    } else {
-      return false;
-    }
-  });
-  let formattedData = filteredData.map( (key) => {
-    return [parseDate(key), genre[key]]; }
-  );
-  return formattedData;
-};
+// export const formatData = (genre, startYear, endYear) => {
+//   const keys = Object.keys(genre).sort();
+//   let filteredData = keys.filter((key) => {
+//     if (key >= startYear && key <= endYear) {
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   });
+//   let formattedData = filteredData.map( (key) => {
+//     return [parseDate(key), genre[key]]; }
+//   );
+//   return formattedData;
+// };
 
 export const GenerateLeftAxis = (scale) => {
   const leftAxis = d3.axisLeft(scale);
