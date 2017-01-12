@@ -274,6 +274,10 @@ svg {
   cursor: pointer;
 }
 
+#removeSubgenre{
+  display: none;
+}
+
 /*spinner*/
 @keyframes spinner {
   to {transform: rotate(360deg);}

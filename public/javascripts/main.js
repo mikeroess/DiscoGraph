@@ -174,7 +174,7 @@ const writeGraph = (localData, minYear, maxYear) => {
       const subgenre = Object.keys(subgenreEntry)[0];
       const subgenreData = subgenreEntry[subgenre];
       globalData[subgenre] = subgenreData;
-      genres.push("subgenre");
+      genres.push(subgenre);
     }
 
   const maxNumOfReleases = getMaxRelease(genres, globalData);
@@ -209,11 +209,17 @@ const writeGraph = (localData, minYear, maxYear) => {
         .call(bottomAxis);
 
     genres.forEach( (genre) => {
-      if (genre === 'subgenre') {
-        const subGenreObject = JSON.parse(localStorage[genre]);
-        const genreName = Object.keys(subGenreObject)[0];
-        const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
-        if (formattedDataset.length === 0) { return; }
+      if (!allGenres.includes(genre)) {
+          // console.log(globalData);
+          // console.log(globalData[genre]);
+        //   // FOR SOME REASON WE'RE NOT EVALUATING globalData[genre];
+          const formattedDataset = formatData(globalData[genre], minYear, maxYear);
+        //
+          if (formattedDataset.length === 0) { return; }
+        // const subGenreObject = JSON.parse(localStorage[genre]);
+        // const genreName = Object.keys(subGenreObject)[0];
+        // const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
+        // if (formattedDataset.length === 0) { return; }
 
         svg.append("path")
           .attr("d", line(formattedDataset))
@@ -227,7 +233,7 @@ const writeGraph = (localData, minYear, maxYear) => {
         .attr("dy", "0.71em")
         .attr("class", "genreLabel")
         .style("fill", "white")
-        .text(genreName);
+        .text(genre);
 
       } else {
       const dataset = JSON.parse(localStorage[genre]);
@@ -269,6 +275,7 @@ $(document).ready(() => {
   const closeTrivia = document.getElementById("triviaClose");
   const triviaSpinner = document.getElementById("triviaSpinner");
   const aboutSpinner = document.getElementById("aboutSpinner");
+  const removeSubgenre = document.getElementById("removeSubgenre");
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
@@ -295,9 +302,15 @@ $(document).ready(() => {
     });
   };
 
+  removeSubgenre.addEventListener("click", (e) => {
+    e.preventDefault();
+    localStorage.setItem("subgenre", "{}");
+    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+    removeSubgenre.style.display = "none";
+  });
+
   const testingCallback = () => {
-        triviaSpinner.style.display = "none";
-        closeTrivia.style.display = "block";
+        triviaModal.style.display = "none";
     };
 
 
@@ -367,7 +380,9 @@ $(document).ready(() => {
           if (Number(end) === Number(year)) {
             callback();
           }
-        },
+          removeSubgenre.style.display = "inline-block";
+        }
+        ,
         (err) => {
           console.log(err);
         }
