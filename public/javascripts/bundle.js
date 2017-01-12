@@ -46,6 +46,11 @@
 
 	'use strict';
 	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.formatData = undefined;
+	
 	var _api = __webpack_require__(1);
 	
 	var _dom_methods = __webpack_require__(2);
@@ -154,6 +159,21 @@
 	  return missingYears;
 	};
 	
+	var formatData = exports.formatData = function formatData(genre, startYear, endYear) {
+	  var keys = Object.keys(genre).sort();
+	  var filteredData = keys.filter(function (key) {
+	    if (key >= startYear && key <= endYear) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  });
+	  var formattedData = filteredData.map(function (key) {
+	    return [(0, _graph.parseDate)(key), genre[key]];
+	  });
+	  return formattedData;
+	};
+	
 	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
 	  var callback = cb;
 	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
@@ -243,7 +263,7 @@
 	      // console.log(globalData);
 	      // console.log(globalData[genre]);
 	      //   // FOR SOME REASON WE'RE NOT EVALUATING globalData[genre];
-	      var formattedDataset = (0, _graph.formatData)(globalData[genre], minYear, maxYear);
+	      var formattedDataset = formatData(globalData[genre], minYear, maxYear);
 	      //
 	      if (formattedDataset.length === 0) {
 	        return;
@@ -253,12 +273,12 @@
 	      // const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
 	      // if (formattedDataset.length === 0) { return; }
 	
-	      svg.append("path").attr("d", (0, _graph.line)(formattedDataset)).attr("stroke", _dom_methods.genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')');
+	      svg.append("path").attr("d", (0, _graph.line)(formattedDataset)).attr("stroke", "white").attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')');
 	
 	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "white").text(genre);
 	    } else {
 	      var dataset = JSON.parse(localStorage[genre]);
-	      var _formattedDataset = (0, _graph.formatData)(dataset, minYear, maxYear);
+	      var _formattedDataset = formatData(dataset, minYear, maxYear);
 	      if (_formattedDataset.length === 0) {
 	        return;
 	      }
