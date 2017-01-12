@@ -170,7 +170,7 @@
 	              }
 	              var reqYear = void 0;
 	              if (reqUrl.match(yearRexep)) {
-	                var _reqYear = reqUrl.match(yearRexep)[0].slice(5, 9);
+	                reqYear = reqUrl.match(yearRexep)[0].slice(5, 9);
 	              }
 	              oldData[i] = itemsPerYear;
 	              localStorage.setItem(genre, JSON.stringify(oldData));
@@ -289,6 +289,7 @@
 	  };
 	
 	  var prefetchCallback = function prefetchCallback() {
+	    debugger;
 	    aboutSpinner.style.display = "none";
 	    closeModal.style.display = "block";
 	  };

@@ -117,7 +117,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
             }
             let reqYear;
             if (reqUrl.match(yearRexep)) {
-              const reqYear = reqUrl.match(yearRexep)[0].slice(5,9);
+              reqYear = reqUrl.match(yearRexep)[0].slice(5,9);
             }
             oldData[i] = itemsPerYear;
             localStorage.setItem(genre, JSON.stringify(oldData));
@@ -263,6 +263,7 @@ $(document).ready(() => {
   openModal.onclick = () => { aboutModal.style.display = "block"; };
 
   const prefetchCallback = () => {
+    debugger
     aboutSpinner.style.display = "none";
     closeModal.style.display = "block";
   };
