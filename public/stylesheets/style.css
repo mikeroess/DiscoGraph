@@ -303,3 +303,9 @@ svg {
   border-bottom-color: #f90;
   animation: spinner 1s linear infinite;
 }
+
+
+#triviaSpinner:before {
+  height: 100px;
+  width:  100px;
+}
