@@ -3,10 +3,10 @@ const RateLimiter = require('limiter').RateLimiter;
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked,
   genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
-  addTriviaModal, removeTriviaSpinner, allowTriviaClose, removeTriviaModal,
+  addTriviaModal, removeTriviaSpinner, removeTriviaModal,
   addTriviaSpinner, addAboutSpinner, removeAboutSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate, GenerateLeftAxis, GenerateBottomAxis,
-  getMaxRelease, getLatestData, getEarliestData } from './graph.js';
+  getMaxRelease, getLatestDate, getEarliestDate } from './graph.js';
 import { formatData, filterFetch, allGenres, getClickedGenres, getUnclickedGenres, setupLocalStorage } from './data_wrangling.js';
 
 const limiter = new RateLimiter(240, "minute");
@@ -60,13 +60,13 @@ const updateStartYear = (startYear) => {
   if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
     fetchAndUpdateSubgenre();
   }
-  const genresToUpdate = getClickedGenres().filter( (genre) => getEarliestData(genre, localStorage) > startYear);
+  const genresToUpdate = getClickedGenres().filter( (genre) => getEarliestDate(genre, localStorage) > startYear);
   genresToUpdate.forEach( (genre) => {
-    const earliestData = getEarliestData(genre, localStorage);
+    const earliestDate = getEarliestDate(genre, localStorage);
     if (genre === genresToUpdate[genresToUpdate.length - 1]) {
-      genreButtonClick(genre, startYear, earliestData, allowTriviaClose);
+      genreButtonClick(genre, startYear, earliestDate, removeTriviaModal);
     } else {
-      genreButtonClick(genre, startYear, earliestData);
+      genreButtonClick(genre, startYear, earliestDate);
     }
   });
 };
@@ -75,13 +75,13 @@ const updateEndYear = (endYear) => {
   if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
     fetchAndUpdateSubgenre();
   }
-  const genresToUpdate = getClickedGenres().filter( (genre) => getLatestData(genre, localStorage) < endYear);
+  const genresToUpdate = getClickedGenres().filter( (genre) => getLatestDate(genre, localStorage) < endYear);
   genresToUpdate.forEach( (genre) => {
-    const latestData = getLatestData(genre, localStorage);
+    const latestDate = getLatestDate(genre, localStorage);
     if (genre === genresToUpdate[genresToUpdate.length - 1]) {
-      genreButtonClick(genre, latestData, endYear, allowTriviaClose);
+      genreButtonClick(genre, latestDate, endYear, removeTriviaModal);
     } else {
-      genreButtonClick(genre, latestData, endYear);
+      genreButtonClick(genre, latestDate, endYear);
     }
   });
 };
@@ -96,7 +96,6 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
   yearsToFetch.forEach( (range) => {
     for (let i = range[0]; i <= range[1]; i++) {
       if (typeof(currentRecords[i]) !== "number") {
-
 
         const triviaSpinner = document.getElementById("triviaSpinner");
         triviaSpinner.style.display = "block";
@@ -263,7 +262,6 @@ $(document).ready(() => {
   openModal.onclick = () => { aboutModal.style.display = "block"; };
 
   const prefetchCallback = () => {
-    debugger
     aboutSpinner.style.display = "none";
     closeModal.style.display = "block";
   };
@@ -298,7 +296,7 @@ $(document).ready(() => {
     };
 
 
-  rockButton.addEventListener("click", () => genreButtonClick("rock", $('#startYear').val(), removeSpinner ));
+  rockButton.addEventListener("click", () => genreButtonClick("rock", $('#startYear').val(), $('#endYear').val(), removeSpinner ));
   popButton.addEventListener("click", () => genreButtonClick("pop", $('#startYear').val(), $('#endYear').val(), removeSpinner));
   hipHopButton.addEventListener("click", () => genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val(), removeSpinner));
   funkSoulButton.addEventListener("click", () => genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val(), removeSpinner));

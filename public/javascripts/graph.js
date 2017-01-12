@@ -37,14 +37,14 @@ export const getMaxRelease = (genres, storage) => {
 };
 
 
-export const getEarliestData = (genre, store) => {
+export const getEarliestDate = (genre, store) => {
   if (store[genre]) {
     return d3.min(Object.keys(JSON.parse(localStorage[genre])));
   }
   else return 2015;
 };
 
-export const getLatestData = (genre, store) => {
+export const getLatestDate = (genre, store) => {
   if (store[genre]) {
     return d3.max(Object.keys(JSON.parse(localStorage[genre])));
   }
