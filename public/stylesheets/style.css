@@ -268,11 +268,21 @@ svg {
 
 #triviaModal {
   display: none;
+  position: fixed;
 }
 
 #triviaModal .modal-content {
   border: none;
-  height: 95%;
+  position:fixed;
+  padding:0;
+  margin:0;
+
+  top:110px;
+  left:0;
+
+  width: 100%;
+  height: 100%;
+  /*background:rgba(255,255,255,0.5);*/
 }
 
 #triviaClose:hover {
