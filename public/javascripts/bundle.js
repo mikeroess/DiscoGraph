@@ -112,14 +112,14 @@
 	    fetchAndUpdateSubgenre();
 	  }
 	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
-	    return (0, _graph.getEarliestData)(genre, localStorage) > startYear;
+	    return (0, _graph.getEarliestDate)(genre, localStorage) > startYear;
 	  });
 	  genresToUpdate.forEach(function (genre) {
-	    var earliestData = (0, _graph.getEarliestData)(genre, localStorage);
+	    var earliestDate = (0, _graph.getEarliestDate)(genre, localStorage);
 	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
-	      genreButtonClick(genre, startYear, earliestData, _dom_methods.allowTriviaClose);
+	      genreButtonClick(genre, startYear, earliestDate, _dom_methods.removeTriviaModal);
 	    } else {
-	      genreButtonClick(genre, startYear, earliestData);
+	      genreButtonClick(genre, startYear, earliestDate);
 	    }
 	  });
 	};
@@ -129,14 +129,14 @@
 	    fetchAndUpdateSubgenre();
 	  }
 	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
-	    return (0, _graph.getLatestData)(genre, localStorage) < endYear;
+	    return (0, _graph.getLatestDate)(genre, localStorage) < endYear;
 	  });
 	  genresToUpdate.forEach(function (genre) {
-	    var latestData = (0, _graph.getLatestData)(genre, localStorage);
+	    var latestDate = (0, _graph.getLatestDate)(genre, localStorage);
 	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
-	      genreButtonClick(genre, latestData, endYear, _dom_methods.allowTriviaClose);
+	      genreButtonClick(genre, latestDate, endYear, _dom_methods.removeTriviaModal);
 	    } else {
-	      genreButtonClick(genre, latestData, endYear);
+	      genreButtonClick(genre, latestDate, endYear);
 	    }
 	  });
 	};
@@ -289,7 +289,6 @@
 	  };
 	
 	  var prefetchCallback = function prefetchCallback() {
-	    debugger;
 	    aboutSpinner.style.display = "none";
 	    closeModal.style.display = "block";
 	  };
@@ -322,7 +321,7 @@
 	  };
 	
 	  rockButton.addEventListener("click", function () {
-	    return genreButtonClick("rock", $('#startYear').val(), removeSpinner);
+	    return genreButtonClick("rock", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	  popButton.addEventListener("click", function () {
 	    return genreButtonClick("pop", $('#startYear').val(), $('#endYear').val(), removeSpinner);
@@ -547,13 +546,13 @@
 	  return d3.max(topReleasesPerGenre);
 	};
 	
-	var getEarliestData = exports.getEarliestData = function getEarliestData(genre, store) {
+	var getEarliestDate = exports.getEarliestDate = function getEarliestDate(genre, store) {
 	  if (store[genre]) {
 	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
 	  } else return 2015;
 	};
 	
-	var getLatestData = exports.getLatestData = function getLatestData(genre, store) {
+	var getLatestDate = exports.getLatestDate = function getLatestDate(genre, store) {
 	  if (store[genre]) {
 	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
 	  } else return 1951;
