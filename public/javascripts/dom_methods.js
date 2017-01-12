@@ -19,17 +19,6 @@ export const genreColors = {
   "subgenre": "white"
 };
 
-export const setupLocalStorage = () => {
-  localStorage.removeItem("subgenre");
-  const genres = Object.keys(genreColors);
-  genres.forEach( (genre) => {
-    if (typeof(localStorage[genre]) === "undefined")
-    localStorage.setItem(genre, JSON.stringify({}));
-  });
-  localStorage.setItem("subgenre", "{}");
-};
-
-
 export const startYearUpdate = (year) => {
   $('#startYearDisplay').val(year);
   if (year >= $('#endYearDisplay').val() - 5) {
@@ -46,7 +35,6 @@ export const endYearUpdate = (year) => {
    }
  };
 
-
 export const addModal = () => {
    const aboutModal = document.getElementById("aboutModal");
    aboutModal.style.display = "block";
@@ -62,7 +50,6 @@ export const addTriviaModal = () => {
    TriviaModal.style.display = "block";
    addTriviaSpinner();
    document.getElementById("triviaClose").style.display = "none";
-
  };
 
 export const removeTriviaModal = () => {
@@ -76,7 +63,6 @@ export const allowTriviaClose = () => {
       triviaSpinner.style.display = "none";
       triviaClose.style.display = "block";
   };
-
 
 export const removeAboutSpinner = () => {
   const aboutClose = document.getElementById("aboutclose");
