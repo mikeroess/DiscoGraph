@@ -46,36 +46,19 @@
 
 	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.formatData = undefined;
-	
 	var _api = __webpack_require__(1);
 	
 	var _dom_methods = __webpack_require__(2);
 	
 	var _graph = __webpack_require__(3);
 	
+	var _data_wrangling = __webpack_require__(16);
+	
 	var d3 = __webpack_require__(4);
 	var RateLimiter = __webpack_require__(13).RateLimiter;
 	
 	
 	var limiter = new RateLimiter(240, "minute");
-	
-	var allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
-	
-	var getEarliestData = function getEarliestData(genre, store) {
-	  if (store[genre]) {
-	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
-	  } else return 2015;
-	};
-	
-	var getLatestData = function getLatestData(genre, store) {
-	  if (store[genre]) {
-	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
-	  } else return 1951;
-	};
 	
 	var fetchAndUpdateSubgenre = function fetchAndUpdateSubgenre() {
 	  var style = $('#genre').val();
@@ -92,7 +75,6 @@
 	    var reqData = { 'style': style, 'year': i };
 	    (0, _dom_methods.addTriviaModal)();
 	    limiter.removeTokens(1, function (err, remainingRequests) {
-	      console.log(remainingRequests);
 	      (0, _api.subGenreQuery)(reqData).then(function (response) {
 	        var reqUrl = response.req["url"];
 	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
@@ -129,11 +111,11 @@
 	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
 	    fetchAndUpdateSubgenre();
 	  }
-	  var genresToUpdate = getClickedGenres().filter(function (genre) {
-	    return getEarliestData(genre, localStorage) > startYear;
+	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
+	    return (0, _graph.getEarliestData)(genre, localStorage) > startYear;
 	  });
 	  genresToUpdate.forEach(function (genre) {
-	    var earliestData = getEarliestData(genre, localStorage);
+	    var earliestData = (0, _graph.getEarliestData)(genre, localStorage);
 	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
 	      genreButtonClick(genre, startYear, earliestData, _dom_methods.allowTriviaClose);
 	    } else {
@@ -146,11 +128,11 @@
 	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
 	    fetchAndUpdateSubgenre();
 	  }
-	  var genresToUpdate = getClickedGenres().filter(function (genre) {
-	    return getLatestData(genre, localStorage) < endYear;
+	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
+	    return (0, _graph.getLatestData)(genre, localStorage) < endYear;
 	  });
 	  genresToUpdate.forEach(function (genre) {
-	    var latestData = getLatestData(genre, localStorage);
+	    var latestData = (0, _graph.getLatestData)(genre, localStorage);
 	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
 	      genreButtonClick(genre, latestData, endYear, _dom_methods.allowTriviaClose);
 	    } else {
@@ -159,82 +141,11 @@
 	  });
 	};
 	
-	var getClickedGenres = function getClickedGenres() {
-	  var clickedGenres = [];
-	  allGenres.forEach(function (genre) {
-	    if ((0, _dom_methods.isButtonClicked)(genre)) {
-	      clickedGenres.push(genre);
-	    }
-	  });
-	  return clickedGenres;
-	};
-	
-	var getUnclickedGenres = function getUnclickedGenres() {
-	  var clickedGenres = [];
-	  allGenres.forEach(function (genre) {
-	    if (!(0, _dom_methods.isButtonClicked)(genre)) {
-	      clickedGenres.push(genre);
-	    }
-	  });
-	  return clickedGenres;
-	};
-	
-	var filterFetch = function filterFetch(oldEntry, genre, startYear, endYear) {
-	  var missingYears = [];
-	  var start = null;
-	  var end = null;
-	  for (var i = startYear; i < endYear; i++) {
-	    if (start === null) {
-	      if (oldEntry[i] !== undefined) {
-	        continue;
-	      } else {
-	        start = i;
-	      }
-	    } else {
-	      if (oldEntry[i] === undefined) {
-	        continue;
-	      } else {
-	        end = i - 1;
-	        missingYears.push([start, end]);
-	        start = null;
-	      }
-	    }
-	  }
-	  if (start !== null) {
-	    if (oldEntry[endYear] !== undefined) {
-	      missingYears.push([start, endYear - 1]);
-	    } else {
-	      missingYears.push([start, endYear]);
-	    }
-	  } else {
-	    if (oldEntry[endYear] !== undefined) {} else {
-	      missingYears.push([endYear, endYear]);
-	    }
-	  }
-	
-	  return missingYears;
-	};
-	
-	var formatData = exports.formatData = function formatData(genre, startYear, endYear) {
-	  var keys = Object.keys(genre).sort();
-	  var filteredData = keys.filter(function (key) {
-	    if (key >= startYear && key <= endYear) {
-	      return true;
-	    } else {
-	      return false;
-	    }
-	  });
-	  var formattedData = filteredData.map(function (key) {
-	    return [(0, _graph.parseDate)(key), genre[key]];
-	  });
-	  return formattedData;
-	};
-	
 	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
 	  var callback = cb;
 	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  var currentRecords = JSON.parse(localStorage[genre]);
-	  var yearsToFetch = filterFetch(currentRecords, genre, startYear, endYear);
+	  var yearsToFetch = (0, _data_wrangling.filterFetch)(currentRecords, genre, startYear, endYear);
 	  var finalYear = void 0;
 	  if (yearsToFetch.length > 0) finalYear = yearsToFetch[yearsToFetch.length - 1][1];
 	  yearsToFetch.forEach(function (range) {
@@ -254,8 +165,14 @@
 	              var yearRexep = /year=\d\d\d\d/;
 	              var reqUrl = response.req["url"];
 	              var oldData = JSON.parse(localStorage[genre]);
-	              var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	              var reqYear = reqUrl.match(yearRexep)[0].slice(5, 9);
+	              var itemsPerYear = void 0;
+	              if (JSON.parse(response["text"])["pagination"] !== "undefined") {
+	                itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	              }
+	              var reqYear = void 0;
+	              if (reqUrl.match(yearRexep)) {
+	                var _reqYear = reqUrl.match(yearRexep)[0].slice(5, 9);
+	              }
 	              oldData[i] = itemsPerYear;
 	              localStorage.setItem(genre, JSON.stringify(oldData));
 	              writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
@@ -320,8 +237,8 @@
 	  svg.append("g").attr("class", "axis").attr("transform", 'translate(' + _graph.margin.left + ', ' + (_graph.h - _graph.margin.bottom) + ')').call(bottomAxis);
 	
 	  genres.forEach(function (genre) {
-	    if (!allGenres.includes(genre)) {
-	      var formattedDataset = formatData(globalData[genre], minYear, maxYear);
+	    if (!_data_wrangling.allGenres.includes(genre)) {
+	      var formattedDataset = (0, _data_wrangling.formatData)(globalData[genre], minYear, maxYear);
 	      //
 	      if (formattedDataset.length === 0) {
 	        return;
@@ -334,7 +251,7 @@
 	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(formattedDataset[formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", "white").text(genre);
 	    } else {
 	      var dataset = JSON.parse(localStorage[genre]);
-	      var _formattedDataset = formatData(dataset, minYear, maxYear);
+	      var _formattedDataset = (0, _data_wrangling.formatData)(dataset, minYear, maxYear);
 	      if (_formattedDataset.length === 0) {
 	        return;
 	      }
@@ -360,7 +277,6 @@
 	  var closeModal = document.getElementById("aboutClose");
 	  var openModal = document.getElementById("aboutOpen");
 	  var triviaModal = document.getElementById("triviaModal");
-	  var closeTrivia = document.getElementById("triviaClose");
 	  var triviaSpinner = document.getElementById("triviaSpinner");
 	  var aboutSpinner = document.getElementById("aboutSpinner");
 	  var removeSubgenre = document.getElementById("removeSubgenre");
@@ -372,9 +288,6 @@
 	  openModal.onclick = function () {
 	    aboutModal.style.display = "block";
 	  };
-	  closeTrivia.onclick = function () {
-	    triviaModal.style.display = "none";
-	  };
 	
 	  var prefetchCallback = function prefetchCallback() {
 	    aboutSpinner.style.display = "none";
@@ -385,8 +298,8 @@
 	    aboutSpinner.style.display = "none";
 	    closeModal.style.display = "block";
 	
-	    allGenres.forEach(function (genre) {
-	      if (filterFetch(JSON.parse(localStorage[genre]), genre, 1970, 1990).length > 0) {
+	    _data_wrangling.allGenres.forEach(function (genre) {
+	      if ((0, _data_wrangling.filterFetch)(JSON.parse(localStorage[genre]), genre, 1970, 1990).length > 0) {
 	        aboutModal.style.display = "block";
 	        aboutSpinner.style.display = "block";
 	        closeModal.style.display = "none";
@@ -404,30 +317,30 @@
 	    subgenreInput.value = "";
 	  });
 	
-	  var testingCallback = function testingCallback() {
+	  var removeSpinner = function removeSpinner() {
 	    triviaModal.style.display = "none";
 	  };
 	
 	  rockButton.addEventListener("click", function () {
-	    return genreButtonClick("rock", $('#startYear').val(), testingCallback);
+	    return genreButtonClick("rock", $('#startYear').val(), removeSpinner);
 	  });
 	  popButton.addEventListener("click", function () {
-	    return genreButtonClick("pop", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	    return genreButtonClick("pop", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	  hipHopButton.addEventListener("click", function () {
-	    return genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	    return genreButtonClick("hip-hop", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	  funkSoulButton.addEventListener("click", function () {
-	    return genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	    return genreButtonClick("funk-soul", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	  electronicButton.addEventListener("click", function () {
-	    return genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	    return genreButtonClick("electronic", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	  classicalButton.addEventListener("click", function () {
-	    return genreButtonClick("classical", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	    return genreButtonClick("classical", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	  jazzButton.addEventListener("click", function () {
-	    return genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val(), testingCallback);
+	    return genreButtonClick("jazz", $('#startYear').val(), $('#endYear').val(), removeSpinner);
 	  });
 	
 	  startYear.addEventListener("input", function () {
@@ -448,7 +361,7 @@
 	    updateEndYear($('#endYear').val());
 	  });
 	
-	  (0, _dom_methods.setupLocalStorage)();
+	  (0, _data_wrangling.setupLocalStorage)();
 	  prefetchData();
 	  writeGraph(localStorage, startYear.value, endYear.value);
 	  (0, _dom_methods.removeTriviaModal)();
@@ -513,15 +426,6 @@
 	  "classical": "#FF5175",
 	  "jazz": "#00FFFF",
 	  "subgenre": "white"
-	};
-	
-	var setupLocalStorage = exports.setupLocalStorage = function setupLocalStorage() {
-	  localStorage.removeItem("subgenre");
-	  var genres = Object.keys(genreColors);
-	  genres.forEach(function (genre) {
-	    if (typeof localStorage[genre] === "undefined") localStorage.setItem(genre, JSON.stringify({}));
-	  });
-	  localStorage.setItem("subgenre", "{}");
 	};
 	
 	var startYearUpdate = exports.startYearUpdate = function startYearUpdate(year) {
@@ -624,21 +528,6 @@
 	
 	var parseDate = exports.parseDate = d3.timeParse("%Y");
 	
-	// export const formatData = (genre, startYear, endYear) => {
-	//   const keys = Object.keys(genre).sort();
-	//   let filteredData = keys.filter((key) => {
-	//     if (key >= startYear && key <= endYear) {
-	//       return true;
-	//     } else {
-	//       return false;
-	//     }
-	//   });
-	//   let formattedData = filteredData.map( (key) => {
-	//     return [parseDate(key), genre[key]]; }
-	//   );
-	//   return formattedData;
-	// };
-	
 	var GenerateLeftAxis = exports.GenerateLeftAxis = function GenerateLeftAxis(scale) {
 	  var leftAxis = d3.axisLeft(scale);
 	  return leftAxis;
@@ -656,6 +545,18 @@
 	    topReleasesPerGenre.push(d3.max(Object.values(storage[genre])));
 	  });
 	  return d3.max(topReleasesPerGenre);
+	};
+	
+	var getEarliestData = exports.getEarliestData = function getEarliestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.min(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 2015;
+	};
+	
+	var getLatestData = exports.getLatestData = function getLatestData(genre, store) {
+	  if (store[genre]) {
+	    return d3.max(Object.keys(JSON.parse(localStorage[genre])));
+	  } else return 1951;
 	};
 
 /***/ },
@@ -17567,6 +17468,102 @@
 	module.exports = TokenBucket;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.getUnclickedGenres = exports.getClickedGenres = exports.filterFetch = exports.formatData = exports.setupLocalStorage = exports.allGenres = undefined;
+	
+	var _dom_methods = __webpack_require__(2);
+	
+	var _graph = __webpack_require__(3);
+	
+	var allGenres = exports.allGenres = ["rock", "pop", "hip-hop", "funk-soul", "jazz", "classical", "electronic"];
+	
+	var setupLocalStorage = exports.setupLocalStorage = function setupLocalStorage() {
+	  localStorage.removeItem("subgenre");
+	  var genres = Object.keys(_dom_methods.genreColors);
+	  genres.forEach(function (genre) {
+	    if (typeof localStorage[genre] === "undefined") localStorage.setItem(genre, JSON.stringify({}));
+	  });
+	  localStorage.setItem("subgenre", "{}");
+	};
+	
+	var formatData = exports.formatData = function formatData(genre, startYear, endYear) {
+	  var keys = Object.keys(genre).sort();
+	  var filteredData = keys.filter(function (key) {
+	    if (key >= startYear && key <= endYear) {
+	      return true;
+	    }
+	  });
+	  var formattedData = filteredData.map(function (key) {
+	    return [(0, _graph.parseDate)(key), genre[key]];
+	  });
+	  return formattedData;
+	};
+	
+	var filterFetch = exports.filterFetch = function filterFetch(oldEntry, genre, startYear, endYear) {
+	  var missingYears = [];
+	  var start = null;
+	  var end = null;
+	  for (var i = startYear; i < endYear; i++) {
+	    if (start === null) {
+	      if (oldEntry[i] !== undefined) {
+	        continue;
+	      } else {
+	        start = i;
+	      }
+	    } else {
+	      if (oldEntry[i] === undefined) {
+	        continue;
+	      } else {
+	        end = i - 1;
+	        missingYears.push([start, end]);
+	        start = null;
+	      }
+	    }
+	  }
+	  if (start !== null) {
+	    if (oldEntry[endYear] !== undefined) {
+	      missingYears.push([start, endYear - 1]);
+	    } else {
+	      missingYears.push([start, endYear]);
+	    }
+	  } else {
+	    if (oldEntry[endYear] !== undefined) {} else {
+	      missingYears.push([endYear, endYear]);
+	    }
+	  }
+	
+	  return missingYears;
+	};
+	
+	var getClickedGenres = exports.getClickedGenres = function getClickedGenres() {
+	  var clickedGenres = [];
+	  allGenres.forEach(function (genre) {
+	    if ((0, _dom_methods.isButtonClicked)(genre)) {
+	      clickedGenres.push(genre);
+	    }
+	  });
+	  return clickedGenres;
+	};
+	
+	var getUnclickedGenres = exports.getUnclickedGenres = function getUnclickedGenres() {
+	  console.log("here");
+	  var clickedGenres = [];
+	  allGenres.forEach(function (genre) {
+	    if (!(0, _dom_methods.isButtonClicked)(genre)) {
+	      clickedGenres.push(genre);
+	    }
+	  });
+	  return clickedGenres;
+	};
 
 /***/ }
 /******/ ]);
