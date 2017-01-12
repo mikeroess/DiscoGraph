@@ -24,7 +24,53 @@ const getLatestData = (genre, store) => {
   else return 1951;
 };
 
+const fetchAndUpdateSubgenre = () => {
+  const style = $('#genre').val();
+  const start = $('#startYear').val();
+  const end = $('#endYear').val();
+  const subgenre = genre.value;
+  const yearRexep = /year=\d\d\d\d/;
+  const callback = () => { document.getElementById("triviaModal").style.display = "none"; };
+  const currentEntry = JSON.parse(localStorage["subgenre"]);
+  for (let i = start; i <= end; i++) {
+      let reqData = {'style': style, 'year': i};
+      // triviaSpinner.style.display = "triviaModal";
+      addTriviaModal();
+      subGenreQuery(reqData).then(
+        (response) => {
+        const reqUrl = response.req["url"];
+        const year = reqUrl.match(yearRexep)[0].slice(5,9);
+        const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+        if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+          const newData = {};
+          newData[subgenre] = {};
+          const updatingData = newData[subgenre];
+          updatingData[year] = itemsPerYear;
+          localStorage.setItem("subgenre", JSON.stringify(newData));
+        } else {
+          const oldEntry = JSON.parse(localStorage["subgenre"]);
+          const oldData = oldEntry[subgenre];
+          oldData[year] = itemsPerYear;
+          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
+        }
+        writeGraph(localStorage, startYear.value, endYear.value);
+        if (Number(end) === Number(year)) {
+          callback();
+        }
+        removeSubgenre.style.display = "inline-block";
+      }
+      ,
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
+};
+
 const updateStartYear = (startYear) => {
+  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
+    fetchAndUpdateSubgenre();
+  }
   const genresToUpdate = getClickedGenres().filter( (genre) => getEarliestData(genre, localStorage) > startYear);
   genresToUpdate.forEach( (genre) => {
     const earliestData = getEarliestData(genre, localStorage);
@@ -37,6 +83,9 @@ const updateStartYear = (startYear) => {
 };
 
 const updateEndYear = (endYear) => {
+  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
+    fetchAndUpdateSubgenre();
+  }
   const genresToUpdate = getClickedGenres().filter( (genre) => getLatestData(genre, localStorage) < endYear);
   genresToUpdate.forEach( (genre) => {
     const latestData = getLatestData(genre, localStorage);
@@ -225,17 +274,12 @@ const writeGraph = (localData, minYear, maxYear) => {
 
     genres.forEach( (genre) => {
       if (!allGenres.includes(genre)) {
-          // console.log(globalData);
-          // console.log(globalData[genre]);
-        //   // FOR SOME REASON WE'RE NOT EVALUATING globalData[genre];
           const formattedDataset = formatData(globalData[genre], minYear, maxYear);
         //
           if (formattedDataset.length === 0) { return; }
-        // const subGenreObject = JSON.parse(localStorage[genre]);
-        // const genreName = Object.keys(subGenreObject)[0];
-        // const formattedDataset = formatData(subGenreObject[genreName], minYear, maxYear);
-        // if (formattedDataset.length === 0) { return; }
-
+          if (genre === "") {
+            genre = "unclassified";
+          }
         svg.append("path")
           .attr("d", line(formattedDataset))
           .attr("stroke", "white")
@@ -274,6 +318,49 @@ const writeGraph = (localData, minYear, maxYear) => {
 
 
 $(document).ready(() => {
+
+  // const fetchAndUpdateSubgenre = () => {
+  //   const style = $('#genre').val();
+  //   const start = $('#startYear').val();
+  //   const end = $('#endYear').val();
+  //   const subgenre = genre.value;
+  //   const yearRexep = /year=\d\d\d\d/;
+  //   const callback = testingCallback;
+  //   const currentEntry = JSON.parse(localStorage["subgenre"]);
+  //   for (let i = start; i <= end; i++) {
+  //       let reqData = {'style': style, 'year': i};
+  //       triviaSpinner.style.display = "";
+  //       addTriviaModal();
+  //       subGenreQuery(reqData).then(
+  //         (response) => {
+  //         const reqUrl = response.req["url"];
+  //         const year = reqUrl.match(yearRexep)[0].slice(5,9);
+  //         const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+  //         if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+  //           const newData = {};
+  //           newData[subgenre] = {};
+  //           const updatingData = newData[subgenre];
+  //           updatingData[year] = itemsPerYear;
+  //           localStorage.setItem("subgenre", JSON.stringify(newData));
+  //         } else {
+  //           const oldEntry = JSON.parse(localStorage["subgenre"]);
+  //           const oldData = oldEntry[subgenre];
+  //           oldData[year] = itemsPerYear;
+  //           localStorage.setItem("subgenre", JSON.stringify(oldEntry));
+  //         }
+  //         writeGraph(localStorage, startYear.value, endYear.value);
+  //         if (Number(end) === Number(year)) {
+  //           callback();
+  //         }
+  //         removeSubgenre.style.display = "inline-block";
+  //       }
+  //       ,
+  //       (err) => {
+  //         console.log(err);
+  //       }
+  //     );
+  //   }
+  // };
   const rockButton = document.getElementById("rock-toggle");
   const popButton = document.getElementById("pop-toggle");
   const hipHopButton = document.getElementById("hip-hop-toggle");
@@ -291,6 +378,7 @@ $(document).ready(() => {
   const triviaSpinner = document.getElementById("triviaSpinner");
   const aboutSpinner = document.getElementById("aboutSpinner");
   const removeSubgenre = document.getElementById("removeSubgenre");
+  const subgenreInput = document.getElementById("genre");
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
@@ -322,6 +410,8 @@ $(document).ready(() => {
     localStorage.setItem("subgenre", "{}");
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     removeSubgenre.style.display = "none";
+    subgenreInput.value = "";
+
   });
 
   const testingCallback = () => {
@@ -362,47 +452,7 @@ $(document).ready(() => {
 
   $("#mainForm").submit( (e) => {
     e.preventDefault();
-
-    const style = $('#genre').val();
-    const start = $('#startYear').val();
-    const end = $('#endYear').val();
-    const subgenre = genre.value;
-    const yearRexep = /year=\d\d\d\d/;
-    const callback = testingCallback;
-    const currentEntry = JSON.parse(localStorage["subgenre"]);
-    for (let i = start; i <= end; i++) {
-        let reqData = {'style': style, 'year': i};
-        triviaSpinner.style.display = "";
-        addTriviaModal();
-        subGenreQuery(reqData).then(
-          (response) => {
-          const reqUrl = response.req["url"];
-          const year = reqUrl.match(yearRexep)[0].slice(5,9);
-          const itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-          if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
-            const newData = {};
-            newData[subgenre] = {};
-            const updatingData = newData[subgenre];
-            updatingData[year] = itemsPerYear;
-            localStorage.setItem("subgenre", JSON.stringify(newData));
-          } else {
-            const oldEntry = JSON.parse(localStorage["subgenre"]);
-            const oldData = oldEntry[subgenre];
-            oldData[year] = itemsPerYear;
-            localStorage.setItem("subgenre", JSON.stringify(oldEntry));
-          }
-          writeGraph(localStorage, startYear.value, endYear.value);
-          if (Number(end) === Number(year)) {
-            callback();
-          }
-          removeSubgenre.style.display = "inline-block";
-        }
-        ,
-        (err) => {
-          console.log(err);
-        }
-      );
-    }
+    fetchAndUpdateSubgenre();
   }
 );
 });

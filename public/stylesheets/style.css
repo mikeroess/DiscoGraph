@@ -270,6 +270,11 @@ svg {
   display: none;
 }
 
+#triviaModal .modal-content {
+  border: none;
+  height: 95%;
+}
+
 #triviaClose:hover {
   cursor: pointer;
 }
