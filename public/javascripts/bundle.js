@@ -54,8 +54,10 @@
 	
 	var _data_wrangling = __webpack_require__(5);
 	
+	var _pie = __webpack_require__(6);
+	
 	var d3 = __webpack_require__(4);
-	var RateLimiter = __webpack_require__(6).RateLimiter;
+	var RateLimiter = __webpack_require__(7).RateLimiter;
 	
 	
 	var limiter = new RateLimiter(240, "minute");
@@ -144,6 +146,8 @@
 	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
 	  var callback = cb;
 	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	  var pieData = (0, _data_wrangling.formatPieData)(1975, localStorage);
+	  (0, _pie.writePie)(pieData);
 	  var currentRecords = JSON.parse(localStorage[genre]);
 	  var yearsToFetch = (0, _data_wrangling.filterFetch)(currentRecords, genre, startYear, endYear);
 	  var finalYear = void 0;
@@ -16966,7 +16970,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.getUnclickedGenres = exports.getClickedGenres = exports.filterFetch = exports.formatData = exports.setupLocalStorage = exports.allGenres = undefined;
+	exports.formatPieData = exports.getPieGenres = exports.getColorsForPie = exports.getUnclickedGenres = exports.getClickedGenres = exports.filterFetch = exports.formatData = exports.setupLocalStorage = exports.allGenres = undefined;
 	
 	var _dom_methods = __webpack_require__(2);
 	
@@ -17051,21 +17055,97 @@
 	  });
 	  return clickedGenres;
 	};
+	
+	var getColorsForPie = exports.getColorsForPie = function getColorsForPie(genres) {
+	  var colors = [];
+	  genres.forEach(function (genre) {
+	    colors.push(_dom_methods.genreColors[genre]);
+	  });
+	  return colors;
+	};
+	
+	var getPieGenres = exports.getPieGenres = function getPieGenres(data) {
+	  var genres = [];
+	  data.forEach(function (datum) {
+	    genres.push(datum["genre"]);
+	  });
+	  return genres;
+	};
+	
+	// PIE DATA SHOULD HAVE FORMAT: [
+	//   {
+	//     GENRE: GENRE,
+	//     COUNT: COUNT
+	//   },
+	//   {
+	//     GENRE: GENRE,
+	//     COUNT: COUNT
+	//   }
+	// ]
+	
+	var formatPieData = exports.formatPieData = function formatPieData(year, dataset) {
+	  var data = [];
+	  var genres = getClickedGenres();
+	  genres.forEach(function (genre) {
+	    var datum = {};
+	    var entry = JSON.parse(dataset[genre]);
+	    datum["genre"] = genre;
+	    datum["count"] = entry[year];
+	    data.push(datum);
+	  });
+	  return data;
+	};
 
 /***/ },
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
 	
-	exports.RateLimiter = __webpack_require__(7);
-	exports.TokenBucket = __webpack_require__(9);
-
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.writePie = undefined;
+	
+	var _data_wrangling = __webpack_require__(5);
+	
+	var writePie = exports.writePie = function writePie(data) {
+	  var dataset = data;
+	  var genres = (0, _data_wrangling.getPieGenres)(dataset);
+	  var d3 = __webpack_require__(4);
+	  var width = 200;
+	  var height = 200;
+	  var radius = 100;
+	
+	  var color = d3.scaleOrdinal().range((0, _data_wrangling.getColorsForPie)(genres));
+	
+	  var pieSvg = d3.select("#d3Pie").append('svg').attr('width', width).attr('height', height).append('g').attr('transform', 'translate( ' + width / 2 + ', ' + height / 2 + ')');
+	
+	  var arc = d3.arc().innerRadius(0).outerRadius(radius);
+	
+	  var pie = d3.pie().value(function (d) {
+	    return d.count;
+	  }).sort(null);
+	
+	  var path = pieSvg.selectAll('path').data(pie(dataset)).enter().append('path').attr('d', arc).attr('fill', function (d, i) {
+	    return color(d.data.genre);
+	  });
+	};
 
 /***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(process) {var TokenBucket = __webpack_require__(9);
+	
+	exports.RateLimiter = __webpack_require__(8);
+	exports.TokenBucket = __webpack_require__(10);
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {var TokenBucket = __webpack_require__(10);
 	
 	/**
 	 * A generic rate limiter. Underneath the hood, this uses a token bucket plus
@@ -17196,10 +17276,10 @@
 	
 	module.exports = RateLimiter;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -17385,7 +17465,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {
@@ -17554,7 +17634,7 @@
 	
 	module.exports = TokenBucket;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }
 /******/ ]);
