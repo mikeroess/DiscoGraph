@@ -264,7 +264,7 @@
 	
 	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(_formattedDataset[_formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", _dom_methods.genreColors[genre]).text(genre);
 	
-	      svg.on("click", function () {
+	      svg.on("mousemove", function () {
 	        var year = _graph.xScale.invert(d3.mouse(this)[0]).getFullYear();
 	        var pieData = (0, _data_wrangling.formatPieData)(year, localStorage);
 	        (0, _pie.writePie)(pieData);
@@ -291,6 +291,7 @@
 	  var aboutSpinner = document.getElementById("aboutSpinner");
 	  var removeSubgenre = document.getElementById("removeSubgenre");
 	  var subgenreInput = document.getElementById("genre");
+	  var removePie = document.getElementById("removePie");
 	
 	  closeModal.onclick = function () {
 	    aboutModal.style.display = "none";
@@ -325,6 +326,20 @@
 	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	    removeSubgenre.style.display = "none";
 	    subgenreInput.value = "";
+	  });
+	
+	  removePie.addEventListener("click", function (e) {
+	    debugger;
+	    e.preventDefault();
+	    if (e.target.innerHTML === "remove pie chart") {
+	      $(".pie").remove();
+	      e.target.innerHTML = "add pie chart";
+	    } else {
+	      var pieYear = $('#startYear').val();
+	      var pieData = (0, _data_wrangling.formatPieData)(pieYear, localStorage);
+	      (0, _pie.writePie)(pieData);
+	      e.target.innerHTML = "remove pie chart";
+	    }
 	  });
 	
 	  var removeSpinner = function removeSpinner() {
@@ -17121,9 +17136,9 @@
 	  var dataset = data;
 	  var genres = (0, _data_wrangling.getPieGenres)(dataset);
 	  var d3 = __webpack_require__(4);
-	  var width = 200;
-	  var height = 200;
-	  var radius = 100;
+	  var width = 100;
+	  var height = 100;
+	  var radius = Math.min(width, height) / 2;
 	
 	  var color = d3.scaleOrdinal().range((0, _data_wrangling.getColorsForPie)(genres));
 	

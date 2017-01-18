@@ -10,7 +10,7 @@ import { margin, w, h, xScale, yScale, line, parseDate, GenerateLeftAxis, Genera
 import { formatData, filterFetch, allGenres, getClickedGenres,
   getUnclickedGenres, setupLocalStorage, getColorsForPie,
   getPieGenres, formatPieData } from './data_wrangling.js';
-import { writePie } from './pie.js';
+import { writePie, removePie } from './pie.js';
 
 const limiter = new RateLimiter(240, "minute");
 
@@ -241,7 +241,7 @@ const writeGraph = (localData, minYear, maxYear) => {
         .style("fill", genreColors[genre])
         .text(genre);
 
-      svg.on("click", function() {
+      svg.on("mousemove", function() {
         const year = xScale.invert(d3.mouse(this)[0]).getFullYear();
         const pieData = formatPieData(year, localStorage);
         writePie(pieData);
@@ -270,6 +270,7 @@ $(document).ready(() => {
   const aboutSpinner = document.getElementById("aboutSpinner");
   const removeSubgenre = document.getElementById("removeSubgenre");
   const subgenreInput = document.getElementById("genre");
+  const removePie = document.getElementById("removePie");
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
@@ -301,7 +302,20 @@ $(document).ready(() => {
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     removeSubgenre.style.display = "none";
     subgenreInput.value = "";
+  });
 
+  removePie.addEventListener("click", (e) => {
+    debugger
+    e.preventDefault();
+    if (e.target.innerHTML === "remove pie chart") {
+      $(".pie").remove();
+      e.target.innerHTML = "add pie chart";
+    } else {
+      const pieYear = $('#startYear').val();
+      const pieData = formatPieData(pieYear, localStorage);
+      writePie(pieData);
+      e.target.innerHTML = "remove pie chart";
+    }
   });
 
   const removeSpinner = () => {

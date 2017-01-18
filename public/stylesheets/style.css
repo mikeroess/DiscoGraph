@@ -289,7 +289,7 @@ svg {
   cursor: pointer;
 }
 
-#removeSubgenre{
+#removeSubgenre {
   display: none;
 }
 
@@ -320,8 +320,24 @@ svg {
   width:  100px;
 }
 
-.pie {
-  text-align: center;
+
+/*pie*/
+#pieDiv {
+  margin-left: 390px;
+  display: inline-block;
+}
+
+#d3Pie {
+  height: 100px;
+  width: 100px;
+  float: left;
+}
+
+#removePie {
+  float: left;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  margin-left: 10px;
 }
 
 .overlay {

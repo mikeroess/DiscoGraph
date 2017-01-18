@@ -1,15 +1,13 @@
 import { getColorsForPie, getPieGenres } from './data_wrangling';
 
-
-
 export const writePie = (data) => {
-    $(".pie").remove();
+  $(".pie").remove();
   const dataset = data;
   const genres = getPieGenres(dataset);
   const d3 = require('d3');
-  const width = 200;
-  const height = 200;
-  const radius = 100;
+  const width = 100;
+  const height = 100;
+  const radius = Math.min(width, height) / 2;
 
   const color = d3.scaleOrdinal()
     .range(getColorsForPie(genres));
