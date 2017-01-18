@@ -12,7 +12,6 @@ app/secret.js
 # Ignore Byebug command history file.
 .byebug_history
 node_modules/
-/public/javascripts/bundle.js
 /public/javascripts/bundle.js.map
 
 # Ignore api
