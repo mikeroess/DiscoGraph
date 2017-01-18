@@ -55,7 +55,7 @@
 	var _data_wrangling = __webpack_require__(5);
 	
 	var d3 = __webpack_require__(4);
-	var RateLimiter = __webpack_require__(6).RateLimiter;
+	var RateLimiter = __webpack_require__(7).RateLimiter;
 	
 	
 	var limiter = new RateLimiter(240, "minute");
@@ -17053,19 +17053,20 @@
 	};
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	exports.RateLimiter = __webpack_require__(7);
-	exports.TokenBucket = __webpack_require__(9);
-
-
-/***/ },
+/* 6 */,
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(process) {var TokenBucket = __webpack_require__(9);
+	
+	exports.RateLimiter = __webpack_require__(8);
+	exports.TokenBucket = __webpack_require__(10);
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {var TokenBucket = __webpack_require__(10);
 	
 	/**
 	 * A generic rate limiter. Underneath the hood, this uses a token bucket plus
@@ -17196,10 +17197,10 @@
 	
 	module.exports = RateLimiter;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -17385,7 +17386,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {
@@ -17554,7 +17555,7 @@
 	
 	module.exports = TokenBucket;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }
 /******/ ]);
