@@ -1,12 +1,12 @@
 import { getColorsForPie, getPieGenres } from './data_wrangling';
 
-export const writePie = (data) => {
+export const writePie = (data, year) => {
   $(".pie").remove();
   const dataset = data;
   const genres = getPieGenres(dataset);
   const d3 = require('d3');
   const width = 100;
-  const height = 100;
+  const height = 150;
   const radius = Math.min(width, height) / 2;
 
   const color = d3.scaleOrdinal()
@@ -36,4 +36,7 @@ export const writePie = (data) => {
     .attr('fill', function(d, i) {
       return color(d.data.genre);
     });
+    pieSvg.append("text").text(year)
+      .attr('fill', 'white')
+      .attr("transform", "translate(-20, -63)");
   };

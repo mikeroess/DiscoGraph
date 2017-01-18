@@ -93,7 +93,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
   const callback = cb;
   writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
   const pieData = formatPieData(1975, localStorage);
-  writePie(pieData);
+  writePie(pieData, 1975);
   const currentRecords = JSON.parse(localStorage[genre]);
   const yearsToFetch = filterFetch(currentRecords, genre, startYear, endYear);
   let finalYear;
@@ -244,7 +244,7 @@ const writeGraph = (localData, minYear, maxYear) => {
       svg.on("mousemove", function() {
         const year = xScale.invert(d3.mouse(this)[0]).getFullYear();
         const pieData = formatPieData(year, localStorage);
-        writePie(pieData);
+        writePie(pieData, year);
       }
       );
     }}
@@ -270,7 +270,7 @@ $(document).ready(() => {
   const aboutSpinner = document.getElementById("aboutSpinner");
   const removeSubgenre = document.getElementById("removeSubgenre");
   const subgenreInput = document.getElementById("genre");
-  const removePie = document.getElementById("removePie");
+
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
@@ -302,20 +302,6 @@ $(document).ready(() => {
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     removeSubgenre.style.display = "none";
     subgenreInput.value = "";
-  });
-
-  removePie.addEventListener("click", (e) => {
-    debugger
-    e.preventDefault();
-    if (e.target.innerHTML === "remove pie chart") {
-      $(".pie").remove();
-      e.target.innerHTML = "add pie chart";
-    } else {
-      const pieYear = $('#startYear').val();
-      const pieData = formatPieData(pieYear, localStorage);
-      writePie(pieData);
-      e.target.innerHTML = "remove pie chart";
-    }
   });
 
   const removeSpinner = () => {
