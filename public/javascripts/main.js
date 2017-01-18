@@ -139,6 +139,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
 };
 
 const writeGraph = (localData, minYear, maxYear) => {
+
   const genres = Object.keys(localData).filter(
     (genre) => {
       if (isButtonClicked(genre)) return genre;
@@ -239,6 +240,13 @@ const writeGraph = (localData, minYear, maxYear) => {
         .attr("class", "genreLabel")
         .style("fill", genreColors[genre])
         .text(genre);
+
+      svg.on("click", function() {
+        const year = xScale.invert(d3.mouse(this)[0]).getFullYear();
+        const pieData = formatPieData(year, localStorage);
+        writePie(pieData);
+      }
+      );
     }}
   );
 };

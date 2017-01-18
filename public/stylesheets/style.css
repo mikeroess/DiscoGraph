@@ -319,3 +319,11 @@ svg {
   height: 100px;
   width:  100px;
 }
+
+.pie {
+  text-align: center;
+}
+
+.overlay {
+  background: transparent;
+}
