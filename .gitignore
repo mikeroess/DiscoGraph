@@ -12,8 +12,8 @@ app/secret.js
 # Ignore Byebug command history file.
 .byebug_history
 node_modules/
-bundle.js
-bundle.js.map
+/public/javascripts/bundle.js
+/public/javascripts/bundle.js.map
 
 # Ignore api
 DiscoGraph/discograph/routes/token.js

@@ -3,11 +3,14 @@ const RateLimiter = require('limiter').RateLimiter;
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked,
   genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
-  addTriviaModal, removeTriviaSpinner, removeTriviaModal,
+  addTriviaModal, removeTriviaSpinner, allowTriviaClose, removeTriviaModal,
   addTriviaSpinner, addAboutSpinner, removeAboutSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease, getLatestDate, getEarliestDate } from './graph.js';
-import { formatData, filterFetch, allGenres, getClickedGenres, getUnclickedGenres, setupLocalStorage } from './data_wrangling.js';
+import { formatData, filterFetch, allGenres, getClickedGenres,
+  getUnclickedGenres, setupLocalStorage, getColorsForPie,
+  getPieGenres, formatPieData } from './data_wrangling.js';
+import { writePie, removePie } from './pie.js';
 
 const limiter = new RateLimiter(240, "minute");
 
@@ -89,6 +92,8 @@ const updateEndYear = (endYear) => {
 const genreButtonClick = function (genre, startYear, endYear, cb) {
   const callback = cb;
   writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+  const pieData = formatPieData(1975, localStorage);
+  writePie(pieData, 1975);
   const currentRecords = JSON.parse(localStorage[genre]);
   const yearsToFetch = filterFetch(currentRecords, genre, startYear, endYear);
   let finalYear;
@@ -134,6 +139,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
 };
 
 const writeGraph = (localData, minYear, maxYear) => {
+
   const genres = Object.keys(localData).filter(
     (genre) => {
       if (isButtonClicked(genre)) return genre;
@@ -234,6 +240,13 @@ const writeGraph = (localData, minYear, maxYear) => {
         .attr("class", "genreLabel")
         .style("fill", genreColors[genre])
         .text(genre);
+
+      svg.on("mousemove", function() {
+        const year = xScale.invert(d3.mouse(this)[0]).getFullYear();
+        const pieData = formatPieData(year, localStorage);
+        writePie(pieData, year);
+      }
+      );
     }}
   );
 };
@@ -257,6 +270,7 @@ $(document).ready(() => {
   const aboutSpinner = document.getElementById("aboutSpinner");
   const removeSubgenre = document.getElementById("removeSubgenre");
   const subgenreInput = document.getElementById("genre");
+
 
   closeModal.onclick = () => { aboutModal.style.display = "none"; };
   openModal.onclick = () => { aboutModal.style.display = "block"; };
@@ -288,7 +302,6 @@ $(document).ready(() => {
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     removeSubgenre.style.display = "none";
     subgenreInput.value = "";
-
   });
 
   const removeSpinner = () => {
