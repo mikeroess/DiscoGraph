@@ -112,20 +112,10 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
         let data = {'genre': genre, 'year': i};
         limiter.removeTokens(1, function(err, remainingRequests) {
           genreQuery(data).then((response) => {
-            const yearRexep = /year=\d\d\d\d/;
-            const reqUrl = response.req["url"];
             const oldData = JSON.parse(localStorage[genre]);
-            let itemsPerYear;
-            if (JSON.parse(response["text"])["pagination"] !== "undefined") {
-              itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-            }
-            let reqYear;
-            if (reqUrl.match(yearRexep)) {
-              reqYear = reqUrl.match(yearRexep)[0].slice(5,9);
-            }
-            oldData[i] = itemsPerYear;
+            Object.assign(oldData, response[genre])
             localStorage.setItem(genre, JSON.stringify(oldData));
-            writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+            const reqYear = Object.keys(response[genre])[0];
             if (typeof(callback) === "function" && Number(finalYear) === Number(reqYear)) {
               callback();
             }
