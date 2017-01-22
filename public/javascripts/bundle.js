@@ -165,10 +165,11 @@
 	          var data = { 'genre': genre, 'year': i };
 	          limiter.removeTokens(1, function (err, remainingRequests) {
 	            (0, _api.genreQuery)(data).then(function (response) {
+	              debugger;
 	              var oldData = JSON.parse(localStorage[genre]);
-	              Object.assign(oldData, response[genre]);
+	              Object.assign(oldData, response);
 	              localStorage.setItem(genre, JSON.stringify(oldData));
-	              var reqYear = Object.keys(response[genre])[0];
+	              var reqYear = Object.keys(response)[0];
 	              if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
 	                callback();
 	              }

@@ -112,10 +112,11 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
         let data = {'genre': genre, 'year': i};
         limiter.removeTokens(1, function(err, remainingRequests) {
           genreQuery(data).then((response) => {
+            debugger
             const oldData = JSON.parse(localStorage[genre]);
-            Object.assign(oldData, response[genre])
+            Object.assign(oldData, response);
             localStorage.setItem(genre, JSON.stringify(oldData));
-            const reqYear = Object.keys(response[genre])[0];
+            const reqYear = Object.keys(response)[0];
             if (typeof(callback) === "function" && Number(finalYear) === Number(reqYear)) {
               callback();
             }

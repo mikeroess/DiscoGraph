@@ -4,10 +4,19 @@ const models = require('../models/index');
 module.exports = (app) => {
   app.get('/getAllGenres', (req, res) => {
     models.Genre.findAll({
-      where: {title: "pop"}
     }).then(
       (genres) => res.json(genres),
       (err) => res.send(err)
+    );
+  });
+
+  app.get('/checkGenre', (req, res) => {
+    console.log("checkingGenre");
+    models.Genre.findOne({
+      where: {title: req.body['genre']}
+    }).then(
+      record => res.send(record),
+      err => res.send(err)
     );
   });
 

@@ -16,9 +16,31 @@ module.exports = {
       title: 'rock',
       createdAt: new Date(),
       updatedAt: new Date(),
+    },{
+      title: 'pop',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      title: 'jazz',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      title: 'classical',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      title: 'electronic',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      title: 'funk-soul',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      title: 'hip-hop',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
-    // {title: 'pop'},
-    // {title: 'disco'},
   ]);
   },
 

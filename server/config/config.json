@@ -4,20 +4,23 @@
     "password": null,
     "database": "music-releases",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "seederStorage": "sequelize"
   },
   "test": {
     "username": "mwr",
     "password": null,
     "database": "music-releases",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "seederStorage": "sequelize"
   },
   "production": {
     "username": "mwr",
     "password": null,
     "database": "music-releases",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "seederStorage": "sequelize"
   }
 }
