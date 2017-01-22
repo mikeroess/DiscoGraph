@@ -116,6 +116,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
             const oldData = JSON.parse(localStorage[genre]);
             Object.assign(oldData, response);
             localStorage.setItem(genre, JSON.stringify(oldData));
+            writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
             const reqYear = Object.keys(response)[0];
             if (typeof(callback) === "function" && Number(finalYear) === Number(reqYear)) {
               callback();
@@ -297,6 +298,7 @@ $(document).ready(() => {
 
   const removeSpinner = () => {
         triviaModal.style.display = "none";
+        writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     };
 
 

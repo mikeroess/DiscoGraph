@@ -9,7 +9,6 @@ router.get('/', function(req, res, next) {
   res.sendfile('../public/index.html');
 });
 
-
 const setupDiscogsReq = (req) => {
   const genre = req.query["genre"];
   const year = req.query["year"];
@@ -25,7 +24,7 @@ const setupDiscogsReq = (req) => {
 };
 
 
-
+// YOU ARE IN CALLBACK HELL WITH PROMISES YOU DOLT
 router.get('/api', function(req, res, next) {
   const genre = req.query["genre"];
   const year = req.query["year"];
