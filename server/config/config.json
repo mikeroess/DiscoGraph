@@ -16,11 +16,7 @@
     "seederStorage": "sequelize"
   },
   "production": {
-    "username": "mwr",
-    "password": null,
-    "database": "music-releases",
-    "host": "127.0.0.1",
-    "dialect": "postgres",
-    "seederStorage": "sequelize"
+    "use_env_variable": "DATABASE_URL",
+    "seederStorage": "sequelize",
   }
 }
