@@ -73,39 +73,35 @@
 	  };
 	  var currentEntry = JSON.parse(localStorage["subgenre"]);
 	
-	  var _loop = function _loop(i) {
+	  for (var i = start; i <= end; i++) {
 	    var reqData = { 'style': style, 'year': i };
 	    (0, _dom_methods.addTriviaModal)();
-	    limiter.removeTokens(1, function (err, remainingRequests) {
-	      (0, _api.subGenreQuery)(reqData).then(function (response) {
-	        var reqUrl = response.req["url"];
-	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
-	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	        if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
-	          var newData = {};
-	          newData[subgenre] = {};
-	          var updatingData = newData[subgenre];
-	          updatingData[year] = itemsPerYear;
-	          localStorage.setItem("subgenre", JSON.stringify(newData));
-	        } else {
-	          var oldEntry = JSON.parse(localStorage["subgenre"]);
-	          var oldData = oldEntry[subgenre];
-	          oldData[year] = itemsPerYear;
-	          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
-	        }
-	        writeGraph(localStorage, startYear.value, endYear.value);
-	        if (Number(end) === Number(year)) {
-	          callback();
-	        }
-	        removeSubgenre.style.display = "inline-block";
-	      }, function (err) {
-	        console.log(err);
-	      });
+	    // limiter.removeTokens(1, function(err, remainingRequests) {
+	    (0, _api.subGenreQuery)(reqData).then(function (response) {
+	      var reqUrl = response.req["url"];
+	      var year = reqUrl.match(yearRexep)[0].slice(5, 9);
+	      var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	      if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+	        var newData = {};
+	        newData[subgenre] = {};
+	        var updatingData = newData[subgenre];
+	        updatingData[year] = itemsPerYear;
+	        localStorage.setItem("subgenre", JSON.stringify(newData));
+	      } else {
+	        var oldEntry = JSON.parse(localStorage["subgenre"]);
+	        var oldData = oldEntry[subgenre];
+	        oldData[year] = itemsPerYear;
+	        localStorage.setItem("subgenre", JSON.stringify(oldEntry));
+	      }
+	      writeGraph(localStorage, startYear.value, endYear.value);
+	      if (Number(end) === Number(year)) {
+	        callback();
+	      }
+	      removeSubgenre.style.display = "inline-block";
+	    }, function (err) {
+	      console.log(err);
 	    });
-	  };
-	
-	  for (var i = start; i <= end; i++) {
-	    _loop(i);
+	    // });
 	  }
 	};
 	
@@ -155,31 +151,28 @@
 	  yearsToFetch.forEach(function (range) {
 	    for (var i = range[0]; i <= range[1]; i++) {
 	      if (typeof currentRecords[i] !== "number") {
-	        (function () {
 	
-	          var triviaSpinner = document.getElementById("triviaSpinner");
-	          triviaSpinner.style.display = "block";
+	        var triviaSpinner = document.getElementById("triviaSpinner");
+	        triviaSpinner.style.display = "block";
 	
-	          (0, _dom_methods.addTriviaModal)();
+	        (0, _dom_methods.addTriviaModal)();
 	
-	          var data = { 'genre': genre, 'year': i };
-	          limiter.removeTokens(1, function (err, remainingRequests) {
-	            (0, _api.genreQuery)(data).then(function (response) {
-	              debugger;
-	              var oldData = JSON.parse(localStorage[genre]);
-	              Object.assign(oldData, response);
-	              localStorage.setItem(genre, JSON.stringify(oldData));
-	              writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-	              var reqYear = Object.keys(response)[0];
-	              if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
-	                writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-	                callback();
-	              }
-	            }, function (error) {
-	              console.log(error);
-	            });
-	          });
-	        })();
+	        var data = { 'genre': genre, 'year': i };
+	        // limiter.removeTokens(1, function(err, remainingRequests) {
+	        (0, _api.genreQuery)(data).then(function (response) {
+	          var oldData = JSON.parse(localStorage[genre]);
+	          Object.assign(oldData, response);
+	          localStorage.setItem(genre, JSON.stringify(oldData));
+	          writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	          var reqYear = Object.keys(response)[0];
+	          if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
+	            writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	            callback();
+	          }
+	        }, function (error) {
+	          console.log(error);
+	        });
+	        // });
 	      }
 	    }
 	  });
