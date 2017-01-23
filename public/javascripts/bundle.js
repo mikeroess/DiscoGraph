@@ -169,8 +169,10 @@
 	              var oldData = JSON.parse(localStorage[genre]);
 	              Object.assign(oldData, response);
 	              localStorage.setItem(genre, JSON.stringify(oldData));
+	              writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	              var reqYear = Object.keys(response)[0];
 	              if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
+	                writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	                callback();
 	              }
 	            }, function (error) {
@@ -253,6 +255,13 @@
 	
 	      svg.on("mousemove", function () {
 	        var year = _graph.xScale.invert(d3.mouse(this)[0]).getFullYear();
+	        if (year < $('#startYear').val()) {
+	          year = $('#startYear').val();
+	        }
+	        if (year > $('#endYear').val()) {
+	          year = $('#endYear').val();
+	        }
+	
 	        var pieData = (0, _data_wrangling.formatPieData)(year, localStorage);
 	        (0, _pie.writePie)(pieData, year);
 	      });
@@ -316,6 +325,7 @@
 	
 	  var removeSpinner = function removeSpinner() {
 	    triviaModal.style.display = "none";
+	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  };
 	
 	  rockButton.addEventListener("click", function () {

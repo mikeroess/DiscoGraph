@@ -119,6 +119,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
             writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
             const reqYear = Object.keys(response)[0];
             if (typeof(callback) === "function" && Number(finalYear) === Number(reqYear)) {
+              writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
               callback();
             }
           },
@@ -234,7 +235,10 @@ const writeGraph = (localData, minYear, maxYear) => {
         .text(genre);
 
       svg.on("mousemove", function() {
-        const year = xScale.invert(d3.mouse(this)[0]).getFullYear();
+        let year = xScale.invert(d3.mouse(this)[0]).getFullYear();
+        if (year < $('#startYear').val()) { year = $('#startYear').val(); }
+        if (year > $('#endYear').val()) { year = $('#endYear').val(); }
+
         const pieData = formatPieData(year, localStorage);
         writePie(pieData, year);
       }
