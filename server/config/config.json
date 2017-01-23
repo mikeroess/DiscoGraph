@@ -14,16 +14,15 @@
     "database": "music-releases",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "protocol": "postgres",
     "seederStorage": "sequelize"
   },
   "production": {
     "dialect": "postgres",
     "protocol": "postgres",
-    "seederStorage": "sequelize",
     "use_env_variable": "DATABASE_URL",
     "dialectOptions": {
         "ssl": true
     },
+    "seederStorage": "sequelize"
   }
 }
