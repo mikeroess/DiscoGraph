@@ -26,7 +26,7 @@ const fetchAndUpdateSubgenre = () => {
   for (let i = start; i <= end; i++) {
       let reqData = {'style': style, 'year': i};
       addTriviaModal();
-      limiter.removeTokens(1, function(err, remainingRequests) {
+      // limiter.removeTokens(1, function(err, remainingRequests) {
         subGenreQuery(reqData).then(
           (response) => {
           const reqUrl = response.req["url"];
@@ -55,7 +55,7 @@ const fetchAndUpdateSubgenre = () => {
           console.log(err);
         }
       );
-    });
+    // });
   }
 };
 
@@ -110,9 +110,8 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
 
 
         let data = {'genre': genre, 'year': i};
-        limiter.removeTokens(1, function(err, remainingRequests) {
+        // limiter.removeTokens(1, function(err, remainingRequests) {
           genreQuery(data).then((response) => {
-            debugger
             const oldData = JSON.parse(localStorage[genre]);
             Object.assign(oldData, response);
             localStorage.setItem(genre, JSON.stringify(oldData));
@@ -125,7 +124,7 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
           },
           (error) => {console.log(error);}
         );
-      });
+      // });
       }
     }
   });
