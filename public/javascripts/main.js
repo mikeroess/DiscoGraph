@@ -59,29 +59,26 @@ const fetchAndUpdateSubgenre = () => {
   }
 };
 
-const updateStartYear = (startYear) => {
+
+
+const updateStartandEndYear = (startYear, endYear) => {
   if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
     fetchAndUpdateSubgenre();
   }
-  const genresToUpdate = getClickedGenres().filter( (genre) => getEarliestDate(genre, localStorage) > startYear);
-  genresToUpdate.forEach( (genre) => {
+  const startGenresToUpdate = getClickedGenres().filter( (genre) => getEarliestDate(genre, localStorage) > startYear);
+  startGenresToUpdate.forEach( (genre) => {
     const earliestDate = getEarliestDate(genre, localStorage);
-    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
+    if (genre === startGenresToUpdate[startGenresToUpdate.length - 1]) {
       genreButtonClick(genre, startYear, earliestDate, removeTriviaModal);
     } else {
       genreButtonClick(genre, startYear, earliestDate);
     }
   });
-};
 
-const updateEndYear = (endYear) => {
-  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
-    fetchAndUpdateSubgenre();
-  }
-  const genresToUpdate = getClickedGenres().filter( (genre) => getLatestDate(genre, localStorage) < endYear);
-  genresToUpdate.forEach( (genre) => {
+  const endGenresToUpdate = getClickedGenres().filter( (genre) => getLatestDate(genre, localStorage) < endYear);
+  endGenresToUpdate.forEach( (genre) => {
     const latestDate = getLatestDate(genre, localStorage);
-    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
+    if (genre === endGenresToUpdate[endGenresToUpdate.length - 1]) {
       genreButtonClick(genre, latestDate, endYear, removeTriviaModal);
     } else {
       genreButtonClick(genre, latestDate, endYear);
@@ -319,7 +316,7 @@ $(document).ready(() => {
   });
 
   startYear.addEventListener("change", () => {
-    updateStartYear($('#startYear').val());
+    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
   });
 
   endYear.addEventListener("input", () => {
@@ -328,7 +325,7 @@ $(document).ready(() => {
   });
 
   endYear.addEventListener("change", () => {
-    updateEndYear($('#endYear').val());
+    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
   });
 
   setupLocalStorage();
