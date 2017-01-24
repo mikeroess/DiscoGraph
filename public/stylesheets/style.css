@@ -8,7 +8,6 @@ body {
   overflow-x: hidden;
 }
 
-
 a {
   color: white;
 }
@@ -289,7 +288,7 @@ svg {
   cursor: pointer;
 }
 
-#removeSubgenre{
+#removeSubgenre {
   display: none;
 }
 
@@ -318,4 +317,11 @@ svg {
 #triviaSpinner:before {
   height: 100px;
   width:  100px;
+}
+
+/*pie*/
+#d3Pie {
+  height: 100px;
+  width: 100px;
+  margin: 0 auto;
 }

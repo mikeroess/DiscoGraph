@@ -54,6 +54,8 @@
 	
 	var _data_wrangling = __webpack_require__(5);
 	
+	var _pie = __webpack_require__(6);
+	
 	var d3 = __webpack_require__(4);
 	var RateLimiter = __webpack_require__(7).RateLimiter;
 	
@@ -71,39 +73,35 @@
 	  };
 	  var currentEntry = JSON.parse(localStorage["subgenre"]);
 	
-	  var _loop = function _loop(i) {
+	  for (var i = start; i <= end; i++) {
 	    var reqData = { 'style': style, 'year': i };
 	    (0, _dom_methods.addTriviaModal)();
-	    limiter.removeTokens(1, function (err, remainingRequests) {
-	      (0, _api.subGenreQuery)(reqData).then(function (response) {
-	        var reqUrl = response.req["url"];
-	        var year = reqUrl.match(yearRexep)[0].slice(5, 9);
-	        var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	        if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
-	          var newData = {};
-	          newData[subgenre] = {};
-	          var updatingData = newData[subgenre];
-	          updatingData[year] = itemsPerYear;
-	          localStorage.setItem("subgenre", JSON.stringify(newData));
-	        } else {
-	          var oldEntry = JSON.parse(localStorage["subgenre"]);
-	          var oldData = oldEntry[subgenre];
-	          oldData[year] = itemsPerYear;
-	          localStorage.setItem("subgenre", JSON.stringify(oldEntry));
-	        }
-	        writeGraph(localStorage, startYear.value, endYear.value);
-	        if (Number(end) === Number(year)) {
-	          callback();
-	        }
-	        removeSubgenre.style.display = "inline-block";
-	      }, function (err) {
-	        console.log(err);
-	      });
+	    // limiter.removeTokens(1, function(err, remainingRequests) {
+	    (0, _api.subGenreQuery)(reqData).then(function (response) {
+	      var reqUrl = response.req["url"];
+	      var year = reqUrl.match(yearRexep)[0].slice(5, 9);
+	      var itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
+	      if (localStorage["subgenre"] === undefined || localStorage["subgenre"] === "{}") {
+	        var newData = {};
+	        newData[subgenre] = {};
+	        var updatingData = newData[subgenre];
+	        updatingData[year] = itemsPerYear;
+	        localStorage.setItem("subgenre", JSON.stringify(newData));
+	      } else {
+	        var oldEntry = JSON.parse(localStorage["subgenre"]);
+	        var oldData = oldEntry[subgenre];
+	        oldData[year] = itemsPerYear;
+	        localStorage.setItem("subgenre", JSON.stringify(oldEntry));
+	      }
+	      writeGraph(localStorage, startYear.value, endYear.value);
+	      if (Number(end) === Number(year)) {
+	        callback();
+	      }
+	      removeSubgenre.style.display = "inline-block";
+	    }, function (err) {
+	      console.log(err);
 	    });
-	  };
-	
-	  for (var i = start; i <= end; i++) {
-	    _loop(i);
+	    // });
 	  }
 	};
 	
@@ -124,16 +122,28 @@
 	  });
 	};
 	
-	var updateEndYear = function updateEndYear(endYear) {
+	var updateStartandEndYear = function updateStartandEndYear(startYear, endYear) {
 	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
 	    fetchAndUpdateSubgenre();
 	  }
-	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
+	  var startGenresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
+	    return (0, _graph.getEarliestDate)(genre, localStorage) > startYear;
+	  });
+	  startGenresToUpdate.forEach(function (genre) {
+	    var earliestDate = (0, _graph.getEarliestDate)(genre, localStorage);
+	    if (genre === startGenresToUpdate[startGenresToUpdate.length - 1]) {
+	      genreButtonClick(genre, startYear, earliestDate, _dom_methods.removeTriviaModal);
+	    } else {
+	      genreButtonClick(genre, startYear, earliestDate);
+	    }
+	  });
+	
+	  var endGenresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
 	    return (0, _graph.getLatestDate)(genre, localStorage) < endYear;
 	  });
-	  genresToUpdate.forEach(function (genre) {
+	  endGenresToUpdate.forEach(function (genre) {
 	    var latestDate = (0, _graph.getLatestDate)(genre, localStorage);
-	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
+	    if (genre === endGenresToUpdate[endGenresToUpdate.length - 1]) {
 	      genreButtonClick(genre, latestDate, endYear, _dom_methods.removeTriviaModal);
 	    } else {
 	      genreButtonClick(genre, latestDate, endYear);
@@ -144,55 +154,44 @@
 	var genreButtonClick = function genreButtonClick(genre, startYear, endYear, cb) {
 	  var callback = cb;
 	  writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	  var pieData = (0, _data_wrangling.formatPieData)(1975, localStorage);
+	  (0, _pie.writePie)(pieData, 1975);
 	  var currentRecords = JSON.parse(localStorage[genre]);
 	  var yearsToFetch = (0, _data_wrangling.filterFetch)(currentRecords, genre, startYear, endYear);
 	  var finalYear = void 0;
 	  if (yearsToFetch.length > 0) finalYear = yearsToFetch[yearsToFetch.length - 1][1];
 	  yearsToFetch.forEach(function (range) {
-	    var _loop2 = function _loop2(i) {
-	      if (typeof currentRecords[i] !== "number") {
-	        (function () {
-	
-	          var triviaSpinner = document.getElementById("triviaSpinner");
-	          triviaSpinner.style.display = "block";
-	
-	          (0, _dom_methods.addTriviaModal)();
-	
-	          var data = { 'genre': genre, 'year': i };
-	          limiter.removeTokens(1, function (err, remainingRequests) {
-	            (0, _api.genreQuery)(data).then(function (response) {
-	              var yearRexep = /year=\d\d\d\d/;
-	              var reqUrl = response.req["url"];
-	              var oldData = JSON.parse(localStorage[genre]);
-	              var itemsPerYear = void 0;
-	              if (JSON.parse(response["text"])["pagination"] !== "undefined") {
-	                itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-	              }
-	              var reqYear = void 0;
-	              if (reqUrl.match(yearRexep)) {
-	                reqYear = reqUrl.match(yearRexep)[0].slice(5, 9);
-	              }
-	              oldData[i] = itemsPerYear;
-	              localStorage.setItem(genre, JSON.stringify(oldData));
-	              writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
-	              if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
-	                callback();
-	              }
-	            }, function (error) {
-	              console.log(error);
-	            });
-	          });
-	        })();
-	      }
-	    };
-	
 	    for (var i = range[0]; i <= range[1]; i++) {
-	      _loop2(i);
+	      if (typeof currentRecords[i] !== "number") {
+	
+	        var triviaSpinner = document.getElementById("triviaSpinner");
+	        triviaSpinner.style.display = "block";
+	
+	        (0, _dom_methods.addTriviaModal)();
+	
+	        var data = { 'genre': genre, 'year': i };
+	        // limiter.removeTokens(1, function(err, remainingRequests) {
+	        (0, _api.genreQuery)(data).then(function (response) {
+	          var oldData = JSON.parse(localStorage[genre]);
+	          Object.assign(oldData, response);
+	          localStorage.setItem(genre, JSON.stringify(oldData));
+	          writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	          var reqYear = Object.keys(response)[0];
+	          if (typeof callback === "function" && Number(finalYear) === Number(reqYear)) {
+	            writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+	            callback();
+	          }
+	        }, function (error) {
+	          console.log(error);
+	        });
+	        // });
+	      }
 	    }
 	  });
 	};
 	
 	var writeGraph = function writeGraph(localData, minYear, maxYear) {
+	
 	  var genres = Object.keys(localData).filter(function (genre) {
 	    if ((0, _dom_methods.isButtonClicked)(genre)) return genre;
 	  });
@@ -258,6 +257,19 @@
 	      svg.append("path").attr("d", (0, _graph.line)(_formattedDataset)).attr("stroke", _dom_methods.genreColors[genre]).attr("stroke-width", 2).attr("fill", "none").attr("transform", 'translate(' + _graph.margin.left + ', ' + _graph.margin.bottom + ')');
 	
 	      svg.append("text").attr("transform", "translate(" + (_graph.w + 3) + "," + (0, _graph.yScale)(_formattedDataset[_formattedDataset.length - 1][1]) + ")").attr("dy", "0.71em").attr("class", "genreLabel").style("fill", _dom_methods.genreColors[genre]).text(genre);
+	
+	      svg.on("mousemove", function () {
+	        var year = _graph.xScale.invert(d3.mouse(this)[0]).getFullYear();
+	        if (year < $('#startYear').val()) {
+	          year = $('#startYear').val();
+	        }
+	        if (year > $('#endYear').val()) {
+	          year = $('#endYear').val();
+	        }
+	
+	        var pieData = (0, _data_wrangling.formatPieData)(year, localStorage);
+	        (0, _pie.writePie)(pieData, year);
+	      });
 	    }
 	  });
 	};
@@ -318,6 +330,7 @@
 	
 	  var removeSpinner = function removeSpinner() {
 	    triviaModal.style.display = "none";
+	    writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
 	  };
 	
 	  rockButton.addEventListener("click", function () {
@@ -348,7 +361,7 @@
 	  });
 	
 	  startYear.addEventListener("change", function () {
-	    updateStartYear($('#startYear').val());
+	    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
 	  });
 	
 	  endYear.addEventListener("input", function () {
@@ -357,7 +370,7 @@
 	  });
 	
 	  endYear.addEventListener("change", function () {
-	    updateEndYear($('#endYear').val());
+	    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
 	  });
 	
 	  (0, _data_wrangling.setupLocalStorage)();
@@ -16966,7 +16979,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.getUnclickedGenres = exports.getClickedGenres = exports.filterFetch = exports.formatData = exports.setupLocalStorage = exports.allGenres = undefined;
+	exports.formatPieData = exports.getPieGenres = exports.getColorsForPie = exports.getUnclickedGenres = exports.getClickedGenres = exports.filterFetch = exports.formatData = exports.setupLocalStorage = exports.allGenres = undefined;
 	
 	var _dom_methods = __webpack_require__(2);
 	
@@ -17051,9 +17064,75 @@
 	  });
 	  return clickedGenres;
 	};
+	
+	var getColorsForPie = exports.getColorsForPie = function getColorsForPie(genres) {
+	  var colors = [];
+	  genres.forEach(function (genre) {
+	    colors.push(_dom_methods.genreColors[genre]);
+	  });
+	  return colors;
+	};
+	
+	var getPieGenres = exports.getPieGenres = function getPieGenres(data) {
+	  var genres = [];
+	  data.forEach(function (datum) {
+	    genres.push(datum["genre"]);
+	  });
+	  return genres;
+	};
+	
+	var formatPieData = exports.formatPieData = function formatPieData(year, dataset) {
+	  var data = [];
+	  var genres = getClickedGenres();
+	  genres.forEach(function (genre) {
+	    var datum = {};
+	    var entry = JSON.parse(dataset[genre]);
+	    datum["genre"] = genre;
+	    datum["count"] = entry[year];
+	    data.push(datum);
+	  });
+	  return data;
+	};
 
 /***/ },
-/* 6 */,
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.writePie = undefined;
+	
+	var _data_wrangling = __webpack_require__(5);
+	
+	var writePie = exports.writePie = function writePie(data, year) {
+	  $(".pie").remove();
+	  var dataset = data;
+	  var genres = (0, _data_wrangling.getPieGenres)(dataset);
+	  var d3 = __webpack_require__(4);
+	  var width = 100;
+	  var height = 150;
+	  var radius = Math.min(width, height) / 2;
+	
+	  var color = d3.scaleOrdinal().range((0, _data_wrangling.getColorsForPie)(genres));
+	
+	  var pieSvg = d3.select("#d3Pie").append('svg').attr('width', width).attr('height', height).attr('class', 'pie').append('g').attr('transform', 'translate( ' + width / 2 + ', ' + height / 2 + ')');
+	
+	  var arc = d3.arc().innerRadius(0).outerRadius(radius);
+	
+	  var pie = d3.pie().value(function (d) {
+	    return d.count;
+	  }).sort(null);
+	
+	  var path = pieSvg.selectAll('path').data(pie(dataset)).enter().append('path').attr('d', arc).attr('fill', function (d, i) {
+	    return color(d.data.genre);
+	  });
+	  pieSvg.append("text").text(year).attr('fill', 'white').attr("transform", "translate(-20, -63)");
+	};
+
+/***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 

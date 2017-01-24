@@ -3,11 +3,15 @@ const RateLimiter = require('limiter').RateLimiter;
 import { genreQuery, subGenreQuery } from './api.js';
 import { clearChart, isButtonClicked,
   genreColors, startYearUpdate, endYearUpdate, addModal, removeModal,
-  addTriviaModal, removeTriviaSpinner, removeTriviaModal,
+  addTriviaModal, removeTriviaSpinner, allowTriviaClose, removeTriviaModal,
   addTriviaSpinner, addAboutSpinner, removeAboutSpinner } from './dom_methods.js';
 import { margin, w, h, xScale, yScale, line, parseDate, GenerateLeftAxis, GenerateBottomAxis,
   getMaxRelease, getLatestDate, getEarliestDate } from './graph.js';
-import { formatData, filterFetch, allGenres, getClickedGenres, getUnclickedGenres, setupLocalStorage } from './data_wrangling.js';
+import { formatData, filterFetch, allGenres, getClickedGenres,
+  getUnclickedGenres, setupLocalStorage, getColorsForPie,
+  getPieGenres, formatPieData } from './data_wrangling.js';
+import { writePie, removePie } from './pie.js';
+
 
 const limiter = new RateLimiter(240, "minute");
 
@@ -23,7 +27,7 @@ const fetchAndUpdateSubgenre = () => {
   for (let i = start; i <= end; i++) {
       let reqData = {'style': style, 'year': i};
       addTriviaModal();
-      limiter.removeTokens(1, function(err, remainingRequests) {
+      // limiter.removeTokens(1, function(err, remainingRequests) {
         subGenreQuery(reqData).then(
           (response) => {
           const reqUrl = response.req["url"];
@@ -52,7 +56,7 @@ const fetchAndUpdateSubgenre = () => {
           console.log(err);
         }
       );
-    });
+    // });
   }
 };
 
@@ -71,14 +75,24 @@ const updateStartYear = (startYear) => {
   });
 };
 
-const updateEndYear = (endYear) => {
+const updateStartandEndYear = (startYear, endYear) => {
   if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
     fetchAndUpdateSubgenre();
   }
-  const genresToUpdate = getClickedGenres().filter( (genre) => getLatestDate(genre, localStorage) < endYear);
-  genresToUpdate.forEach( (genre) => {
+  const startGenresToUpdate = getClickedGenres().filter( (genre) => getEarliestDate(genre, localStorage) > startYear);
+  startGenresToUpdate.forEach( (genre) => {
+    const earliestDate = getEarliestDate(genre, localStorage);
+    if (genre === startGenresToUpdate[startGenresToUpdate.length - 1]) {
+      genreButtonClick(genre, startYear, earliestDate, removeTriviaModal);
+    } else {
+      genreButtonClick(genre, startYear, earliestDate);
+    }
+  });
+
+  const endGenresToUpdate = getClickedGenres().filter( (genre) => getLatestDate(genre, localStorage) < endYear);
+  endGenresToUpdate.forEach( (genre) => {
     const latestDate = getLatestDate(genre, localStorage);
-    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
+    if (genre === endGenresToUpdate[endGenresToUpdate.length - 1]) {
       genreButtonClick(genre, latestDate, endYear, removeTriviaModal);
     } else {
       genreButtonClick(genre, latestDate, endYear);
@@ -89,6 +103,8 @@ const updateEndYear = (endYear) => {
 const genreButtonClick = function (genre, startYear, endYear, cb) {
   const callback = cb;
   writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+  const pieData = formatPieData(1975, localStorage);
+  writePie(pieData, 1975);
   const currentRecords = JSON.parse(localStorage[genre]);
   const yearsToFetch = filterFetch(currentRecords, genre, startYear, endYear);
   let finalYear;
@@ -100,40 +116,32 @@ const genreButtonClick = function (genre, startYear, endYear, cb) {
         const triviaSpinner = document.getElementById("triviaSpinner");
         triviaSpinner.style.display = "block";
 
-
         addTriviaModal();
 
 
         let data = {'genre': genre, 'year': i};
-        limiter.removeTokens(1, function(err, remainingRequests) {
+        // limiter.removeTokens(1, function(err, remainingRequests) {
           genreQuery(data).then((response) => {
-            const yearRexep = /year=\d\d\d\d/;
-            const reqUrl = response.req["url"];
             const oldData = JSON.parse(localStorage[genre]);
-            let itemsPerYear;
-            if (JSON.parse(response["text"])["pagination"] !== "undefined") {
-              itemsPerYear = JSON.parse(response["text"])["pagination"]["items"];
-            }
-            let reqYear;
-            if (reqUrl.match(yearRexep)) {
-              reqYear = reqUrl.match(yearRexep)[0].slice(5,9);
-            }
-            oldData[i] = itemsPerYear;
+            Object.assign(oldData, response);
             localStorage.setItem(genre, JSON.stringify(oldData));
             writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
+            const reqYear = Object.keys(response)[0];
             if (typeof(callback) === "function" && Number(finalYear) === Number(reqYear)) {
+              writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
               callback();
             }
           },
           (error) => {console.log(error);}
         );
-      });
+      // });
       }
     }
   });
 };
 
 const writeGraph = (localData, minYear, maxYear) => {
+
   const genres = Object.keys(localData).filter(
     (genre) => {
       if (isButtonClicked(genre)) return genre;
@@ -234,6 +242,16 @@ const writeGraph = (localData, minYear, maxYear) => {
         .attr("class", "genreLabel")
         .style("fill", genreColors[genre])
         .text(genre);
+
+      svg.on("mousemove", function() {
+        let year = xScale.invert(d3.mouse(this)[0]).getFullYear();
+        if (year < $('#startYear').val()) { year = $('#startYear').val(); }
+        if (year > $('#endYear').val()) { year = $('#endYear').val(); }
+
+        const pieData = formatPieData(year, localStorage);
+        writePie(pieData, year);
+      }
+      );
     }}
   );
 };
@@ -288,11 +306,11 @@ $(document).ready(() => {
     writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     removeSubgenre.style.display = "none";
     subgenreInput.value = "";
-
   });
 
   const removeSpinner = () => {
         triviaModal.style.display = "none";
+        writeGraph(localStorage, $('#startYear').val(), $('#endYear').val());
     };
 
 
@@ -310,7 +328,7 @@ $(document).ready(() => {
   });
 
   startYear.addEventListener("change", () => {
-    updateStartYear($('#startYear').val());
+    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
   });
 
   endYear.addEventListener("input", () => {
@@ -319,7 +337,7 @@ $(document).ready(() => {
   });
 
   endYear.addEventListener("change", () => {
-    updateEndYear($('#endYear').val());
+    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
   });
 
   setupLocalStorage();

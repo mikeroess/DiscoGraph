@@ -80,3 +80,32 @@ export const getUnclickedGenres = () => {
   });
   return clickedGenres;
 };
+
+export const getColorsForPie = (genres) => {
+  const colors = [];
+  genres.forEach( (genre) => {
+    colors.push(genreColors[genre]);
+  });
+  return colors;
+};
+
+export const getPieGenres = (data) => {
+  const genres = [];
+  data.forEach( (datum) => {
+    genres.push(datum["genre"]);
+  });
+  return genres;
+};
+
+export const formatPieData = (year, dataset) => {
+  const data = [];
+  const genres = getClickedGenres();
+  genres.forEach( (genre) => {
+    const datum = {};
+    const entry = JSON.parse(dataset[genre]);
+    datum["genre"] = genre;
+    datum["count"] = entry[year];
+    data.push(datum);
+  });
+  return data;
+};
