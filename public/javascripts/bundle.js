@@ -105,33 +105,28 @@
 	  }
 	};
 	
-	var updateStartYear = function updateStartYear(startYear) {
+	var updateStartandEndYear = function updateStartandEndYear(startYear, endYear) {
 	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
 	    fetchAndUpdateSubgenre();
 	  }
-	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
+	  var startGenresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
 	    return (0, _graph.getEarliestDate)(genre, localStorage) > startYear;
 	  });
-	  genresToUpdate.forEach(function (genre) {
+	  startGenresToUpdate.forEach(function (genre) {
 	    var earliestDate = (0, _graph.getEarliestDate)(genre, localStorage);
-	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
+	    if (genre === startGenresToUpdate[startGenresToUpdate.length - 1]) {
 	      genreButtonClick(genre, startYear, earliestDate, _dom_methods.removeTriviaModal);
 	    } else {
 	      genreButtonClick(genre, startYear, earliestDate);
 	    }
 	  });
-	};
 	
-	var updateEndYear = function updateEndYear(endYear) {
-	  if (Object.keys(JSON.parse(localStorage["subgenre"])).length !== 0) {
-	    fetchAndUpdateSubgenre();
-	  }
-	  var genresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
+	  var endGenresToUpdate = (0, _data_wrangling.getClickedGenres)().filter(function (genre) {
 	    return (0, _graph.getLatestDate)(genre, localStorage) < endYear;
 	  });
-	  genresToUpdate.forEach(function (genre) {
+	  endGenresToUpdate.forEach(function (genre) {
 	    var latestDate = (0, _graph.getLatestDate)(genre, localStorage);
-	    if (genre === genresToUpdate[genresToUpdate.length - 1]) {
+	    if (genre === endGenresToUpdate[endGenresToUpdate.length - 1]) {
 	      genreButtonClick(genre, latestDate, endYear, _dom_methods.removeTriviaModal);
 	    } else {
 	      genreButtonClick(genre, latestDate, endYear);
@@ -349,7 +344,7 @@
 	  });
 	
 	  startYear.addEventListener("change", function () {
-	    updateStartYear($('#startYear').val());
+	    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
 	  });
 	
 	  endYear.addEventListener("input", function () {
@@ -358,7 +353,7 @@
 	  });
 	
 	  endYear.addEventListener("change", function () {
-	    updateEndYear($('#endYear').val());
+	    updateStartandEndYear($('#startYear').val(), $('#endYear').val());
 	  });
 	
 	  (0, _data_wrangling.setupLocalStorage)();
